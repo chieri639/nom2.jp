@@ -241,7 +241,7 @@ export default function SakeRecoPage() {
                                     borderRadius: 8,
                                     border: '1px solid #ddd',
                                     padding: '6px 10px',
-                                    fontSize: 13,
+                                    fontSize: 16, // FIX: Prevent iOS zoom
                                     outline: 'none',
                                     background: '#fff',
                                 }}
