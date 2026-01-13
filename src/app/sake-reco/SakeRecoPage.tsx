@@ -202,7 +202,7 @@ export default function SakeChatRecoPage() {
     const pickDirection = async (tag: string) => {
         setTasteTags(prev => {
             // keep only one direction among direction options
-            const directionSet = new Set(DIRECTION_OPTIONS.map(o => o.tag));
+            const directionSet = new Set<string>(DIRECTION_OPTIONS.map(o => o.tag));
             const kept = prev.filter(t => !directionSet.has(t));
             return [...kept, tag];
         });
