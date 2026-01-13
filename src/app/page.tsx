@@ -160,7 +160,7 @@ export default function SakeRecoPage() {
                 <section
                     style={{
                         display: 'grid',
-                        gridTemplateColumns: '1fr',
+                        gridTemplateColumns: 'minmax(0, 1fr)', // Fix grid overflow
                         gap: 10,
                         background: '#f6f6f6',
                         borderRadius: 12,
@@ -233,15 +233,6 @@ export default function SakeRecoPage() {
                                     background: '#fff',
                                 }}
                             />
-                            <button onClick={load} style={{
-                                ...primaryBtnStyle,
-                                padding: '0 12px',
-                                fontSize: 13,
-                                whiteSpace: 'nowrap',
-                                flexShrink: 0,
-                            }}>
-                                AI検索🔍
-                            </button>
                         </div>
                     </div>
                     {/* loading indicator moved to absolute or inside button logic if needed, usually fine hidden or next to items count. kept separate for simplicity? 
