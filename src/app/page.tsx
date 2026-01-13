@@ -40,6 +40,8 @@ const TEMP_OPTIONS = [
     { key: 'warm', label: '燗' },
 ] as const;
 
+const SUGGESTED_TAGS = ['辛口', '甘口', 'フルーティ', 'すっきり', '初心者', 'プレゼント'];
+
 export default function SakeRecoPage() {
     const [items, setItems] = useState<SakeItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -114,12 +116,23 @@ export default function SakeRecoPage() {
             .map(x => x.s);
     }, [items, tempPref, tagTokens]);
 
+    const addTag = (tag: string) => {
+        if (!tagQuery) {
+            setTagQuery(tag);
+        } else {
+            const current = tagQuery.split(',').map(s => s.trim()).filter(Boolean);
+            if (!current.includes(tag)) {
+                setTagQuery([...current, tag].join(', '));
+            }
+        }
+    };
+
     return (
-        <div style={{ maxWidth: 960, margin: '0 auto', padding: 16, fontFamily: 'system-ui, -apple-system', color: '#333' }}>
-            <header style={{ marginBottom: 12 }}>
-                <h1 style={{ fontSize: 20, margin: 0 }}>日本酒おすすめ</h1>
-                <p style={{ margin: '6px 0 0', fontSize: 13, opacity: 0.75 }}>
-                    入力に合わせて、あなたが承認した日本酒（active）の中からおすすめを並べ替えます。
+        <div style={{ maxWidth: 960, margin: '0 auto', padding: 16, fontFamily: 'system-ui, -apple-system', color: '#ffffff' }}>
+            <header style={{ marginBottom: 16 }}>
+                <h1 style={{ fontSize: 22, margin: 0, fontWeight: 700 }}>AIによるおすすめ日本酒提案</h1>
+                <p style={{ margin: '6px 0 0', fontSize: 13, opacity: 0.9 }}>
+                    入力に合わせて、あなたが承認した日本酒の中からおすすめを並べ替えます。
                 </p>
             </header>
 
@@ -127,15 +140,16 @@ export default function SakeRecoPage() {
                 style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr',
-                    gap: 12,
+                    gap: 16,
                     background: '#f6f6f6',
-                    borderRadius: 12,
-                    padding: 12,
-                    marginBottom: 16,
+                    borderRadius: 16,
+                    padding: 16,
+                    marginBottom: 20,
+                    color: '#333', // Filter box text is dark
                 }}
             >
                 <div>
-                    <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 6 }}>温度</div>
+                    <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 8, fontWeight: 600 }}>温度</div>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                         <button
                             onClick={() => setTempPref('')}
@@ -156,26 +170,47 @@ export default function SakeRecoPage() {
                 </div>
 
                 <div>
-                    <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 6 }}>好みタグ（カンマ区切り）</div>
+                    <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 8, fontWeight: 600 }}>好みタグ（カンマ区切り）</div>
                     <input
                         value={tagQuery}
                         onChange={e => setTagQuery(e.target.value)}
                         placeholder="例：フルーティ, すっきり, 生酛"
                         style={{
                             width: '100%',
+                            boxSizing: 'border-box', // Fix overflow
                             borderRadius: 10,
                             border: '1px solid #ddd',
                             padding: '10px 12px',
                             fontSize: 14,
                             outline: 'none',
                             background: '#fff',
+                            marginBottom: 8,
                         }}
                     />
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {SUGGESTED_TAGS.map(t => (
+                            <button
+                                key={t}
+                                onClick={() => addTag(t)}
+                                style={{
+                                    fontSize: 11,
+                                    padding: '4px 10px',
+                                    borderRadius: 999,
+                                    background: '#e0e0e0',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#333'
+                                }}
+                            >
+                                + {t}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <button onClick={load} style={primaryBtnStyle}>
-                        再読み込み
+                        AIで検索🔍
                     </button>
                     <span style={{ fontSize: 12, opacity: 0.7 }}>
                         {loading ? '読み込み中…' : `表示 ${filtered.length} 件`}
@@ -183,22 +218,23 @@ export default function SakeRecoPage() {
                 </div>
             </section >
 
-            {error && (
-                <div style={{ background: '#fff0f0', border: '1px solid #ffd0d0', padding: 12, borderRadius: 12, marginBottom: 12 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 4 }}>読み込みに失敗しました</div>
-                    <div style={{ fontSize: 13, opacity: 0.85 }}>{error}</div>
-                    <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6 }}>
-                        ※ iframe / ログイン状態で挙動が変わる場合があります。再読み込みをお試しください。
+            {
+                error && (
+                    <div style={{ background: '#fff0f0', border: '1px solid #ffd0d0', padding: 12, borderRadius: 12, marginBottom: 12, color: '#d32f2f' }}>
+                        <div style={{ fontWeight: 600, marginBottom: 4 }}>読み込みに失敗しました</div>
+                        <div style={{ fontSize: 13, opacity: 0.85 }}>{error}</div>
+                        <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6 }}>
+                            ※ iframe / ログイン状態で挙動が変わる場合があります。再読み込みをお試しください。
+                        </div>
                     </div>
-                </div>
-            )
+                )
             }
 
-            <main style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
+            <main style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12, color: '#333' }}>
                 {loading && !items.length ? (
                     <SkeletonList />
                 ) : filtered.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}>
+                    <div style={{ textAlign: 'center', padding: '40px 0', color: '#fff', opacity: 0.7 }}>
                         該当する日本酒がありませんでした。条件を変更してお試しください。
                     </div>
                 ) : (
@@ -206,8 +242,8 @@ export default function SakeRecoPage() {
                 )}
             </main>
 
-            <footer style={{ marginTop: 18, fontSize: 11, opacity: 0.6 }}>
-                データ提供：SakeMaster（active） / 楽天アフィリンク
+            <footer style={{ marginTop: 24, fontSize: 11, opacity: 0.5, textAlign: 'center' }}>
+                データ提供：SakeMaster / 楽天アフィリンク
             </footer>
         </div >
     );
@@ -296,6 +332,7 @@ const tagStyle: React.CSSProperties = {
     borderRadius: 999,
     background: '#f3f3f3',
     border: '1px solid #e9e9e9',
+    color: '#333',
 };
 
 function pillStyle(active: boolean): React.CSSProperties {
@@ -311,11 +348,13 @@ function pillStyle(active: boolean): React.CSSProperties {
 }
 
 const primaryBtnStyle: React.CSSProperties = {
-    padding: '10px 12px',
+    padding: '10px 16px',
     borderRadius: 12,
-    border: '1px solid #111',
-    background: '#111',
+    border: 'none',
+    background: 'linear-gradient(135deg, #111, #333)',
     color: '#fff',
-    fontSize: 13,
+    fontSize: 14,
+    fontWeight: 600,
     cursor: 'pointer',
+    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
 };
