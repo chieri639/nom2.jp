@@ -137,6 +137,7 @@ export default function SakeRecoPage() {
             maxWidth: 960,
             margin: '0 auto',
             padding: 16,
+            overflowX: 'hidden', // Stop horizontal scroll
             fontFamily: 'system-ui, -apple-system',
             color: '#ffffff',
             boxSizing: 'border-box',
