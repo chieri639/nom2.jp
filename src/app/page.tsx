@@ -148,97 +148,102 @@ export default function SakeRecoPage() {
                 background: 'linear-gradient(180deg, rgba(0,0,0,0.92), rgba(0,0,0,0.75) 60%, rgba(0,0,0,0))',
                 backdropFilter: 'blur(6px)',
             }}>
-                <header style={{ marginBottom: 12 }}>
-                    <h1 style={{ fontSize: 20, margin: 0, fontWeight: 700 }}>nom2.jp "AI Ver"によるおすすめ日本酒</h1>
-                    <p style={{ margin: '4px 0 0', fontSize: 12, opacity: 0.9 }}>
+                <header style={{ marginBottom: 8, padding: '0 4px' }}>
+                    <h1 style={{ fontSize: 18, margin: 0, fontWeight: 700 }}>nom2.jp "AI Ver"によるおすすめ日本酒</h1>
+                    <p style={{ margin: '4px 0 0', fontSize: 11, opacity: 0.9 }}>
                         nom2.jpおすすめの日本酒を検索＆購入できます
                     </p>
                 </header>
 
                 <section
                     style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        alignItems: 'flex-start',
-                        gap: 16,
+                        display: 'grid',
+                        gridTemplateColumns: '1fr',
+                        gap: 10,
                         background: '#f6f6f6',
-                        borderRadius: 16,
+                        borderRadius: 12,
                         padding: 12,
                         marginBottom: 0,
                         color: '#333',
                     }}
                 >
-                    {/* Left Column: Temperature & Action */}
-                    <div style={{ flex: 1, minWidth: 260, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                        <div>
-                            <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 6, fontWeight: 600 }}>温度</div>
-                            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ fontSize: 11, opacity: 0.75, fontWeight: 600, minWidth: 28 }}>温度</div>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            <button
+                                onClick={() => setTempPref('')}
+                                style={pillStyle(tempPref === '')}
+                            >
+                                指定なし
+                            </button>
+                            {TEMP_OPTIONS.map(o => (
                                 <button
-                                    onClick={() => setTempPref('')}
-                                    style={pillStyle(tempPref === '')}
+                                    key={o.key}
+                                    onClick={() => setTempPref(o.key)}
+                                    style={pillStyle(tempPref === o.key)}
                                 >
-                                    指定なし
+                                    {o.label}
                                 </button>
-                                {TEMP_OPTIONS.map(o => (
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                            <div style={{ fontSize: 11, opacity: 0.75, fontWeight: 600 }}>好みタグ</div>
+                            <div style={{ display: 'flex', gap: 4, overflowX: 'auto', scrollbarWidth: 'none' }}>
+                                {SUGGESTED_TAGS.map(t => (
                                     <button
-                                        key={o.key}
-                                        onClick={() => setTempPref(o.key)}
-                                        style={pillStyle(tempPref === o.key)}
+                                        key={t}
+                                        onClick={() => addTag(t)}
+                                        style={{
+                                            fontSize: 10,
+                                            padding: '2px 8px',
+                                            borderRadius: 999,
+                                            background: '#e0e0e0',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            color: '#333',
+                                            whiteSpace: 'nowrap'
+                                        }}
                                     >
-                                        {o.label}
+                                        + {t}
                                     </button>
                                 ))}
                             </div>
                         </div>
-
-                        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 'auto' }}>
-                            <button onClick={load} style={primaryBtnStyle}>
-                                AIで検索🔍
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <input
+                                value={tagQuery}
+                                onChange={e => setTagQuery(e.target.value)}
+                                placeholder="例：フルーティ, すっきり, 生酛"
+                                style={{
+                                    flex: 1,
+                                    width: '100%',
+                                    boxSizing: 'border-box',
+                                    borderRadius: 8,
+                                    border: '1px solid #ddd',
+                                    padding: '6px 10px',
+                                    fontSize: 13,
+                                    outline: 'none',
+                                    background: '#fff',
+                                }}
+                            />
+                            <button onClick={load} style={{
+                                ...primaryBtnStyle,
+                                padding: '0 16px',
+                                fontSize: 13,
+                                whiteSpace: 'nowrap'
+                            }}>
+                                AI検索🔍
                             </button>
-                            <span style={{ fontSize: 12, opacity: 0.7 }}>
-                                {loading ? '読み込み中…' : `表示 ${filtered.length} 件`}
-                            </span>
                         </div>
                     </div>
-
-                    {/* Right Column: Tags */}
-                    <div style={{ flex: 1, minWidth: 260 }}>
-                        <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 6, fontWeight: 600 }}>好みタグ（カンマ区切り）</div>
-                        <input
-                            value={tagQuery}
-                            onChange={e => setTagQuery(e.target.value)}
-                            placeholder="例：フルーティ, すっきり, 生酛"
-                            style={{
-                                width: '100%',
-                                boxSizing: 'border-box',
-                                borderRadius: 10,
-                                border: '1px solid #ddd',
-                                padding: '10px 12px',
-                                fontSize: 14,
-                                outline: 'none',
-                                background: '#fff',
-                                marginBottom: 8,
-                            }}
-                        />
-                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                            {SUGGESTED_TAGS.map(t => (
-                                <button
-                                    key={t}
-                                    onClick={() => addTag(t)}
-                                    style={{
-                                        fontSize: 11,
-                                        padding: '4px 10px',
-                                        borderRadius: 999,
-                                        background: '#e0e0e0',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        color: '#333'
-                                    }}
-                                >
-                                    + {t}
-                                </button>
-                            ))}
-                        </div>
+                    {/* loading indicator moved to absolute or inside button logic if needed, usually fine hidden or next to items count. kept separate for simplicity? 
+                        Actually, let's keep the items count simple. 
+                    */}
+                    <div style={{ fontSize: 11, opacity: 0.7, textAlign: 'right', marginTop: -4 }}>
+                        {loading ? '読み込み中…' : `表示 ${filtered.length} 件`}
                     </div>
                 </section >
             </div>
