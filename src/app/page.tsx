@@ -167,11 +167,24 @@ export default function SakeRecoPage() {
                         padding: 12,
                         marginBottom: 0,
                         color: '#333',
+                        // Fix for horizontal scroll (white box moving)
+                        width: '100%',
+                        maxWidth: '100%',
+                        overflowX: 'hidden',
                     }}
                 >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{ fontSize: 11, opacity: 0.75, fontWeight: 600, minWidth: 28 }}>温度</div>
-                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        <div style={{
+                            display: 'flex',
+                            gap: 6,
+                            // Scroll horizontally instead of wrap
+                            flexWrap: 'nowrap',
+                            overflowX: 'auto',
+                            WebkitOverflowScrolling: 'touch',
+                            paddingBottom: 0, // minimal padding
+                            scrollbarWidth: 'none', // hide scrollbar if preferred
+                        }}>
                             <button
                                 onClick={() => setTempPref('')}
                                 style={pillStyle(tempPref === '')}
@@ -261,7 +274,7 @@ export default function SakeRecoPage() {
                 overflowY: 'auto',
                 WebkitOverflowScrolling: 'touch',
                 display: 'grid',
-                gridTemplateColumns: '1fr',
+                gridTemplateColumns: 'minmax(0, 1fr)', // Ensure grid children don't overflow
                 gap: 12,
                 color: '#333',
                 paddingBottom: 24,
@@ -384,6 +397,8 @@ function pillStyle(active: boolean): React.CSSProperties {
         color: active ? '#fff' : '#111',
         fontSize: 13,
         cursor: 'pointer',
+        flex: '0 0 auto',       // Ensure no shrink
+        whiteSpace: 'nowrap',   // Ensure no wrap
     };
 }
 
