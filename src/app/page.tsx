@@ -128,95 +128,115 @@ export default function SakeRecoPage() {
     };
 
     return (
-        <div style={{ maxWidth: 960, margin: '0 auto', padding: 16, fontFamily: 'system-ui, -apple-system', color: '#ffffff' }}>
-            <header style={{ marginBottom: 16 }}>
-                <h1 style={{ fontSize: 22, margin: 0, fontWeight: 700 }}>nom2.jp "AI Ver"によるおすすめ日本酒</h1>
-                <p style={{ margin: '6px 0 0', fontSize: 13, opacity: 0.9 }}>
-                    nom2.jpおすすめの日本酒を検索＆購入できます
-                </p>
-            </header>
+        <div style={{
+            height: '100%',
+            minHeight: 800,
+            display: 'flex',
+            flexDirection: 'column',
+            maxWidth: 960,
+            margin: '0 auto',
+            padding: 16,
+            fontFamily: 'system-ui, -apple-system',
+            color: '#ffffff',
+            boxSizing: 'border-box',
+        }}>
+            <div style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 20,
+                paddingBottom: 12,
+                background: 'linear-gradient(180deg, rgba(0,0,0,0.92), rgba(0,0,0,0.75) 60%, rgba(0,0,0,0))',
+                backdropFilter: 'blur(6px)',
+            }}>
+                <header style={{ marginBottom: 16 }}>
+                    <h1 style={{ fontSize: 22, margin: 0, fontWeight: 700 }}>nom2.jp "AI Ver"によるおすすめ日本酒</h1>
+                    <p style={{ margin: '6px 0 0', fontSize: 13, opacity: 0.9 }}>
+                        nom2.jpおすすめの日本酒を検索＆購入できます
+                    </p>
+                </header>
 
-            <section
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr',
-                    gap: 16,
-                    background: '#f6f6f6',
-                    borderRadius: 16,
-                    padding: 16,
-                    marginBottom: 20,
-                    color: '#333', // Filter box text is dark
-                }}
-            >
-                <div>
-                    <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 8, fontWeight: 600 }}>温度</div>
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        <button
-                            onClick={() => setTempPref('')}
-                            style={pillStyle(tempPref === '')}
-                        >
-                            指定なし
+                <section
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr',
+                        gap: 16,
+                        background: '#f6f6f6',
+                        borderRadius: 16,
+                        padding: 16,
+                        marginBottom: 0,
+                        color: '#333', // Filter box text is dark
+                    }}
+                >
+                    <div>
+                        <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 8, fontWeight: 600 }}>温度</div>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            <button
+                                onClick={() => setTempPref('')}
+                                style={pillStyle(tempPref === '')}
+                            >
+                                指定なし
+                            </button>
+                            {TEMP_OPTIONS.map(o => (
+                                <button
+                                    key={o.key}
+                                    onClick={() => setTempPref(o.key)}
+                                    style={pillStyle(tempPref === o.key)}
+                                >
+                                    {o.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 8, fontWeight: 600 }}>好みタグ（カンマ区切り）</div>
+                        <input
+                            value={tagQuery}
+                            onChange={e => setTagQuery(e.target.value)}
+                            placeholder="例：フルーティ, すっきり, 生酛"
+                            style={{
+                                width: '100%',
+                                boxSizing: 'border-box', // Fix overflow
+                                borderRadius: 10,
+                                border: '1px solid #ddd',
+                                padding: '10px 12px',
+                                fontSize: 14,
+                                outline: 'none',
+                                background: '#fff',
+                                marginBottom: 8,
+                            }}
+                        />
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            {SUGGESTED_TAGS.map(t => (
+                                <button
+                                    key={t}
+                                    onClick={() => addTag(t)}
+                                    style={{
+                                        fontSize: 11,
+                                        padding: '4px 10px',
+                                        borderRadius: 999,
+                                        background: '#e0e0e0',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        color: '#333'
+                                    }}
+                                >
+                                    + {t}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <button onClick={load} style={primaryBtnStyle}>
+                            AIで検索🔍
                         </button>
-                        {TEMP_OPTIONS.map(o => (
-                            <button
-                                key={o.key}
-                                onClick={() => setTempPref(o.key)}
-                                style={pillStyle(tempPref === o.key)}
-                            >
-                                {o.label}
-                            </button>
-                        ))}
+                        <span style={{ fontSize: 12, opacity: 0.7 }}>
+                            {loading ? '読み込み中…' : `表示 ${filtered.length} 件`}
+                        </span>
                     </div>
-                </div>
-
-                <div>
-                    <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 8, fontWeight: 600 }}>好みタグ（カンマ区切り）</div>
-                    <input
-                        value={tagQuery}
-                        onChange={e => setTagQuery(e.target.value)}
-                        placeholder="例：フルーティ, すっきり, 生酛"
-                        style={{
-                            width: '100%',
-                            boxSizing: 'border-box', // Fix overflow
-                            borderRadius: 10,
-                            border: '1px solid #ddd',
-                            padding: '10px 12px',
-                            fontSize: 14,
-                            outline: 'none',
-                            background: '#fff',
-                            marginBottom: 8,
-                        }}
-                    />
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                        {SUGGESTED_TAGS.map(t => (
-                            <button
-                                key={t}
-                                onClick={() => addTag(t)}
-                                style={{
-                                    fontSize: 11,
-                                    padding: '4px 10px',
-                                    borderRadius: 999,
-                                    background: '#e0e0e0',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    color: '#333'
-                                }}
-                            >
-                                + {t}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <button onClick={load} style={primaryBtnStyle}>
-                        AIで検索🔍
-                    </button>
-                    <span style={{ fontSize: 12, opacity: 0.7 }}>
-                        {loading ? '読み込み中…' : `表示 ${filtered.length} 件`}
-                    </span>
-                </div>
-            </section >
+                </section >
+            </div>
 
             {
                 error && (
@@ -230,7 +250,16 @@ export default function SakeRecoPage() {
                 )
             }
 
-            <main style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12, color: '#333' }}>
+            <main style={{
+                flex: 1,
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                display: 'grid',
+                gridTemplateColumns: '1fr',
+                gap: 12,
+                color: '#333',
+                paddingBottom: 24,
+            }}>
                 {loading && !items.length ? (
                     <SkeletonList />
                 ) : filtered.length === 0 ? (
