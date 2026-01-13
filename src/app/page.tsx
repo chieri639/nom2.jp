@@ -6,6 +6,7 @@ type SakeItem = {
     id: string;
     name: string;
     brewery?: string;
+    prefecture?: string;
     style_tags: string[];
     taste_tags: string[];
     serve_temp: string[];
@@ -317,7 +318,12 @@ function SakeCard({ item }: { item: SakeItem }) {
 
                 <div>
                     <div style={{ fontWeight: 700, lineHeight: 1.2 }}>{item.name}</div>
-                    {item.brewery && <div style={{ fontSize: 12, opacity: 0.75, marginTop: 2 }}>{item.brewery}</div>}
+                    {(item.brewery || item.prefecture) && (
+                        <div style={{ fontSize: 12, opacity: 0.75, marginTop: 2 }}>
+                            {item.brewery}
+                            {item.prefecture && <span style={{ marginLeft: 6 }}>({item.prefecture})</span>}
+                        </div>
+                    )}
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
                         {(item.style_tags || []).slice(0, 4).map(t => (
