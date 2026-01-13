@@ -135,6 +135,7 @@ export default function SakeRecoPage() {
             display: 'flex',
             flexDirection: 'column',
             maxWidth: 960,
+            width: '100%', // FIX: Revert 100vw to avoid scrollbar width issue
             margin: '0 auto',
             padding: 16,
             overflowX: 'hidden', // Stop horizontal scroll
@@ -184,6 +185,8 @@ export default function SakeRecoPage() {
                             WebkitOverflowScrolling: 'touch',
                             paddingBottom: 0, // minimal padding
                             scrollbarWidth: 'none', // hide scrollbar if preferred
+                            flex: 1, // FIX: Take available space
+                            minWidth: 0, // FIX: Allow shrinking below content size
                         }}>
                             <button
                                 onClick={() => setTempPref('')}
