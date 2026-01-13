@@ -115,7 +115,7 @@ export default function SakeRecoPage() {
     }, [items, tempPref, tagTokens]);
 
     return (
-        <div style={{ maxWidth: 960, margin: '0 auto', padding: 16, fontFamily: 'system-ui, -apple-system' }}>
+        <div style={{ maxWidth: 960, margin: '0 auto', padding: 16, fontFamily: 'system-ui, -apple-system', color: '#333' }}>
             <header style={{ marginBottom: 12 }}>
                 <h1 style={{ fontSize: 20, margin: 0 }}>日本酒おすすめ</h1>
                 <p style={{ margin: '6px 0 0', fontSize: 13, opacity: 0.75 }}>
