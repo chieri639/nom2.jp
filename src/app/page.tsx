@@ -130,9 +130,9 @@ export default function SakeRecoPage() {
     return (
         <div style={{ maxWidth: 960, margin: '0 auto', padding: 16, fontFamily: 'system-ui, -apple-system', color: '#ffffff' }}>
             <header style={{ marginBottom: 16 }}>
-                <h1 style={{ fontSize: 22, margin: 0, fontWeight: 700 }}>AIによるおすすめ日本酒提案</h1>
+                <h1 style={{ fontSize: 22, margin: 0, fontWeight: 700 }}>nom2.jp "AI Ver"によるおすすめ日本酒</h1>
                 <p style={{ margin: '6px 0 0', fontSize: 13, opacity: 0.9 }}>
-                    入力に合わせて、あなたが承認した日本酒の中からおすすめを並べ替えます。
+                    nom2.jpおすすめの日本酒を検索＆購入できます
                 </p>
             </header>
 
