@@ -192,8 +192,8 @@ export default function SakeRecoPage() {
 
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                            <div style={{ fontSize: 11, opacity: 0.75, fontWeight: 600 }}>好みタグ</div>
-                            <div style={{ display: 'flex', gap: 4, overflowX: 'auto', scrollbarWidth: 'none' }}>
+                            <div style={{ fontSize: 11, opacity: 0.75, fontWeight: 600, flexShrink: 0 }}>好みタグ</div>
+                            <div style={{ display: 'flex', gap: 4, overflowX: 'auto', scrollbarWidth: 'none', flex: 1, minWidth: 0 }}>
                                 {SUGGESTED_TAGS.map(t => (
                                     <button
                                         key={t}
@@ -206,7 +206,8 @@ export default function SakeRecoPage() {
                                             border: 'none',
                                             cursor: 'pointer',
                                             color: '#333',
-                                            whiteSpace: 'nowrap'
+                                            whiteSpace: 'nowrap',
+                                            flexShrink: 0,
                                         }}
                                     >
                                         + {t}
@@ -218,9 +219,10 @@ export default function SakeRecoPage() {
                             <input
                                 value={tagQuery}
                                 onChange={e => setTagQuery(e.target.value)}
-                                placeholder="例：フルーティ, すっきり, 生酛"
+                                placeholder="例：フルーティ, すっきり"
                                 style={{
                                     flex: 1,
+                                    minWidth: 0, // Ensure shrink
                                     width: '100%',
                                     boxSizing: 'border-box',
                                     borderRadius: 8,
@@ -233,9 +235,10 @@ export default function SakeRecoPage() {
                             />
                             <button onClick={load} style={{
                                 ...primaryBtnStyle,
-                                padding: '0 16px',
+                                padding: '0 12px',
                                 fontSize: 13,
-                                whiteSpace: 'nowrap'
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0,
                             }}>
                                 AI検索🔍
                             </button>
