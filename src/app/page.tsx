@@ -446,33 +446,3 @@ const primaryBtnStyle: React.CSSProperties = {
     cursor: 'pointer',
     boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
 };
-
-useEffect(() => {
-    let startX = 0;
-    let startY = 0;
-
-    const onTouchStart = (e: TouchEvent) => {
-        if (e.touches.length !== 1) return;
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-        if (e.touches.length !== 1) return;
-        const dx = Math.abs(e.touches[0].clientX - startX);
-        const dy = Math.abs(e.touches[0].clientY - startY);
-
-        // 横移動が縦より大きい場合は止める
-        if (dx > dy + 2) {
-            e.preventDefault();
-        }
-    };
-
-    document.addEventListener('touchstart', onTouchStart, { passive: true });
-    document.addEventListener('touchmove', onTouchMove, { passive: false });
-
-    return () => {
-        document.removeEventListener('touchstart', onTouchStart);
-        document.removeEventListener('touchmove', onTouchMove as any);
-    };
-}, []);
