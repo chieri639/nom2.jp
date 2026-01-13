@@ -1,112 +1,321 @@
 'use client';
 
-import Link from 'next/link';
-import { Search, Wine } from 'lucide-react';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
-export default function Home() {
-    const [query, setQuery] = useState('');
-    const router = useRouter();
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (query.trim()) {
-            router.push(`/search?q=${encodeURIComponent(query)}`);
-        }
+type SakeItem = {
+    id: string;
+    name: string;
+    brewery?: string;
+    style_tags: string[];
+    taste_tags: string[];
+    serve_temp: string[];
+    reason?: string;
+    rakuten: {
+        affiliate_url?: string;
+        image_url?: string;
+        item_url?: string;
+        item_code?: string;
     };
+    updated_at?: string;
+};
+
+type ApiResponse = {
+    ok: boolean;
+    count: number;
+    items: SakeItem[];
+};
+
+const API_URL =
+    'https://script.google.com/macros/s/AKfycbw3C6mroyk4Sr46I8qD86b_QYDjQKzDGDhdMtSWYNw66eWPOZIfUYDKHu-R0f8xnNL-/exec';
+
+const TEMP_OPTIONS_MAP: Record<string, string> = {
+    cold: '冷やして',
+    room: '常温',
+    warm: '燗',
+};
+
+const TEMP_OPTIONS = [
+    { key: 'cold', label: '冷やして' },
+    { key: 'room', label: '常温' },
+    { key: 'warm', label: '燗' },
+] as const;
+
+export default function SakeRecoPage() {
+    const [items, setItems] = useState<SakeItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // preferences (簡易)
+    const [tempPref, setTempPref] = useState<string>(''); // cold/room/warm
+    const [tagQuery, setTagQuery] = useState<string>(''); // "フルーティ,辛口" など
+
+    const tagTokens = useMemo(() => {
+        return tagQuery
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
+    }, [tagQuery]);
+
+    async function load() {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch(API_URL, { cache: 'no-store' });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = (await res.json()) as ApiResponse;
+            if (!data.ok) throw new Error('API returned ok=false');
+            setItems(data.items || []);
+        } catch (e: any) {
+            setError(e?.message ?? 'Failed to fetch');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        load();
+    }, []);
+
+    const filtered = useMemo(() => {
+        let result = [...items];
+
+        // 1. 温度フィルタ (必須一致)
+        if (tempPref) {
+            result = result.filter(s => s.serve_temp?.includes(tempPref));
+        }
+
+        // 2. タグフィルタ (どれか1つでも一致すればOK、なければ除外)
+        if (tagTokens.length) {
+            result = result.filter(s => {
+                const all = new Set([...(s.style_tags || []), ...(s.taste_tags || [])]);
+                return tagTokens.some(t => all.has(t));
+            });
+        }
+
+        // 3. スコアリング (ソート用)
+        const scoreOne = (s: SakeItem) => {
+            let score = 0;
+            // タグ一致数が多いほど上位へ
+            if (tagTokens.length) {
+                const all = new Set([...(s.style_tags || []), ...(s.taste_tags || [])]);
+                for (const t of tagTokens) {
+                    if (all.has(t)) score += 1;
+                }
+            }
+            // 画像/リンクが揃ってるものを少し優先
+            if (s.rakuten?.affiliate_url) score += 1;
+            if (s.rakuten?.image_url) score += 1;
+            return score;
+        };
+
+        return result
+            .map(s => ({ s, score: scoreOne(s) }))
+            .sort((a, b) => b.score - a.score)
+            .map(x => x.s);
+    }, [items, tempPref, tagTokens]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 text-slate-900 dark:text-slate-50 font-sans selection:bg-indigo-500/30">
+        <div style={{ maxWidth: 960, margin: '0 auto', padding: 16, fontFamily: 'system-ui, -apple-system' }}>
+            <header style={{ marginBottom: 12 }}>
+                <h1 style={{ fontSize: 20, margin: 0 }}>日本酒おすすめ</h1>
+                <p style={{ margin: '6px 0 0', fontSize: 13, opacity: 0.75 }}>
+                    入力に合わせて、あなたが承認した日本酒（active）の中からおすすめを並べ替えます。
+                </p>
+            </header>
 
-            {/* Navigation (Simple) */}
-            <nav className="fixed w-full z-50 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
-                            <Wine size={18} />
-                        </span>
-                        <span>日本酒AI</span>
-                    </Link>
-                    <div className="flex items-center gap-4">
-                        <Link href="/login" className="text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                            ログイン
-                        </Link>
-                        <Link href="/signup" className="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors shadow-lg shadow-indigo-500/20">
-                            無料で始める
-                        </Link>
+            <section
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr',
+                    gap: 12,
+                    background: '#f6f6f6',
+                    borderRadius: 12,
+                    padding: 12,
+                    marginBottom: 16,
+                }}
+            >
+                <div>
+                    <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 6 }}>温度</div>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <button
+                            onClick={() => setTempPref('')}
+                            style={pillStyle(tempPref === '')}
+                        >
+                            指定なし
+                        </button>
+                        {TEMP_OPTIONS.map(o => (
+                            <button
+                                key={o.key}
+                                onClick={() => setTempPref(o.key)}
+                                style={pillStyle(tempPref === o.key)}
+                            >
+                                {o.label}
+                            </button>
+                        ))}
                     </div>
                 </div>
-            </nav>
 
-            <main className="pt-32 pb-16 px-4">
-                <div className="container mx-auto max-w-5xl">
+                <div>
+                    <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 6 }}>好みタグ（カンマ区切り）</div>
+                    <input
+                        value={tagQuery}
+                        onChange={e => setTagQuery(e.target.value)}
+                        placeholder="例：フルーティ, すっきり, 生酛"
+                        style={{
+                            width: '100%',
+                            borderRadius: 10,
+                            border: '1px solid #ddd',
+                            padding: '10px 12px',
+                            fontSize: 14,
+                            outline: 'none',
+                            background: '#fff',
+                        }}
+                    />
+                </div>
 
-                    {/* Hero Section */}
-                    <div className="flex flex-col items-center text-center space-y-8 mb-24 anim-fade-in">
-                        <div className="inline-flex items-center rounded-full border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1 text-sm text-indigo-800 dark:text-indigo-300 backdrop-blur-xl">
-                            <span className="flex h-2 w-2 rounded-full bg-indigo-600 mr-2 animate-pulse"></span>
-                            AIがあなたにぴったりの一本を提案
-                        </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <button onClick={load} style={primaryBtnStyle}>
+                        再読み込み
+                    </button>
+                    <span style={{ fontSize: 12, opacity: 0.7 }}>
+                        {loading ? '読み込み中…' : `表示 ${filtered.length} 件`}
+                    </span>
+                </div>
+            </section >
 
-                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-800 to-slate-900 dark:from-white dark:via-indigo-200 dark:to-white pb-2 max-w-4xl">
-                            未知なる日本酒との<br className="md:hidden" />出会いを、<br />
-                            <span className="text-indigo-600 dark:text-indigo-400">AIコンシェルジュ</span>と共に。
-                        </h1>
-
-                        <p className="max-w-2xl text-lg md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
-                            好みの味わい、ペアリングしたい料理、今の気分。<br />
-                            簡単な質問に答えるだけで、膨大なデータベースから<br />
-                            あなただけの「最高の一本」を見つけ出します。
-                        </p>
-
-                        {/* Search Input */}
-                        <form onSubmit={handleSearch} className="w-full max-w-xl relative group">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                            <div className="relative flex items-center bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 p-2">
-                                <Search className="ml-4 text-slate-400" size={20} />
-                                <input
-                                    type="text"
-                                    value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
-                                    placeholder="「フルーティーで辛口な大吟醸は？」"
-                                    className="w-full bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white placeholder-slate-400 h-12"
-                                />
-                                <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-6 h-12 flex items-center font-medium transition-colors shadow-md">
-                                    検索
-                                </button>
-                            </div>
-                        </form>
-
-                        <div className="flex gap-4 pt-4 text-sm text-slate-500">
-                            <span>Try:</span>
-                            <button onClick={() => setQuery("刺身に合うお酒")} className="hover:text-indigo-600 underline">刺身に合うお酒</button>
-                            <button onClick={() => setQuery("初心者向け")} className="hover:text-indigo-600 underline">初心者向け</button>
-                            <button onClick={() => setQuery("プレゼント用")} className="hover:text-indigo-600 underline">プレゼント用</button>
-                        </div>
+            {error && (
+                <div style={{ background: '#fff0f0', border: '1px solid #ffd0d0', padding: 12, borderRadius: 12, marginBottom: 12 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>読み込みに失敗しました</div>
+                    <div style={{ fontSize: 13, opacity: 0.85 }}>{error}</div>
+                    <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6 }}>
+                        ※ iframe / ログイン状態で挙動が変わる場合があります。再読み込みをお試しください。
                     </div>
+                </div>
+            )
+            }
 
-                    {/* Features Grid */}
-                    <div className="grid md:grid-cols-3 gap-8 px-4">
-                        {[
-                            { title: "パーソナライズ", desc: "あなたの味覚嗜好を学習し、使えば使うほど精度が向上します。", icon: "🎯" },
-                            { title: "包括的なデータ", desc: "全国1,000以上の酒蔵データから、隠れた名酒を発掘します。", icon: "🍶" },
-                            { title: "購入サポート", desc: "気になったお酒は、RakutenなどのECサイトですぐに購入可能。", icon: "🛒" }
-                        ].map((feature, i) => (
-                            <div key={i} className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/50 transition-colors shadow-sm hover:shadow-xl">
-                                <div className="text-4xl mb-4">{feature.icon}</div>
-                                <h3 className="font-bold text-lg mb-2">{feature.title}</h3>
-                                <p className="text-slate-600 dark:text-slate-400">{feature.desc}</p>
-                            </div>
+            <main style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
+                {loading && !items.length ? (
+                    <SkeletonList />
+                ) : filtered.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}>
+                        該当する日本酒がありませんでした。条件を変更してお試しください。
+                    </div>
+                ) : (
+                    filtered.map(s => <SakeCard key={s.id} item={s} />)
+                )}
+            </main>
+
+            <footer style={{ marginTop: 18, fontSize: 11, opacity: 0.6 }}>
+                データ提供：SakeMaster（active） / 楽天アフィリンク
+            </footer>
+        </div >
+    );
+}
+
+function SakeCard({ item }: { item: SakeItem }) {
+    const img = item.rakuten?.image_url;
+    const buy = item.rakuten?.affiliate_url || item.rakuten?.item_url;
+
+    return (
+        <article style={{ background: '#fff', border: '1px solid #eee', borderRadius: 14, padding: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '92px 1fr', gap: 12 }}>
+                <div
+                    style={{
+                        width: 92,
+                        height: 92,
+                        borderRadius: 12,
+                        background: '#f2f2f2',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}
+                >
+                    {img ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                        <span style={{ fontSize: 11, opacity: 0.6 }}>No Image</span>
+                    )}
+                </div>
+
+                <div>
+                    <div style={{ fontWeight: 700, lineHeight: 1.2 }}>{item.name}</div>
+                    {item.brewery && <div style={{ fontSize: 12, opacity: 0.75, marginTop: 2 }}>{item.brewery}</div>}
+
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                        {(item.style_tags || []).slice(0, 4).map(t => (
+                            <span key={`st-${t}`} style={tagStyle}>{t}</span>
+                        ))}
+                        {(item.taste_tags || []).slice(0, 4).map(t => (
+                            <span key={`tt-${t}`} style={tagStyle}>{t}</span>
+                        ))}
+                        {(item.serve_temp || []).slice(0, 3).map(t => (
+                            <span key={`tp-${t}`} style={tagStyle}>{TEMP_OPTIONS_MAP[t] || t}</span>
                         ))}
                     </div>
 
-                </div>
-            </main>
+                    {item.reason && <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.45 }}>{item.reason}</p>}
 
-            <footer className="py-8 text-center text-slate-500 text-sm border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
-                <p>&copy; 2024 日本酒AI. All rights reserved.</p>
-            </footer>
-        </div>
+                    <div style={{ marginTop: 10, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <a
+                            href={buy || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                ...primaryBtnStyle,
+                                display: 'inline-block',
+                                textDecoration: 'none',
+                                pointerEvents: buy ? 'auto' : 'none',
+                                opacity: buy ? 1 : 0.5,
+                            }}
+                        >
+                            購入する
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </article>
     );
 }
+
+function SkeletonList() {
+    return (
+        <>
+            {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} style={{ background: '#fff', border: '1px solid #eee', borderRadius: 14, padding: 12, height: 120 }} />
+            ))}
+        </>
+    );
+}
+
+const tagStyle: React.CSSProperties = {
+    fontSize: 11,
+    padding: '4px 8px',
+    borderRadius: 999,
+    background: '#f3f3f3',
+    border: '1px solid #e9e9e9',
+};
+
+function pillStyle(active: boolean): React.CSSProperties {
+    return {
+        padding: '8px 10px',
+        borderRadius: 999,
+        border: '1px solid #ddd',
+        background: active ? '#111' : '#fff',
+        color: active ? '#fff' : '#111',
+        fontSize: 13,
+        cursor: 'pointer',
+    };
+}
+
+const primaryBtnStyle: React.CSSProperties = {
+    padding: '10px 12px',
+    borderRadius: 12,
+    border: '1px solid #111',
+    background: '#111',
+    color: '#fff',
+    fontSize: 13,
+    cursor: 'pointer',
+};

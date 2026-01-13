@@ -68,5 +68,28 @@ Google Cloudの知識が少し必要ですが、スケーリング性能が高�
 
 ## 💡 どっちがいい？
 
-- **とりあえずURLが欲しい！** 👉 **Render.com** (設定がGUIだけで完結して楽です)
 - **Googleの技術を使いたい / 将来的に大規模にしたい** 👉 **Cloud Run**
+
+---
+
+## 🌐 独自ドメイン (nom2.jp) の設定
+
+アプリを公開後、URLを `nom2.test` や `onrender.com` から `nom2.jp` に変更する手順です。
+
+### 1. Render.com の場合
+1.  Dashboard > Settings > **Custom Domains** に移動。
+2.  `nom2.jp` を入力して「Add Domain」をクリック。
+3.  表示される **CNAME** や **Aレコード** の情報を、お持ちのドメイン管理画面（お名前.comやGoDaddyなど）のDNS設定に追加します。
+4.  反映されるまで数分〜数時間待ちます。
+
+### 2. Google Cloud Run の場合
+1.  Cloud Run コンソール > **Integrations** (統合) > **Custom Domains** を選択。
+2.  「Mapping」を追加し、`nom2.jp` を指定。
+3.  Google Search Console でドメイン所有権の確認を求められる場合があります。
+4.  表示されるDNSレコードをドメイン管理画面に追加します。
+
+### 📂 URL構成について
+現在のコードでは、日本酒おすすめページは以下のURLになります。
+- **`https://nom2.jp/sake-reco`**
+
+もしトップページ (`https://nom2.jp/`) で直接表示したい場合は、`src/app/sake-reco/page.tsx` の内容を `src/app/page.tsx` に移動させてください。
