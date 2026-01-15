@@ -28,6 +28,7 @@ export default function SakeSimilarPage() {
     const [allSakes, setAllSakes] = useState<Sake[]>([]);
     const [baseSake, setBaseSake] = useState<Sake | null>(null);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetch(API_URL)
@@ -38,6 +39,16 @@ export default function SakeSimilarPage() {
             })
             .catch(() => setLoading(false));
     }, []);
+
+    const filteredSakes = useMemo(() => {
+        if (!searchQuery.trim()) return allSakes;
+        const q = searchQuery.toLowerCase();
+        return allSakes.filter(s =>
+            s.name.toLowerCase().includes(q) ||
+            s.brewery.toLowerCase().includes(q) ||
+            s.prefecture.toLowerCase().includes(q)
+        );
+    }, [allSakes, searchQuery]);
 
     const similarSakes = useMemo(() => {
         if (!baseSake) return [];
@@ -60,9 +71,31 @@ export default function SakeSimilarPage() {
         <div style={{ color: '#fff' }}>
             {!baseSake ? (
                 <div>
-                    <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 16 }}>基準となる日本酒を選んでください</h2>
-                    <div style={{ display: 'grid', gap: 10 }}>
-                        {allSakes.map(s => (
+                    <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>基準となる日本酒を選んでください</h2>
+                    <p style={{ fontSize: 13, opacity: 0.6, marginBottom: 16 }}>銘柄名や酒蔵名で検索できます</p>
+
+                    <div style={{ marginBottom: 20 }}>
+                        <input
+                            type="text"
+                            placeholder="例: 来福, 新政, 茨城..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '12px 16px',
+                                borderRadius: 12,
+                                background: '#222',
+                                border: '1px solid #444',
+                                color: '#fff',
+                                fontSize: 15,
+                                outline: 'none',
+                                boxSizing: 'border-box'
+                            }}
+                        />
+                    </div>
+
+                    <div style={{ display: 'grid', gap: 10, maxHeight: 500, overflowY: 'auto', paddingRight: 4 }}>
+                        {filteredSakes.map(s => (
                             <button
                                 key={s.id}
                                 onClick={() => {
@@ -75,6 +108,9 @@ export default function SakeSimilarPage() {
                                 <div style={{ fontSize: 11, opacity: 0.6 }}>{s.brewery} / {s.prefecture}</div>
                             </button>
                         ))}
+                        {filteredSakes.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: '40px 0', opacity: 0.5 }}>一致する銘柄が見つかりませんでした</div>
+                        )}
                     </div>
                 </div>
             ) : (
