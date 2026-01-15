@@ -101,8 +101,13 @@ export default function SakeChatRecoPage() {
     const [submitted, setSubmitted] = useState(false);
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
-    const resultsStartRef = useRef<HTMLDivElement | null>(null);
-    const scrollToBottom = () => bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    const latestMessageRef = useRef<HTMLDivElement | null>(null);
+
+    const scrollToBottom = () => {
+        // Scroll specifically within the chat message container if possible,
+        // or just ensure the latest message is visible.
+        latestMessageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    };
 
     // ----- Load dataset -----
     async function load() {
@@ -136,20 +141,10 @@ export default function SakeChatRecoPage() {
         setSubmitted(false);
     }, []);
 
-    // scroll to results start when submitted
+    // Auto scroll chat when messages update
     useEffect(() => {
-        if (submitted && resultsStartRef.current) {
-            // slightly delayed to ensure rendering
-            setTimeout(() => {
-                resultsStartRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
-        }
-    }, [submitted]);
-
-    // auto scroll
-    useEffect(() => {
-        if (!submitted) scrollToBottom();
-    }, [messages, typing, submitted]);
+        scrollToBottom();
+    }, [messages, typing]);
 
     // ----- iOS iframe: prevent horizontal pan (page-level) -----
     useEffect(() => {
@@ -264,18 +259,18 @@ export default function SakeChatRecoPage() {
         ]);
     };
 
-    // ----- Filtering / scoring (reuse your logic, slightly extended) -----
+    // ----- Filtering / scoring -----
     const filtered = useMemo(() => {
         if (!submitted) return [];
 
         let result = [...items];
 
-        // temp filter: if any temp selected, must match at least one
+        // temp filter
         if (tempKeys.length) {
             result = result.filter(s => (s.serve_temp || []).some(t => tempKeys.includes(t)));
         }
 
-        // tag filter: match any chosen taste/style tag (if any exists)
+        // tag filter
         const tokens = [...styleTags, ...tasteTags].filter(Boolean);
         if (tokens.length) {
             result = result.filter(s => {
@@ -300,7 +295,7 @@ export default function SakeChatRecoPage() {
             if (s.rakuten?.affiliate_url) score += 1;
             if (s.rakuten?.image_url) score += 1;
 
-            // free text hint (lightweight): if user wrote something, try to match keywords against name/brewery/prefecture
+            // free text hint
             const ft = freeText.trim();
             if (ft) {
                 const hay = `${s.name} ${s.brewery ?? ''} ${s.prefecture ?? ''}`.toLowerCase();
@@ -330,241 +325,232 @@ export default function SakeChatRecoPage() {
         if (directionChosen.length) parts.push(`方向：${directionChosen.join(' / ')}`);
         if (bodyChosen.length) parts.push(`質感：${bodyChosen.join(' / ')}`);
         if (tempKeys.length) parts.push(`温度：${tempKeys.map(k => TEMP_OPTIONS_MAP[k] ?? k).join(' / ')}`);
+        if (freeText.trim()) parts.push(`その他：${freeText.trim()}`); // Q5
         return parts.join('｜');
-    }, [submitted, styleTags, tasteTags, tempKeys]);
+    }, [submitted, styleTags, tasteTags, tempKeys, freeText]);
 
     return (
         <div
             style={{
-                minHeight: 800,
-                width: '100%',
-                maxWidth: 'min(960px, 100%)',
-                margin: '0 auto',
-                padding: 14,
-                boxSizing: 'border-box',
+                height: '100svh',
+                display: 'flex',
+                flexDirection: 'column',
+                background: '#000',
                 color: '#fff',
-                overflowX: 'hidden',
+                overflow: 'hidden',
                 fontFamily: 'system-ui, -apple-system',
             }}
         >
-            <header style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 12, opacity: 0.75 }}>ai.nom2.jp</div>
-                <h1 style={{ fontSize: 18, margin: 0, fontWeight: 800 }}>おすすめ日本酒レコメンド</h1>
-                <div style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>
-                    5つの質問に答えるだけで、あなた向けを提案します
-                </div>
-            </header>
-
-            {/* Chat */}
+            {/* 上：チャット（固定高さ or flex: 0 0 auto） */}
             <div
                 style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.10)',
-                    borderRadius: 16,
-                    padding: 12,
-                    overflow: 'hidden',
+                    flex: '0 0 auto',
+                    maxHeight: '60%', // チャットエリアが広がりすぎないように制限
+                    display: 'flex',
+                    flexDirection: 'column',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)',
                 }}
             >
+                <header style={{ padding: 12, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ fontSize: 12, opacity: 0.75 }}>ai.nom2.jp</div>
+                    <h1 style={{ fontSize: 16, margin: 0, fontWeight: 800 }}>おすすめ日本酒レコメンド</h1>
+                </header>
+
                 <div
                     style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 10,
-                        maxHeight: 520,
+                        padding: 12,
                         overflowY: 'auto',
                         WebkitOverflowScrolling: 'touch',
-                        paddingRight: 4,
                     }}
                 >
-                    {messages.map(m => (
-                        <ChatBubble key={m.id} role={m.role} text={m.text} />
-                    ))}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {messages.map(m => (
+                            <ChatBubble key={m.id} role={m.role} text={m.text} />
+                        ))}
 
-                    {typing && <ChatBubble role="bot" text="…" typing />}
+                        {typing && <ChatBubble role="bot" text="…" typing />}
 
-                    {/* results inserted as bot message */}
-                    {submitted && (
-                        <>
-                            <div ref={resultsStartRef} style={{ scrollMarginTop: 20 }} />
+                        {/* results summary inserted as bot message */}
+                        {submitted && (
                             <ChatBubble role="bot" text={`条件まとめ：${summaryLine || '指定なし'}`} />
-                            {error ? (
-                                <div style={{ marginTop: 10 }}>
-                                    <div style={errorBoxStyle}>
-                                        <div style={{ fontWeight: 700, marginBottom: 4 }}>読み込みに失敗しました</div>
-                                        <div style={{ fontSize: 12, opacity: 0.9 }}>{error}</div>
+                        )}
+                        <div ref={latestMessageRef} />
+                    </div>
+
+                    {/* Input area */}
+                    {!submitted && (
+                        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div style={{ fontSize: 11, opacity: 0.75, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
+                                <span>Step {step}/{STEP_TOTAL}</span>
+                                <button onClick={reset} style={linkBtn}>リセット</button>
+                            </div>
+
+                            {step === 1 && (
+                                <>
+                                    <OptionGrid>
+                                        {MOOD_OPTIONS.map(o => (
+                                            <button key={o.tag} onClick={() => pickMood(o.tag)} style={chipBtn}>
+                                                {o.label}
+                                            </button>
+                                        ))}
+                                    </OptionGrid>
+                                    <div style={{ marginTop: 10, textAlign: 'right' }}>
+                                        <button onClick={() => handleSkip(2)} style={textBtn}>スキップ</button>
                                     </div>
-                                </div>
-                            ) : loadingData ? (
-                                <div style={{ marginTop: 10 }}>
-                                    <SkeletonList />
-                                </div>
-                            ) : filtered.length === 0 ? (
-                                <ChatBubble role="bot" text="該当が見つかりませんでした。条件を少しゆるめて試してみてください。" />
-                            ) : (
-                                <div style={{ marginTop: 10, display: 'grid', gap: 10 }}>
-                                    {filtered.map(s => (
-                                        <SakeCard key={s.id} item={s} />
-                                    ))}
-                                </div>
+                                </>
                             )}
-                            <div style={{ marginTop: 10, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                                <button onClick={reset} style={secondaryBtn}>
-                                    もう一度診断する
-                                </button>
-                                <button onClick={load} style={secondaryBtn}>
-                                    データ更新
-                                </button>
+
+                            {step === 2 && (
+                                <>
+                                    <OptionGrid>
+                                        {DIRECTION_OPTIONS.map(o => (
+                                            <button key={o.tag} onClick={() => pickDirection(o.tag)} style={chipBtn}>
+                                                {o.label}
+                                            </button>
+                                        ))}
+                                    </OptionGrid>
+                                    <div style={{ marginTop: 10, textAlign: 'right' }}>
+                                        <button onClick={() => handleSkip(3)} style={textBtn}>スキップ</button>
+                                    </div>
+                                </>
+                            )}
+
+                            {step === 3 && (
+                                <>
+                                    <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 8 }}>複数選べます</div>
+                                    <OptionGrid>
+                                        {BODY_OPTIONS.map(o => {
+                                            const active = tasteTags.includes(o.tag);
+                                            return (
+                                                <button
+                                                    key={o.tag}
+                                                    onClick={() => toggleBody(o.tag)}
+                                                    style={{ ...chipBtn, ...(active ? chipBtnActive : {}) }}
+                                                >
+                                                    {o.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </OptionGrid>
+                                    <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <button onClick={() => handleSkip(4)} style={textBtn}>スキップ</button>
+                                        <button onClick={confirmBody} style={primaryBtn}>次へ</button>
+                                    </div>
+                                </>
+                            )}
+
+                            {step === 4 && (
+                                <>
+                                    <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 8 }}>複数選べます</div>
+                                    <OptionGrid>
+                                        {TEMP_OPTIONS.map(o => {
+                                            const active = tempKeys.includes(o.key);
+                                            return (
+                                                <button
+                                                    key={o.key}
+                                                    onClick={() => toggleTemp(o.key)}
+                                                    style={{ ...chipBtn, ...(active ? chipBtnActive : {}) }}
+                                                >
+                                                    {o.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </OptionGrid>
+                                    <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <button onClick={() => handleSkip(5)} style={textBtn}>スキップ</button>
+                                        <button onClick={confirmTemp} style={primaryBtn}>次へ</button>
+                                    </div>
+                                </>
+                            )}
+
+                            {step === 5 && (
+                                <>
+                                    <textarea
+                                        value={freeText}
+                                        onChange={e => setFreeText(e.target.value)}
+                                        placeholder="例：お寿司に合わせたい、辛口は苦手、予算は3,000円くらい…など"
+                                        style={textArea}
+                                    />
+                                    <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                                        <button
+                                            onClick={() => submit()}
+                                            style={primaryBtn}
+                                            disabled={loadingData}
+                                        >
+                                            {loadingData ? '読み込み中…' : '送信しておすすめを見る'}
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setFreeText('');
+                                                submit();
+                                            }}
+                                            style={secondaryBtn}
+                                            disabled={loadingData}
+                                        >
+                                            スキップ
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* 下：検索結果（ここだけスクロール） */}
+            <div
+                style={{
+                    flex: '1 1 auto',
+                    overflowY: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                    padding: 12,
+                    background: '#111',
+                }}
+            >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>おすすめ結果</div>
+                    <div style={{ fontSize: 12, opacity: 0.8 }}>
+                        {submitted ? (loadingData ? '読み込み中…' : `${filtered.length}件ヒット`) : '-'}
+                    </div>
+                </div>
+
+                <main style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
+                    {!submitted ? (
+                        <div style={{ textAlign: 'center', padding: 40, opacity: 0.5, fontSize: 13 }}>
+                            上のチャットで質問に答えると<br />ここに結果が表示されます
+                        </div>
+                    ) : loadingData ? (
+                        <SkeletonList />
+                    ) : error ? (
+                        <div style={errorBoxStyle}>
+                            <div style={{ fontWeight: 700, marginBottom: 4 }}>読み込みに失敗しました</div>
+                            <div style={{ fontSize: 12, opacity: 0.9 }}>{error}</div>
+                        </div>
+                    ) : filtered.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: 24, opacity: 0.7 }}>
+                            該当する日本酒がありませんでした。<br />条件を変えてみてください。
+                            <div style={{ marginTop: 16 }}>
+                                <button onClick={reset} style={secondaryBtn}>リセット</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {filtered.map(s => <SakeCard key={s.id} item={s} />)}
+                            <div style={{ marginTop: 20, textAlign: 'center', opacity: 0.6, fontSize: 11 }}>
+                                - 結果は以上です -
+                            </div>
+                            <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center', gap: 10 }}>
+                                <button onClick={reset} style={secondaryBtn}>リセットして再診断</button>
                             </div>
                         </>
                     )}
+                </main>
 
-                    <div ref={bottomRef} />
-                </div>
-
-                {/* Input area (changes by step) */}
-                {!submitted && (
-                    <div style={{ marginTop: 12 }}>
-                        {/* Step UI */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                            <div style={{ fontSize: 11, opacity: 0.75 }}>Step {step}/{STEP_TOTAL}</div>
-                            <button onClick={reset} style={linkBtn}>
-                                リセット
-                            </button>
-                        </div>
-
-                        {step === 1 && (
-                            <>
-                                <OptionGrid>
-                                    {MOOD_OPTIONS.map(o => (
-                                        <button key={o.tag} onClick={() => pickMood(o.tag)} style={chipBtn}>
-                                            {o.label}
-                                        </button>
-                                    ))}
-                                </OptionGrid>
-                                <div style={{ marginTop: 10, textAlign: 'right' }}>
-                                    <button onClick={() => handleSkip(2)} style={textBtn}>
-                                        スキップ
-                                    </button>
-                                </div>
-                            </>
-                        )}
-
-                        {step === 2 && (
-                            <>
-                                <OptionGrid>
-                                    {DIRECTION_OPTIONS.map(o => (
-                                        <button key={o.tag} onClick={() => pickDirection(o.tag)} style={chipBtn}>
-                                            {o.label}
-                                        </button>
-                                    ))}
-                                </OptionGrid>
-                                <div style={{ marginTop: 10, textAlign: 'right' }}>
-                                    <button onClick={() => handleSkip(3)} style={textBtn}>
-                                        スキップ
-                                    </button>
-                                </div>
-                            </>
-                        )}
-
-                        {step === 3 && (
-                            <>
-                                <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 8 }}>複数選べます</div>
-                                <OptionGrid>
-                                    {BODY_OPTIONS.map(o => {
-                                        const active = tasteTags.includes(o.tag);
-                                        return (
-                                            <button
-                                                key={o.tag}
-                                                onClick={() => toggleBody(o.tag)}
-                                                style={{ ...chipBtn, ...(active ? chipBtnActive : {}) }}
-                                            >
-                                                {o.label}
-                                            </button>
-                                        );
-                                    })}
-                                </OptionGrid>
-                                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <button onClick={() => handleSkip(4)} style={textBtn}>
-                                        スキップ
-                                    </button>
-                                    <button onClick={confirmBody} style={primaryBtn}>
-                                        次へ
-                                    </button>
-                                </div>
-                            </>
-                        )}
-
-                        {step === 4 && (
-                            <>
-                                <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 8 }}>複数選べます</div>
-                                <OptionGrid>
-                                    {TEMP_OPTIONS.map(o => {
-                                        const active = tempKeys.includes(o.key);
-                                        return (
-                                            <button
-                                                key={o.key}
-                                                onClick={() => toggleTemp(o.key)}
-                                                style={{ ...chipBtn, ...(active ? chipBtnActive : {}) }}
-                                            >
-                                                {o.label}
-                                            </button>
-                                        );
-                                    })}
-                                </OptionGrid>
-                                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <button onClick={() => handleSkip(5)} style={textBtn}>
-                                        スキップ
-                                    </button>
-                                    <button onClick={confirmTemp} style={primaryBtn}>
-                                        次へ
-                                    </button>
-                                </div>
-                            </>
-                        )}
-
-                        {step === 5 && (
-                            <>
-                                <textarea
-                                    value={freeText}
-                                    onChange={e => setFreeText(e.target.value)}
-                                    placeholder="例：お寿司に合わせたい、辛口は苦手、予算は3,000円くらい…など"
-                                    style={textArea}
-                                />
-                                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                                    <button
-                                        onClick={() => {
-                                            // allow submit even if empty
-                                            submit();
-                                        }}
-                                        style={primaryBtn}
-                                        disabled={loadingData}
-                                        title={loadingData ? 'データ読み込み中です' : '送信しておすすめを見る'}
-                                    >
-                                        {loadingData ? '読み込み中…' : '送信しておすすめを見る'}
-                                    </button>
-
-                                    <button
-                                        onClick={() => {
-                                            // allow skipping free text
-                                            setFreeText('');
-                                            submit();
-                                        }}
-                                        style={secondaryBtn}
-                                        disabled={loadingData}
-                                    >
-                                        スキップ
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                )}
+                <footer style={{ marginTop: 40, fontSize: 11, opacity: 0.4, textAlign: 'center' }}>
+                    データ提供：SakeMaster / 楽天アフィリンク
+                </footer>
             </div>
-
-            <footer style={{ marginTop: 12, fontSize: 11, opacity: 0.55, textAlign: 'center' }}>
-                データ提供：SakeMaster / 楽天アフィリンク
-            </footer>
-        </div >
+        </div>
     );
 }
 
@@ -638,7 +624,8 @@ function SakeCard({ item }: { item: SakeItem }) {
                     {(item.brewery || item.prefecture) && (
                         <div style={{ fontSize: 12, opacity: 0.75, marginTop: 2 }}>
                             {item.brewery}
-                            {item.prefecture && <span style={{ marginLeft: 6 }}>({item.prefecture})</span>}
+                            {item.prefecture && item.brewery && <span> / </span>}
+                            {item.prefecture && <span>{item.prefecture}</span>}
                         </div>
                     )}
 
