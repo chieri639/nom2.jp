@@ -348,7 +348,7 @@ export default function SakeChatRecoPage() {
             }}
         >
             <header style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 12, opacity: 0.75 }}>nom2.jp AI</div>
+                <div style={{ fontSize: 12, opacity: 0.75 }}>ai.nom2.jp</div>
                 <h1 style={{ fontSize: 18, margin: 0, fontWeight: 800 }}>おすすめ日本酒レコメンド</h1>
                 <div style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>
                     5つの質問に答えるだけで、あなた向けを提案します
