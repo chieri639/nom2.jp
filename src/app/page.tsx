@@ -48,18 +48,18 @@ export default function Home() {
             </header>
 
             {/* AI only */}
-            <main style={{ maxWidth: 980, margin: '0 auto', padding: '18px 16px 60px', width: '100%', boxSizing: 'border-box' }}>
-                <div style={{ padding: '24px 0 12px' }}>
-                    <h2 style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.15, color: '#111', margin: 0, wordBreak: 'break-word' }}>
+            <main style={{ maxWidth: 980, margin: '0 auto', padding: isMobile ? '12px 20px 80px' : '40px 24px 100px', width: '100%', boxSizing: 'border-box' }}>
+                <div style={{ padding: '24px 0 16px' }}>
+                    <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, lineHeight: 1.2, color: '#111', margin: 0, wordBreak: 'break-word' }}>
                         AIがおすすめ日本酒を提案
                     </h2>
                 </div>
 
                 <section style={{
                     background: '#0b0b0b',
-                    borderRadius: 18,
-                    padding: isMobile ? '12px 10px' : 14,
-                    boxShadow: '0 14px 40px rgba(0,0,0,0.18)',
+                    borderRadius: 24,
+                    padding: isMobile ? '16px 12px' : 20,
+                    boxShadow: '0 18px 50px rgba(0,0,0,0.22)',
                     width: '100%',
                     boxSizing: 'border-box',
                 }}>
