@@ -17,42 +17,31 @@ export default function Home() {
                 backdropFilter: 'blur(8px)',
                 zIndex: 50,
             }}>
-                <div style={{ fontWeight: 800, letterSpacing: 1 }}>nom × nom</div>
-                <button style={{
-                    border: '1px solid #ddd',
-                    background: '#fff',
-                    borderRadius: 999,
-                    padding: '8px 12px',
-                    fontSize: 12,
-                    cursor: 'pointer'
-                }}>
-                    MENU
-                </button>
+                <div style={{ fontWeight: 800, letterSpacing: 1, fontSize: 18 }}>nom × nom</div>
+                <a
+                    href="https://nom2.jp"
+                    style={{
+                        fontSize: 12,
+                        color: '#666',
+                        textDecoration: 'none',
+                        border: '1px solid #ddd',
+                        padding: '6px 14px',
+                        borderRadius: 999,
+                        background: '#fff'
+                    }}
+                >
+                    nom2.jpへ戻る
+                </a>
             </header>
-
-            {/* Hero */}
-            <section style={{ background: '#000' }}>
-                <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 16px' }}>
-                    <div style={{
-                        height: 220,
-                        borderRadius: 16,
-                        overflow: 'hidden',
-                        margin: '18px 0',
-                        background: 'linear-gradient(135deg, #111, #333)',
-                        display: 'flex',
-                        alignItems: 'flex-end',
-                        padding: 18,
-                        color: '#fff'
-                    }}>
-                        <div style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.15 }}>
-                            AIがおすすめ日本酒を提案
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* AI only */}
             <main style={{ maxWidth: 980, margin: '0 auto', padding: '18px 16px 60px' }}>
+                <div style={{ padding: '24px 0 12px' }}>
+                    <h2 style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.15, color: '#111', margin: 0 }}>
+                        AIがおすすめ日本酒を提案
+                    </h2>
+                </div>
+
                 <section style={{
                     background: '#0b0b0b',
                     borderRadius: 18,

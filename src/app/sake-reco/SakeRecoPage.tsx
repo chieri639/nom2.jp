@@ -237,7 +237,7 @@ function ChatPanel(props: any) {
             minHeight: 500,
             overflow: 'hidden',
         }}>
-            <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.08)', fontSize: 12, opacity: 0.8, display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ padding: '12px 14px 4px', fontSize: 12, opacity: 0.6, display: 'flex', justifyContent: 'space-between' }}>
                 <span>AI診断チャット</span>
                 <button onClick={props.onReset} style={{ background: 'none', border: 'none', color: '#888', textDecoration: 'underline', fontSize: 11, cursor: 'pointer' }}>リセット</button>
             </div>
@@ -330,9 +330,9 @@ function ResultsPanel({ submitted, loading, items, error, onReset }: any) {
             gridTemplateRows: 'auto 1fr',
             overflow: 'hidden',
         }}>
-            <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)', fontSize: 13, fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '12px 14px 4px', fontSize: 13, fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span>おすすめ日本酒</span>
-                <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 400 }}>{submitted ? `${items.length}件ヒット` : '-'}</span>
+                <span style={{ fontSize: 11, opacity: 0.5, fontWeight: 400 }}>{submitted ? `${items.length}件ヒット` : '-'}</span>
             </div>
 
             <div style={{
