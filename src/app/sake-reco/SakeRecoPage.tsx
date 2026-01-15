@@ -421,37 +421,38 @@ export default function SakeChatRecoPage() {
                         </div>
 
                         {step === 1 && (
-                            <OptionGrid>
-                                {MOOD_OPTIONS.map(o => (
-                                    <button key={o.tag} onClick={() => pickMood(o.tag)} style={chipBtn}>
-                                        {o.label}
+                            <>
+                                <OptionGrid>
+                                    {MOOD_OPTIONS.map(o => (
+                                        <button key={o.tag} onClick={() => pickMood(o.tag)} style={chipBtn}>
+                                            {o.label}
+                                        </button>
+                                    ))}
+                                </OptionGrid>
+                                <div style={{ marginTop: 10, textAlign: 'right' }}>
+                                    <button onClick={() => handleSkip(2)} style={textBtn}>
+                                        スキップ
                                     </button>
-                                ))}
-                            </OptionGrid>
-                            <div style={{ marginTop: 10, textAlign: 'right' }}>
-                                <button onClick={() => handleSkip(2)} style={textBtn}>
-                                    スキップ
-                                </button>
-                            </div>
-                        </>
-                    )}
+                                </div>
+                            </>
+                        )}
 
-                    {step === 2 && (
-                        <>
-                            <OptionGrid>
-                                {DIRECTION_OPTIONS.map(o => (
-                                    <button key={o.tag} onClick={() => pickDirection(o.tag)} style={chipBtn}>
-                                        {o.label}
+                        {step === 2 && (
+                            <>
+                                <OptionGrid>
+                                    {DIRECTION_OPTIONS.map(o => (
+                                        <button key={o.tag} onClick={() => pickDirection(o.tag)} style={chipBtn}>
+                                            {o.label}
+                                        </button>
+                                    ))}
+                                </OptionGrid>
+                                <div style={{ marginTop: 10, textAlign: 'right' }}>
+                                    <button onClick={() => handleSkip(3)} style={textBtn}>
+                                        スキップ
                                     </button>
-                                ))}
-                            </OptionGrid>
-                            <div style={{ marginTop: 10, textAlign: 'right' }}>
-                                <button onClick={() => handleSkip(3)} style={textBtn}>
-                                    スキップ
-                                </button>
-                            </div>
-                        </>
-                    )}
+                                </div>
+                            </>
+                        )}
 
                         {step === 3 && (
                             <>
