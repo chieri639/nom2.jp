@@ -7,7 +7,13 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: '日本酒AI - あなたに最高の一本を',
   description: 'AIがあなたの好みに合わせて日本酒を提案します。',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({

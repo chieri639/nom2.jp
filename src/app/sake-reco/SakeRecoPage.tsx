@@ -181,8 +181,6 @@ export default function SakeChatRecoPage() {
                 color: '#fff',
                 height: isMobile ? 'auto' : 'min(820px, calc(100svh - 160px))',
                 minHeight: isMobile ? 800 : 'unset',
-                width: '100%',
-                maxWidth: '100%',
                 overflowX: 'hidden',
                 boxSizing: 'border-box',
             }}
