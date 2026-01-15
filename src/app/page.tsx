@@ -13,7 +13,7 @@ export default function Home() {
     }, []);
 
     return (
-        <div style={{ background: '#fff', color: '#111', minHeight: '100vh', width: '100%', overflowX: 'hidden', fontFamily: '"Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif' }}>
+        <div className="sake-reco-main-container" style={{ background: '#fff', color: '#111', minHeight: '100vh', fontFamily: '"Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif' }}>
             {/* Header */}
             <header style={{
                 height: 64,
@@ -28,6 +28,7 @@ export default function Home() {
                 backdropFilter: 'blur(8px)',
                 zIndex: 50,
                 width: '100%',
+                maxWidth: '100%',
                 boxSizing: 'border-box',
             }}>
                 <div style={{ fontWeight: 800, letterSpacing: 1, fontSize: 18 }}>nom × nom</div>
@@ -48,7 +49,7 @@ export default function Home() {
             </header>
 
             {/* AI only */}
-            <main style={{ maxWidth: 980, margin: '0 auto', padding: isMobile ? '12px 20px 80px' : '40px 24px 100px', width: '100%', boxSizing: 'border-box' }}>
+            <main className="sake-reco-main-container" style={{ maxWidth: 980, margin: '0 auto', padding: isMobile ? '12px 16px 80px' : '40px 24px 100px' }}>
                 <div style={{ padding: '24px 0 16px' }}>
                     <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 800, lineHeight: 1.2, color: '#111', margin: 0, wordBreak: 'break-word' }}>
                         AIがおすすめ日本酒を提案
@@ -58,10 +59,12 @@ export default function Home() {
                 <section style={{
                     background: '#0b0b0b',
                     borderRadius: 24,
-                    padding: isMobile ? '16px 12px' : 20,
+                    padding: isMobile ? '12px 10px' : 20,
                     boxShadow: '0 18px 50px rgba(0,0,0,0.22)',
                     width: '100%',
+                    maxWidth: '100%',
                     boxSizing: 'border-box',
+                    overflow: 'hidden',
                 }}>
                     <SakeRecoPage />
                 </section>

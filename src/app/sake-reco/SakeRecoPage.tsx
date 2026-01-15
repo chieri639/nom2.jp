@@ -174,29 +174,19 @@ export default function SakeChatRecoPage() {
         return parts.join(' | ');
     }, [styleTags, tasteTags, tempKeys, freeText]);
 
-    // Prevent horizontal pan on iOS
-    useEffect(() => {
-        const handleTouchMove = (e: TouchEvent) => {
-            if (e.touches.length > 1) return;
-        };
-        document.addEventListener('touchmove', handleTouchMove, { passive: true });
-        return () => document.removeEventListener('touchmove', handleTouchMove);
-    }, []);
-
     return (
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 420px) minmax(0, 1fr)',
-            gap: 12,
-            color: '#fff',
-            height: isMobile ? 'auto' : 'min(820px, calc(100svh - 160px))',
-            minHeight: isMobile ? 800 : 'unset',
-            width: '100%',
-            maxWidth: '100%',
-            overflowX: 'hidden',
-            boxSizing: 'border-box',
-            touchAction: 'pan-y',
-        }}>
+        <div
+            className="sake-reco-grid no-horizontal-pan"
+            style={{
+                color: '#fff',
+                height: isMobile ? 'auto' : 'min(820px, calc(100svh - 160px))',
+                minHeight: isMobile ? 800 : 'unset',
+                width: '100%',
+                maxWidth: '100%',
+                overflowX: 'hidden',
+                boxSizing: 'border-box',
+            }}
+        >
             {/* Left/Top: Chat Panel */}
             <ChatPanel
                 messages={messages}

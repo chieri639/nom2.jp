@@ -72,3 +72,28 @@ canvas {
 .anim-fade-in {
   animation: fade-in 0.8s ease-out forwards;
 }
+
+.sake-reco-main-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.sake-reco-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .sake-reco-grid {
+    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  }
+}
+
+/* iOS Safari horizontal jump fix */
+.no-horizontal-pan {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
