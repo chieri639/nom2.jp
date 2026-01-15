@@ -137,8 +137,8 @@ export default function SakeChatRecoPage() {
 
     // auto scroll
     useEffect(() => {
-        scrollToBottom();
-    }, [messages, typing]);
+        if (!submitted) scrollToBottom();
+    }, [messages, typing, submitted]);
 
     // ----- iOS iframe: prevent horizontal pan (page-level) -----
     useEffect(() => {
