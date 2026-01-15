@@ -412,7 +412,12 @@ function SakeCard({ item }: { item: SakeItem }) {
                 <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>
                     {item.brewery}{item.prefecture ? ` / ${item.prefecture}` : ''}
                 </div>
-                <div style={{ marginTop: 8 }}>
+                {item.reason && (
+                    <div style={{ fontSize: 12, lineHeight: 1.4, color: '#444', marginTop: 8, background: '#f9f9f9', padding: '8px', borderRadius: '8px' }}>
+                        {item.reason}
+                    </div>
+                )}
+                <div style={{ marginTop: 10 }}>
                     <a href={buy} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '6px 14px', borderRadius: 8, background: '#111', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>購入する</a>
                 </div>
             </div>
