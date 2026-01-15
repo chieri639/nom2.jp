@@ -101,6 +101,7 @@ export default function SakeChatRecoPage() {
     const [submitted, setSubmitted] = useState(false);
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
+    const resultsStartRef = useRef<HTMLDivElement | null>(null);
     const scrollToBottom = () => bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
     // ----- Load dataset -----
@@ -134,6 +135,16 @@ export default function SakeChatRecoPage() {
         setStep(1);
         setSubmitted(false);
     }, []);
+
+    // scroll to results start when submitted
+    useEffect(() => {
+        if (submitted && resultsStartRef.current) {
+            // slightly delayed to ensure rendering
+            setTimeout(() => {
+                resultsStartRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    }, [submitted]);
 
     // auto scroll
     useEffect(() => {
@@ -374,6 +385,7 @@ export default function SakeChatRecoPage() {
                     {/* results inserted as bot message */}
                     {submitted && (
                         <>
+                            <div ref={resultsStartRef} style={{ scrollMarginTop: 20 }} />
                             <ChatBubble role="bot" text={`条件まとめ：${summaryLine || '指定なし'}`} />
                             {error ? (
                                 <div style={{ marginTop: 10 }}>
