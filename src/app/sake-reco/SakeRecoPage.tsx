@@ -17,65 +17,48 @@ type SakeItem = {
         item_url?: string;
         item_code?: string;
     };
-    updated_at?: string;
 };
 
-type ApiResponse = {
-    ok: boolean;
-    count: number;
-    items: SakeItem[];
-};
-
-const API_URL =
-    'https://script.google.com/macros/s/AKfycbw3C6mroyk4Sr46I8qD86b_QYDjQKzDGDhdMtSWYNw66eWPOZIfUYDKHu-R0f8xnNL-/exec';
-
-const TEMP_OPTIONS_MAP: Record<string, string> = {
-    cold: '冷やして',
-    room: '常温',
-    warm: '燗',
-};
-
-const STEP_TOTAL = 5;
-
-// Q1: 気分（style_tags に寄せる）
-const MOOD_OPTIONS = [
-    { label: '食事と合わせたい（食中酒）', tag: '食中酒' },
-    { label: 'プレゼントにしたい', tag: 'プレゼント' },
-    { label: '日本酒初心者向けがいい', tag: '初心者' },
-    { label: '今っぽい/モダンな感じ', tag: 'モダン' },
-    { label: '王道/クラシックが好き', tag: 'クラシック' },
-] as const;
-
-// Q2: 味の方向（taste_tags に寄せる）
-const DIRECTION_OPTIONS = [
-    { label: 'フルーティ', tag: 'フルーティ' },
-    { label: 'すっきり', tag: 'すっきり' },
-    { label: '辛口', tag: '辛口' },
-    { label: '甘口', tag: '甘口' },
-] as const;
-
-// Q3: 質感（複数）
-const BODY_OPTIONS = [
-    { label: '旨味', tag: '旨味' },
-    { label: 'コク', tag: 'コク' },
-    { label: 'キレ', tag: 'キレ' },
-    { label: '濃醇', tag: '濃醇' },
-] as const;
-
-// Q4: 温度（複数）
-const TEMP_OPTIONS = [
-    { label: '冷やして', key: 'cold' },
-    { label: '常温', key: 'room' },
-    { label: '燗', key: 'warm' },
-] as const;
-
-type ChatRole = 'bot' | 'user' | 'system';
+type ChatRole = 'bot' | 'user';
 
 type ChatMessage = {
     id: string;
     role: ChatRole;
     text: string;
 };
+
+const API_URL = 'https://script.google.com/macros/s/AKfycbw3C6mroyk4Sr46I8qD86b_QYDjQKzDGDhdMtSWYNw66eWPOZIfUYDKHu-R0f8xnNL-/exec';
+
+const TEMP_OPTIONS_MAP: Record<string, string> = { cold: '冷やして', room: '常温', warm: '燗' };
+const STEP_TOTAL = 5;
+
+const MOOD_OPTIONS = [
+    { label: '食事と合わせたい（食中酒）', tag: '食中酒' },
+    { label: 'プレゼントにしたい', tag: 'プレゼント' },
+    { label: '日本酒初心者向けがいい', tag: '初心者' },
+    { label: '今っぽい/モダンな感じ', tag: 'モダン' },
+    { label: '王道/クラシックが好き', tag: 'クラシック' },
+];
+
+const DIRECTION_OPTIONS = [
+    { label: 'フルーティ', tag: 'フルーティ' },
+    { label: 'すっきり', tag: 'すっきり' },
+    { label: '辛口', tag: '辛口' },
+    { label: '甘口', tag: '甘口' },
+];
+
+const BODY_OPTIONS = [
+    { label: '旨味', tag: '旨味' },
+    { label: 'コク', tag: 'コク' },
+    { label: 'キレ', tag: 'キレ' },
+    { label: '濃醇', tag: '濃醇' },
+];
+
+const TEMP_OPTIONS = [
+    { label: '冷やして', key: 'cold' },
+    { label: '常温', key: 'room' },
+    { label: '燗', key: 'warm' },
+];
 
 function uid(prefix = 'm') {
     return `${prefix}_${Math.random().toString(36).slice(2, 9)}_${Date.now().toString(36)}`;
@@ -86,683 +69,367 @@ export default function SakeChatRecoPage() {
     const [loadingData, setLoadingData] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // chat state
+    // Chat states
     const [step, setStep] = useState<number>(1);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [typing, setTyping] = useState(false);
-
-    // answers (structured)
     const [styleTags, setStyleTags] = useState<string[]>([]);
     const [tasteTags, setTasteTags] = useState<string[]>([]);
     const [tempKeys, setTempKeys] = useState<string[]>([]);
     const [freeText, setFreeText] = useState<string>('');
-
-    // results
     const [submitted, setSubmitted] = useState(false);
 
-    const bottomRef = useRef<HTMLDivElement | null>(null);
-    const latestMessageRef = useRef<HTMLDivElement | null>(null);
+    // Responsive check
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
 
-    const scrollToBottom = () => {
-        // Scroll specifically within the chat message container if possible,
-        // or just ensure the latest message is visible.
-        latestMessageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    };
-
-    // ----- Load dataset -----
-    async function load() {
+    // Load Data
+    const load = async () => {
         setLoadingData(true);
         setError(null);
         try {
             const res = await fetch(API_URL, { cache: 'no-store' });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = (await res.json()) as ApiResponse;
-            if (!data.ok) throw new Error('API returned ok=false');
-            setItems(data.items || []);
+            const data = await res.json();
+            if (data.ok) setItems(data.items || []);
+            else throw new Error('API Error');
         } catch (e: any) {
             setError(e?.message ?? 'Failed to fetch');
         } finally {
             setLoadingData(false);
         }
-    }
+    };
 
+    useEffect(() => { load(); }, []);
+
+    // Initial Messages
     useEffect(() => {
-        load();
+        reset();
     }, []);
 
-    // ----- Boot messages -----
-    useEffect(() => {
-        // initialize chat once
-        setMessages([
-            { id: uid(), role: 'bot', text: '日本酒AIです。5つの質問で、好みに合う銘柄を提案します🍶' },
-            { id: uid(), role: 'bot', text: 'Q1：今日はどんなシーン？（近いものを選んでください）' },
-        ]);
-        setStep(1);
-        setSubmitted(false);
-    }, []);
-
-    // Auto scroll chat when messages update
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages, typing]);
-
-    // ----- iOS iframe: prevent horizontal pan (page-level) -----
-    useEffect(() => {
-        let startX = 0;
-        let startY = 0;
-
-        const onTouchStart = (e: TouchEvent) => {
-            if (e.touches.length !== 1) return;
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-        };
-
-        const onTouchMove = (e: TouchEvent) => {
-            if (e.touches.length !== 1) return;
-            const dx = Math.abs(e.touches[0].clientX - startX);
-            const dy = Math.abs(e.touches[0].clientY - startY);
-            if (dx > dy + 2) e.preventDefault();
-        };
-
-        document.addEventListener('touchstart', onTouchStart, { passive: true });
-        document.addEventListener('touchmove', onTouchMove, { passive: false });
-
-        return () => {
-            document.removeEventListener('touchstart', onTouchStart);
-            document.removeEventListener('touchmove', onTouchMove as any);
-        };
-    }, []);
-
-    // ----- Helpers to add bot messages with typing -----
     const botSay = async (text: string) => {
         setTyping(true);
-        await new Promise(r => setTimeout(r, 400));
+        await new Promise(r => setTimeout(r, 600));
         setMessages(prev => [...prev, { id: uid(), role: 'bot', text }]);
         setTyping(false);
     };
 
-    const userSay = (text: string) => {
-        setMessages(prev => [...prev, { id: uid(), role: 'user', text }]);
-    };
+    const userSay = (text: string) => setMessages(prev => [...prev, { id: uid(), role: 'user', text }]);
 
     const nextQuestion = async (nextStep: number) => {
-        if (nextStep === 2) {
-            await botSay('Q2：味の方向はどれが近い？（1つ選ぶ）');
-        } else if (nextStep === 3) {
-            await botSay('Q3：質感の好みは？（複数OK）');
-        } else if (nextStep === 4) {
-            await botSay('Q4：飲み方（温度）は？（複数OK）');
-        } else if (nextStep === 5) {
-            await botSay('Q5：最後に。苦手なタイプ・合わせたい料理・予算など自由にどうぞ（任意）');
-        }
         setStep(nextStep);
+        if (nextStep === 2) await botSay('Q2：味の方向はどれが近い？（1つ選ぶ）');
+        else if (nextStep === 3) await botSay('Q3：質感の好みは？（複数OK）');
+        else if (nextStep === 4) await botSay('Q4：飲み方（温度）は？（複数OK）');
+        else if (nextStep === 5) await botSay('Q5：最後に、苦手なタイプや合わせたい料理、予算など自由にどうぞ（任意）');
     };
 
-    const handleSkip = async (nextStep: number) => {
+    const handleSkip = async (ns: number) => {
         userSay('（スキップ）');
-        await nextQuestion(nextStep);
-    };
-
-    // ----- Answer handlers -----
-    const pickMood = async (tag: string) => {
-        setStyleTags([tag]);
-        userSay(MOOD_OPTIONS.find(o => o.tag === tag)?.label ?? tag);
-        await nextQuestion(2);
-    };
-
-    const pickDirection = async (tag: string) => {
-        setTasteTags(prev => {
-            // keep only one direction among direction options
-            const directionSet = new Set<string>(DIRECTION_OPTIONS.map(o => o.tag));
-            const kept = prev.filter(t => !directionSet.has(t));
-            return [...kept, tag];
-        });
-        userSay(DIRECTION_OPTIONS.find(o => o.tag === tag)?.label ?? tag);
-        await nextQuestion(3);
-    };
-
-    const toggleBody = (tag: string) => {
-        setTasteTags(prev => (prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]));
-    };
-
-    const confirmBody = async () => {
-        const chosen = tasteTags.filter(t => BODY_OPTIONS.some(o => o.tag === t));
-        userSay(chosen.length ? `質感：${chosen.join(' / ')}` : '質感：指定なし');
-        await nextQuestion(4);
-    };
-
-    const toggleTemp = (key: string) => {
-        setTempKeys(prev => (prev.includes(key) ? prev.filter(t => t !== key) : [...prev, key]));
-    };
-
-    const confirmTemp = async () => {
-        userSay(tempKeys.length ? `温度：${tempKeys.map(k => TEMP_OPTIONS_MAP[k] ?? k).join(' / ')}` : '温度：指定なし');
-        await nextQuestion(5);
+        await nextQuestion(ns);
     };
 
     const submit = async () => {
-        userSay(freeText.trim() ? freeText.trim() : '（自由入力なし）');
-        await botSay('了解！条件をまとめて、おすすめを出します…');
+        userSay(freeText.trim() ? freeText.trim() : '（特になし）');
+        await botSay('承知しました！おすすめの銘柄をまとめます。');
         setSubmitted(true);
     };
 
     const reset = () => {
-        setStyleTags([]);
-        setTasteTags([]);
-        setTempKeys([]);
-        setFreeText('');
-        setSubmitted(false);
-        setStep(1);
         setMessages([
-            { id: uid(), role: 'bot', text: '日本酒AIです。5つの質問で、好みに合う銘柄を提案します🍶' },
-            { id: uid(), role: 'bot', text: 'Q1：今日はどんなシーン？（近いものを選んでください）' },
+            { id: uid(), role: 'bot', text: '日本酒AIです。5つの質問で、あなたにぴったりの銘柄をご提案します🍶' },
+            { id: uid(), role: 'bot', text: 'Q1：今日はどんなシーンで楽しみたいですか？' }
         ]);
+        setStep(1); setStyleTags([]); setTasteTags([]); setTempKeys([]); setFreeText(''); setSubmitted(false);
     };
 
-    // ----- Filtering / scoring -----
+    // Filter Logic
     const filtered = useMemo(() => {
         if (!submitted) return [];
-
-        let result = [...items];
-
-        // temp filter
-        if (tempKeys.length) {
-            result = result.filter(s => (s.serve_temp || []).some(t => tempKeys.includes(t)));
-        }
-
-        // tag filter
+        let res = [...items];
+        if (tempKeys.length) res = res.filter(s => (s.serve_temp || []).some(t => tempKeys.includes(t)));
         const tokens = [...styleTags, ...tasteTags].filter(Boolean);
         if (tokens.length) {
-            result = result.filter(s => {
+            res = res.filter(s => {
                 const all = new Set([...(s.style_tags || []), ...(s.taste_tags || [])]);
                 return tokens.some(t => all.has(t));
             });
         }
-
-        const scoreOne = (s: SakeItem) => {
-            let score = 0;
-            const all = new Set([...(s.style_tags || []), ...(s.taste_tags || [])]);
-
-            // tag matches
-            for (const t of tokens) if (all.has(t)) score += 2;
-
-            // temp match
-            if (tempKeys.length) {
-                for (const k of tempKeys) if ((s.serve_temp || []).includes(k)) score += 1;
-            }
-
-            // link/image completeness
-            if (s.rakuten?.affiliate_url) score += 1;
-            if (s.rakuten?.image_url) score += 1;
-
-            // free text hint
-            const ft = freeText.trim();
-            if (ft) {
-                const hay = `${s.name} ${s.brewery ?? ''} ${s.prefecture ?? ''}`.toLowerCase();
-                const needles = ft
-                    .split(/[,\s　]+/)
-                    .map(x => x.trim().toLowerCase())
-                    .filter(x => x.length >= 2);
-                for (const n of needles) if (hay.includes(n)) score += 1;
-            }
-
-            return score;
-        };
-
-        return result
-            .map(s => ({ s, score: scoreOne(s) }))
-            .sort((a, b) => b.score - a.score)
-            .map(x => x.s)
-            .slice(0, 20); // show top 20
-    }, [submitted, items, styleTags, tasteTags, tempKeys, freeText]);
+        return res.slice(0, 20);
+    }, [submitted, items, styleTags, tasteTags, tempKeys]);
 
     const summaryLine = useMemo(() => {
-        if (!submitted) return '';
         const parts: string[] = [];
-        if (styleTags.length) parts.push(`シーン：${styleTags.join(' / ')}`);
-        const directionChosen = tasteTags.filter(t => DIRECTION_OPTIONS.some(o => o.tag === t));
-        const bodyChosen = tasteTags.filter(t => BODY_OPTIONS.some(o => o.tag === t));
-        if (directionChosen.length) parts.push(`方向：${directionChosen.join(' / ')}`);
-        if (bodyChosen.length) parts.push(`質感：${bodyChosen.join(' / ')}`);
-        if (tempKeys.length) parts.push(`温度：${tempKeys.map(k => TEMP_OPTIONS_MAP[k] ?? k).join(' / ')}`);
-        if (freeText.trim()) parts.push(`その他：${freeText.trim()}`); // Q5
-        return parts.join('｜');
-    }, [submitted, styleTags, tasteTags, tempKeys, freeText]);
+        if (styleTags.length) parts.push(`シーン：${styleTags.join('/')}`);
+        const direction = tasteTags.filter(t => DIRECTION_OPTIONS.some(o => o.tag === t));
+        const body = tasteTags.filter(t => BODY_OPTIONS.some(o => o.tag === t));
+        if (direction.length) parts.push(`味：${direction.join('/')}`);
+        if (body.length) parts.push(`質感：${body.join('/')}`);
+        if (tempKeys.length) parts.push(`温度：${tempKeys.map(k => TEMP_OPTIONS_MAP[k]).join('/')}`);
+        if (freeText.trim()) parts.push(`その他：${freeText.trim()}`);
+        return parts.join(' | ');
+    }, [styleTags, tasteTags, tempKeys, freeText]);
 
     return (
-        <div
-            style={{
-                // height: '100svh', // REMOVED for embedded use
-                height: 700, // Fixed height for embedded use
-                display: 'flex',
-                flexDirection: 'column',
-                background: '#000',
-                color: '#fff',
-                overflow: 'hidden',
-                // fontFamily: 'system-ui, -apple-system', // Inherit from parent
-            }}
-        >
-            {/* 上：チャット（固定高さ or flex: 0 0 auto） */}
-            <div
-                style={{
-                    flex: '0 0 auto',
-                    maxHeight: '60%', // チャットエリアが広がりすぎないように制限
-                    display: 'flex',
-                    flexDirection: 'column',
-                    borderBottom: '1px solid rgba(255,255,255,0.08)',
-                }}
-            >
-                <header style={{ padding: 12, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <div style={{ fontSize: 12, opacity: 0.75 }}>ai.nom2.jp</div>
-                    <h1 style={{ fontSize: 16, margin: 0, fontWeight: 800 }}>おすすめ日本酒レコメンド</h1>
-                </header>
+        <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 420px) minmax(0, 1fr)',
+            gap: 12,
+            color: '#fff',
+            height: isMobile ? 'auto' : 'min(820px, calc(100svh - 160px))',
+            minHeight: isMobile ? 800 : 'unset',
+        }}>
+            {/* Left/Top: Chat Panel */}
+            <ChatPanel
+                messages={messages}
+                typing={typing}
+                step={step}
+                submitted={submitted}
+                summaryLine={summaryLine}
+                freeText={freeText}
+                setFreeText={setFreeText}
+                onReset={reset}
+                onNextStep={nextQuestion}
+                onSkip={handleSkip}
+                onSubmit={submit}
+                // Options
+                setStyleTags={setStyleTags}
+                tasteTags={tasteTags}
+                setTasteTags={setTasteTags}
+                tempKeys={tempKeys}
+                setTempKeys={setTempKeys}
+                isMobile={isMobile}
+            />
 
-                <div
-                    style={{
-                        padding: 12,
-                        overflowY: 'auto',
-                        WebkitOverflowScrolling: 'touch',
-                    }}
-                >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {messages.map(m => (
-                            <ChatBubble key={m.id} role={m.role} text={m.text} />
-                        ))}
+            {/* Right/Bottom: Results Panel */}
+            <ResultsPanel
+                submitted={submitted}
+                loading={loadingData}
+                items={filtered}
+                error={error}
+                onReset={reset}
+            />
+        </div>
+    );
+}
 
-                        {typing && <ChatBubble role="bot" text="…" typing />}
+// ----- Subcomponents -----
 
-                        {/* results summary inserted as bot message */}
-                        {submitted && (
-                            <ChatBubble role="bot" text={`条件まとめ：${summaryLine || '指定なし'}`} />
+function ChatPanel(props: any) {
+    const scrollRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [props.messages, props.typing]);
+
+    return (
+        <div style={{
+            background: '#111',
+            borderRadius: 16,
+            border: '1px solid rgba(255,255,255,0.08)',
+            display: 'grid',
+            gridTemplateRows: 'auto 1fr auto',
+            minHeight: 500,
+            overflow: 'hidden',
+        }}>
+            <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.08)', fontSize: 12, opacity: 0.8, display: 'flex', justifyContent: 'space-between' }}>
+                <span>AI診断チャット</span>
+                <button onClick={props.onReset} style={{ background: 'none', border: 'none', color: '#888', textDecoration: 'underline', fontSize: 11, cursor: 'pointer' }}>リセット</button>
+            </div>
+
+            <div ref={scrollRef} style={{
+                padding: 12,
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+            }}>
+                {props.messages.map((m: any) => (
+                    <div key={m.id} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: 10 }}>
+                        <div style={{
+                            maxWidth: '88%',
+                            padding: '10px 14px',
+                            borderRadius: 18,
+                            fontSize: 14,
+                            lineHeight: 1.5,
+                            background: m.role === 'user' ? '#1d4ed8' : '#262626',
+                            borderTopRightRadius: m.role === 'user' ? 4 : 18,
+                            borderTopLeftRadius: m.role === 'user' ? 18 : 4,
+                            wordBreak: 'break-word',
+                        }}>
+                            {m.text}
+                        </div>
+                    </div>
+                ))}
+                {props.typing && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 10 }}>
+                        <div style={{ padding: '8px 12px', borderRadius: 16, background: '#262626', opacity: 0.6, fontSize: 12 }}>入力中…</div>
+                    </div>
+                )}
+                {props.submitted && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 10 }}>
+                        <div style={{ maxWidth: '90%', padding: '12px', borderRadius: 14, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', fontSize: 12 }}>
+                            <div style={{ fontWeight: 700, marginBottom: 4, color: '#22c55e' }}>✅ 診断完了</div>
+                            <div style={{ opacity: 0.8 }}>{props.summaryLine}</div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div style={{ padding: '12px', borderTop: '1px solid rgba(255,255,255,0.08)', background: '#151515' }}>
+                {!props.submitted ? (
+                    <div>
+                        {props.step === 1 && (
+                            <OptionList options={MOOD_OPTIONS.map(o => ({ ...o, onClick: () => { props.setStyleTags([o.tag]); props.onNextStep(2); } }))} onSkip={() => props.onSkip(2)} />
                         )}
-                        <div ref={latestMessageRef} />
+                        {props.step === 2 && (
+                            <OptionList options={DIRECTION_OPTIONS.map(o => ({ ...o, onClick: () => { props.setTasteTags([o.tag]); props.onNextStep(3); } }))} onSkip={() => props.onSkip(3)} />
+                        )}
+                        {props.step === 3 && (
+                            <MultiSelect options={BODY_OPTIONS} values={props.tasteTags} onToggle={(t: string) => props.setTasteTags((prev: string[]) => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])} onNext={() => props.onNextStep(4)} onSkip={() => props.onSkip(4)} />
+                        )}
+                        {props.step === 4 && (
+                            <MultiSelect options={TEMP_OPTIONS} values={props.tempKeys} field="key" onToggle={(k: string) => props.setTempKeys((prev: string[]) => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])} onNext={() => props.onNextStep(5)} onSkip={() => props.onSkip(5)} />
+                        )}
+                        {props.step === 5 && (
+                            <div>
+                                <textarea
+                                    value={props.freeText}
+                                    onChange={(e) => props.setFreeText(e.target.value)}
+                                    placeholder="自由に入力（任意）"
+                                    style={{ width: '100%', height: 60, borderRadius: 12, background: '#000', color: '#fff', border: '1px solid #333', padding: 10, fontSize: 14, outline: 'none', marginBottom: 8 }}
+                                />
+                                <div style={{ display: 'flex', gap: 8 }}>
+                                    <button onClick={props.onSubmit} style={{ flex: 1, padding: 10, borderRadius: 12, background: '#22c55e', color: '#000', fontWeight: 700, border: 'none', cursor: 'pointer' }}>送信する</button>
+                                    <button onClick={props.onSubmit} style={{ padding: 10, borderRadius: 12, background: '#333', color: '#ccc', border: 'none', cursor: 'pointer' }}>スキップ</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
-
-                    {/* Input area */}
-                    {!submitted && (
-                        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div style={{ fontSize: 11, opacity: 0.75, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
-                                <span>Step {step}/{STEP_TOTAL}</span>
-                                <button onClick={reset} style={linkBtn}>リセット</button>
-                            </div>
-
-                            {step === 1 && (
-                                <>
-                                    <OptionGrid>
-                                        {MOOD_OPTIONS.map(o => (
-                                            <button key={o.tag} onClick={() => pickMood(o.tag)} style={chipBtn}>
-                                                {o.label}
-                                            </button>
-                                        ))}
-                                    </OptionGrid>
-                                    <div style={{ marginTop: 10, textAlign: 'right' }}>
-                                        <button onClick={() => handleSkip(2)} style={textBtn}>スキップ</button>
-                                    </div>
-                                </>
-                            )}
-
-                            {step === 2 && (
-                                <>
-                                    <OptionGrid>
-                                        {DIRECTION_OPTIONS.map(o => (
-                                            <button key={o.tag} onClick={() => pickDirection(o.tag)} style={chipBtn}>
-                                                {o.label}
-                                            </button>
-                                        ))}
-                                    </OptionGrid>
-                                    <div style={{ marginTop: 10, textAlign: 'right' }}>
-                                        <button onClick={() => handleSkip(3)} style={textBtn}>スキップ</button>
-                                    </div>
-                                </>
-                            )}
-
-                            {step === 3 && (
-                                <>
-                                    <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 8 }}>複数選べます</div>
-                                    <OptionGrid>
-                                        {BODY_OPTIONS.map(o => {
-                                            const active = tasteTags.includes(o.tag);
-                                            return (
-                                                <button
-                                                    key={o.tag}
-                                                    onClick={() => toggleBody(o.tag)}
-                                                    style={{ ...chipBtn, ...(active ? chipBtnActive : {}) }}
-                                                >
-                                                    {o.label}
-                                                </button>
-                                            );
-                                        })}
-                                    </OptionGrid>
-                                    <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <button onClick={() => handleSkip(4)} style={textBtn}>スキップ</button>
-                                        <button onClick={confirmBody} style={primaryBtn}>次へ</button>
-                                    </div>
-                                </>
-                            )}
-
-                            {step === 4 && (
-                                <>
-                                    <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 8 }}>複数選べます</div>
-                                    <OptionGrid>
-                                        {TEMP_OPTIONS.map(o => {
-                                            const active = tempKeys.includes(o.key);
-                                            return (
-                                                <button
-                                                    key={o.key}
-                                                    onClick={() => toggleTemp(o.key)}
-                                                    style={{ ...chipBtn, ...(active ? chipBtnActive : {}) }}
-                                                >
-                                                    {o.label}
-                                                </button>
-                                            );
-                                        })}
-                                    </OptionGrid>
-                                    <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <button onClick={() => handleSkip(5)} style={textBtn}>スキップ</button>
-                                        <button onClick={confirmTemp} style={primaryBtn}>次へ</button>
-                                    </div>
-                                </>
-                            )}
-
-                            {step === 5 && (
-                                <>
-                                    <textarea
-                                        value={freeText}
-                                        onChange={e => setFreeText(e.target.value)}
-                                        placeholder="例：お寿司に合わせたい、辛口は苦手、予算は3,000円くらい…など"
-                                        style={textArea}
-                                    />
-                                    <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                                        <button
-                                            onClick={() => submit()}
-                                            style={primaryBtn}
-                                            disabled={loadingData}
-                                        >
-                                            {loadingData ? '読み込み中…' : '送信しておすすめを見る'}
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setFreeText('');
-                                                submit();
-                                            }}
-                                            style={secondaryBtn}
-                                            disabled={loadingData}
-                                        >
-                                            スキップ
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* 下：検索結果（ここだけスクロール） */}
-            <div
-                style={{
-                    flex: '1 1 auto',
-                    overflowY: 'auto',
-                    WebkitOverflowScrolling: 'touch',
-                    padding: 12,
-                    background: '#111',
-                }}
-            >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
-                    <div style={{ fontWeight: 700, fontSize: 16 }}>おすすめ結果</div>
-                    <div style={{ fontSize: 12, opacity: 0.8 }}>
-                        {submitted ? (loadingData ? '読み込み中…' : `${filtered.length}件ヒット`) : '-'}
+                ) : (
+                    <div style={{ textAlign: 'center' }}>
+                        <button onClick={props.onReset} style={{ width: '100%', padding: 12, borderRadius: 12, background: '#333', color: '#fff', border: '1px solid #444', fontWeight: 600, cursor: 'pointer' }}>もう一度診断する</button>
                     </div>
-                </div>
-
-                <main style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12 }}>
-                    {!submitted ? (
-                        <div style={{ textAlign: 'center', padding: 40, opacity: 0.5, fontSize: 13 }}>
-                            上のチャットで質問に答えると<br />ここに結果が表示されます
-                        </div>
-                    ) : loadingData ? (
-                        <SkeletonList />
-                    ) : error ? (
-                        <div style={errorBoxStyle}>
-                            <div style={{ fontWeight: 700, marginBottom: 4 }}>読み込みに失敗しました</div>
-                            <div style={{ fontSize: 12, opacity: 0.9 }}>{error}</div>
-                        </div>
-                    ) : filtered.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: 24, opacity: 0.7 }}>
-                            該当する日本酒がありませんでした。<br />条件を変えてみてください。
-                            <div style={{ marginTop: 16 }}>
-                                <button onClick={reset} style={secondaryBtn}>リセット</button>
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            {filtered.map(s => <SakeCard key={s.id} item={s} />)}
-                            <div style={{ marginTop: 20, textAlign: 'center', opacity: 0.6, fontSize: 11 }}>
-                                - 結果は以上です -
-                            </div>
-                            <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center', gap: 10 }}>
-                                <button onClick={reset} style={secondaryBtn}>リセットして再診断</button>
-                            </div>
-                        </>
-                    )}
-                </main>
-
-                <footer style={{ marginTop: 40, fontSize: 11, opacity: 0.4, textAlign: 'center' }}>
-                    データ提供：SakeMaster / 楽天アフィリンク
-                </footer>
+                )}
             </div>
         </div>
     );
 }
 
-function ChatBubble({ role, text, typing }: { role: ChatRole; text: string; typing?: boolean }) {
-    const isUser = role === 'user';
+function ResultsPanel({ submitted, loading, items, error, onReset }: any) {
     return (
-        <div style={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
-            <div
-                style={{
-                    maxWidth: '92%',
-                    padding: '10px 12px',
-                    borderRadius: 14,
-                    background: isUser ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.08)',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    fontSize: 13,
-                    lineHeight: 1.5,
-                    whiteSpace: 'pre-wrap',
-                    overflowWrap: 'anywhere',
-                }}
-            >
-                {typing ? <span style={{ opacity: 0.85 }}>typing…</span> : text}
+        <div style={{
+            background: '#0a0a0a',
+            borderRadius: 16,
+            border: '1px solid rgba(255,255,255,0.08)',
+            display: 'grid',
+            gridTemplateRows: 'auto 1fr',
+            overflow: 'hidden',
+        }}>
+            <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.08)', fontSize: 13, fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>おすすめ日本酒</span>
+                <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 400 }}>{submitted ? `${items.length}件ヒット` : '-'}</span>
+            </div>
+
+            <div style={{
+                padding: 12,
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+            }}>
+                {!submitted ? (
+                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.4, fontSize: 13, textAlign: 'center', minHeight: 200 }}>
+                        診断が完了すると<br />ここにリストが表示されます
+                    </div>
+                ) : loading ? (
+                    <div style={{ display: 'grid', gap: 12 }}>
+                        {[1, 2, 3].map(i => <div key={i} style={{ height: 120, borderRadius: 14, background: '#1a1a1a' }} />)}
+                    </div>
+                ) : error ? (
+                    <div style={{ padding: 20, color: '#f87171', fontSize: 13 }}>エラーが発生しました: {error}</div>
+                ) : items.length === 0 ? (
+                    <div style={{ padding: 40, textAlign: 'center', opacity: 0.6 }}>
+                        該当ありませんでした。<br />条件を変えてみてください。
+                    </div>
+                ) : (
+                    <div style={{ display: 'grid', gap: 12 }}>
+                        {items.map((s: any) => <SakeCard key={s.id} item={s} />)}
+                        <div style={{ padding: '20px 0', textAlign: 'center', opacity: 0.3, fontSize: 11 }}>END.</div>
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
-function OptionGrid({ children }: { children: React.ReactNode }) {
+// ----- UI Parts -----
+
+function OptionList({ options, onSkip }: any) {
     return (
-        <div
-            style={{
-                display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1fr)',
-                gap: 8,
-            }}
-        >
-            {children}
+        <div style={{ display: 'grid', gap: 8 }}>
+            {options.map((o: any, i: number) => (
+                <button key={i} onClick={o.onClick} style={chipBtn}>{o.label}</button>
+            ))}
+            <button onClick={onSkip} style={{ background: 'none', border: 'none', color: '#777', padding: 8, fontSize: 12 }}>スキップ</button>
+        </div>
+    );
+}
+
+function MultiSelect({ options, values, onToggle, onNext, onSkip, field = 'tag' }: any) {
+    return (
+        <div>
+            <div style={{ display: 'grid', gap: 8 }}>
+                {options.map((o: any, i: number) => {
+                    const active = values.includes(o[field]);
+                    return <button key={i} onClick={() => onToggle(o[field])} style={{ ...chipBtn, ...(active ? { background: '#333', border: '1px solid #555' } : {}) }}>{o.label}</button>;
+                })}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
+                <button onClick={onSkip} style={{ background: 'none', border: 'none', color: '#777', fontSize: 12 }}>スキップ</button>
+                <button onClick={onNext} style={{ padding: '8px 16px', borderRadius: 10, background: '#fff', color: '#000', border: 'none', fontWeight: 700 }}>次へ</button>
+            </div>
         </div>
     );
 }
 
 function SakeCard({ item }: { item: SakeItem }) {
-    const img = item.rakuten?.image_url;
     const buy = item.rakuten?.affiliate_url || item.rakuten?.item_url;
-
     return (
-        <article style={{ background: '#fff', border: '1px solid #eee', borderRadius: 14, padding: 12, color: '#333' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '92px 1fr', gap: 12 }}>
-                <div
-                    style={{
-                        width: 92,
-                        height: 92,
-                        borderRadius: 12,
-                        background: '#f2f2f2',
-                        overflow: 'hidden',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flex: '0 0 auto',
-                    }}
-                >
-                    {img ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                        <span style={{ fontSize: 11, opacity: 0.6 }}>No Image</span>
-                    )}
+        <div style={{ background: '#fff', borderRadius: 14, padding: 12, color: '#111', display: 'grid', gridTemplateColumns: '80px 1fr', gap: 12 }}>
+            <div style={{ width: 80, height: 80, borderRadius: 10, background: '#f5f5f5', overflow: 'hidden' }}>
+                {item.rakuten?.image_url ? (
+                    <img src={item.rakuten.image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                ) : (
+                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.2, fontSize: 10 }}>No Image</div>
+                )}
+            </div>
+            <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 800, fontSize: 14, lineHeight: 1.2 }}>{item.name}</div>
+                <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>
+                    {item.brewery}{item.prefecture ? ` / ${item.prefecture}` : ''}
                 </div>
-
-                <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 800, lineHeight: 1.2 }}>{item.name}</div>
-                    {(item.brewery || item.prefecture) && (
-                        <div style={{ fontSize: 12, opacity: 0.75, marginTop: 2 }}>
-                            {item.brewery}
-                            {item.prefecture && item.brewery && <span> / </span>}
-                            {item.prefecture && <span>{item.prefecture}</span>}
-                        </div>
-                    )}
-
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
-                        {(item.style_tags || []).slice(0, 3).map(t => (
-                            <span key={`st-${t}`} style={tagStyle}>{t}</span>
-                        ))}
-                        {(item.taste_tags || []).slice(0, 4).map(t => (
-                            <span key={`tt-${t}`} style={tagStyle}>{t}</span>
-                        ))}
-                        {(item.serve_temp || []).slice(0, 3).map(t => (
-                            <span key={`tp-${t}`} style={tagStyle}>{TEMP_OPTIONS_MAP[t] || t}</span>
-                        ))}
-                    </div>
-
-                    {item.reason && <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.45 }}>{item.reason}</p>}
-
-                    <div style={{ marginTop: 10, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        <a
-                            href={buy || '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                                ...primaryBtn,
-                                display: 'inline-block',
-                                textDecoration: 'none',
-                                pointerEvents: buy ? 'auto' : 'none',
-                                opacity: buy ? 1 : 0.5,
-                            }}
-                        >
-                            購入する
-                        </a>
-                    </div>
+                <div style={{ marginTop: 8 }}>
+                    <a href={buy} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '6px 14px', borderRadius: 8, background: '#111', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>購入する</a>
                 </div>
             </div>
-        </article>
+        </div>
     );
 }
-
-function SkeletonList() {
-    return (
-        <>
-            {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} style={{ background: '#fff', border: '1px solid #eee', borderRadius: 14, padding: 12, height: 120 }} />
-            ))}
-        </>
-    );
-}
-
-// styles
-const tagStyle: React.CSSProperties = {
-    fontSize: 11,
-    padding: '4px 8px',
-    borderRadius: 999,
-    background: '#f3f3f3',
-    border: '1px solid #e9e9e9',
-    color: '#333',
-};
 
 const chipBtn: React.CSSProperties = {
+    padding: '10px 12px',
+    borderRadius: 12,
+    background: '#222',
+    border: '1px solid #333',
+    color: '#fff',
+    fontSize: 13,
     textAlign: 'left',
-    padding: '10px 12px',
-    borderRadius: 14,
-    border: '1px solid rgba(255,255,255,0.14)',
-    background: 'rgba(255,255,255,0.06)',
-    color: '#fff',
-    fontSize: 13,
     cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-};
-
-const chipBtnActive: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.18)',
-    border: '1px solid rgba(255,255,255,0.25)',
-};
-
-const primaryBtn: React.CSSProperties = {
-    padding: '10px 14px',
-    borderRadius: 12,
-    border: 'none',
-    background: 'linear-gradient(135deg, #111, #333)',
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 700,
-    cursor: 'pointer',
-};
-
-const secondaryBtn: React.CSSProperties = {
-    padding: '10px 14px',
-    borderRadius: 12,
-    border: '1px solid rgba(255,255,255,0.18)',
-    background: 'rgba(255,255,255,0.08)',
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: 600,
-    cursor: 'pointer',
-};
-
-const linkBtn: React.CSSProperties = {
-    background: 'transparent',
-    border: 'none',
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 12,
-    cursor: 'pointer',
-    textDecoration: 'underline',
-};
-
-const textBtn: React.CSSProperties = {
-    background: 'transparent',
-    border: 'none',
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: 13,
-    cursor: 'pointer',
-    padding: '8px',
-};
-
-const textArea: React.CSSProperties = {
     width: '100%',
-    minHeight: 84,
-    borderRadius: 12,
-    border: '1px solid rgba(255,255,255,0.16)',
-    background: 'rgba(0,0,0,0.25)',
-    color: '#fff',
-    padding: '10px 12px',
-    fontSize: 16, // iOS zoom防止
-    outline: 'none',
-    boxSizing: 'border-box',
-    resize: 'vertical',
 };
 
-const errorBoxStyle: React.CSSProperties = {
-    background: '#fff0f0',
-    border: '1px solid #ffd0d0',
-    padding: 12,
-    borderRadius: 12,
-    color: '#d32f2f',
-};
+const linkBtn: React.CSSProperties = { background: 'none', border: 'none', color: '#888', textDecoration: 'underline', fontSize: 11, cursor: 'pointer' };
