@@ -138,7 +138,7 @@ export default function SakeChatRecoPage() {
     // auto scroll
     useEffect(() => {
         scrollToBottom();
-    }, [messages, typing, submitted]);
+    }, [messages, typing]);
 
     // ----- iOS iframe: prevent horizontal pan (page-level) -----
     useEffect(() => {
@@ -190,6 +190,11 @@ export default function SakeChatRecoPage() {
             await botSay('Q5：最後に。苦手なタイプ・合わせたい料理・予算など自由にどうぞ（任意）');
         }
         setStep(nextStep);
+    };
+
+    const handleSkip = async (nextStep: number) => {
+        userSay('（スキップ）');
+        await nextQuestion(nextStep);
     };
 
     // ----- Answer handlers -----
@@ -423,9 +428,16 @@ export default function SakeChatRecoPage() {
                                     </button>
                                 ))}
                             </OptionGrid>
-                        )}
+                            <div style={{ marginTop: 10, textAlign: 'right' }}>
+                                <button onClick={() => handleSkip(2)} style={textBtn}>
+                                    スキップ
+                                </button>
+                            </div>
+                        </>
+                    )}
 
-                        {step === 2 && (
+                    {step === 2 && (
+                        <>
                             <OptionGrid>
                                 {DIRECTION_OPTIONS.map(o => (
                                     <button key={o.tag} onClick={() => pickDirection(o.tag)} style={chipBtn}>
@@ -433,7 +445,13 @@ export default function SakeChatRecoPage() {
                                     </button>
                                 ))}
                             </OptionGrid>
-                        )}
+                            <div style={{ marginTop: 10, textAlign: 'right' }}>
+                                <button onClick={() => handleSkip(3)} style={textBtn}>
+                                    スキップ
+                                </button>
+                            </div>
+                        </>
+                    )}
 
                         {step === 3 && (
                             <>
@@ -452,7 +470,10 @@ export default function SakeChatRecoPage() {
                                         );
                                     })}
                                 </OptionGrid>
-                                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
+                                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <button onClick={() => handleSkip(4)} style={textBtn}>
+                                        スキップ
+                                    </button>
                                     <button onClick={confirmBody} style={primaryBtn}>
                                         次へ
                                     </button>
@@ -477,7 +498,10 @@ export default function SakeChatRecoPage() {
                                         );
                                     })}
                                 </OptionGrid>
-                                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
+                                <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <button onClick={() => handleSkip(5)} style={textBtn}>
+                                        スキップ
+                                    </button>
                                     <button onClick={confirmTemp} style={primaryBtn}>
                                         次へ
                                     </button>
@@ -527,7 +551,7 @@ export default function SakeChatRecoPage() {
             <footer style={{ marginTop: 12, fontSize: 11, opacity: 0.55, textAlign: 'center' }}>
                 データ提供：SakeMaster / 楽天アフィリンク
             </footer>
-        </div>
+        </div >
     );
 }
 
@@ -709,6 +733,15 @@ const linkBtn: React.CSSProperties = {
     fontSize: 12,
     cursor: 'pointer',
     textDecoration: 'underline',
+};
+
+const textBtn: React.CSSProperties = {
+    background: 'transparent',
+    border: 'none',
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 13,
+    cursor: 'pointer',
+    padding: '8px',
 };
 
 const textArea: React.CSSProperties = {
