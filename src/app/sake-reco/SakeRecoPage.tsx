@@ -197,7 +197,25 @@ export default function SakeChatRecoPage() {
                 onSkip={handleSkip}
                 onSubmit={submit}
                 // Options
-                setStyleTags={setStyleTags}
+                pickMood={(tag: string, label: string) => {
+                    userSay(label);
+                    setStyleTags([tag]);
+                    nextQuestion(2);
+                }}
+                pickDirection={(tag: string, label: string) => {
+                    userSay(label);
+                    setTasteTags([tag]);
+                    nextQuestion(3);
+                }}
+                confirmBody={() => {
+                    const chosen = tasteTags.filter(t => BODY_OPTIONS.some(o => o.tag === t));
+                    userSay(chosen.length ? `質感：${chosen.join(' / ')}` : '質感：指定なし');
+                    nextQuestion(4);
+                }}
+                confirmTemp={() => {
+                    userSay(tempKeys.length ? `温度：${tempKeys.map(k => TEMP_OPTIONS_MAP[k]).join(' / ')}` : '温度：指定なし');
+                    nextQuestion(5);
+                }}
                 tasteTags={tasteTags}
                 setTasteTags={setTasteTags}
                 tempKeys={tempKeys}
@@ -256,7 +274,8 @@ function ChatPanel(props: any) {
                             borderRadius: 18,
                             fontSize: 14,
                             lineHeight: 1.5,
-                            background: m.role === 'user' ? '#1d4ed8' : '#262626',
+                            background: m.role === 'user' ? '#fff' : '#262626',
+                            color: m.role === 'user' ? '#111' : '#fff',
                             borderTopRightRadius: m.role === 'user' ? 4 : 18,
                             borderTopLeftRadius: m.role === 'user' ? 18 : 4,
                             wordBreak: 'break-word',
@@ -284,16 +303,16 @@ function ChatPanel(props: any) {
                 {!props.submitted ? (
                     <div>
                         {props.step === 1 && (
-                            <OptionList options={MOOD_OPTIONS.map(o => ({ ...o, onClick: () => { props.setStyleTags([o.tag]); props.onNextStep(2); } }))} onSkip={() => props.onSkip(2)} />
+                            <OptionList options={MOOD_OPTIONS.map(o => ({ ...o, onClick: () => props.pickMood(o.tag, o.label) }))} onSkip={() => props.onSkip(2)} />
                         )}
                         {props.step === 2 && (
-                            <OptionList options={DIRECTION_OPTIONS.map(o => ({ ...o, onClick: () => { props.setTasteTags([o.tag]); props.onNextStep(3); } }))} onSkip={() => props.onSkip(3)} />
+                            <OptionList options={DIRECTION_OPTIONS.map(o => ({ ...o, onClick: () => props.pickDirection(o.tag, o.label) }))} onSkip={() => props.onSkip(3)} />
                         )}
                         {props.step === 3 && (
-                            <MultiSelect options={BODY_OPTIONS} values={props.tasteTags} onToggle={(t: string) => props.setTasteTags((prev: string[]) => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])} onNext={() => props.onNextStep(4)} onSkip={() => props.onSkip(4)} />
+                            <MultiSelect options={BODY_OPTIONS} values={props.tasteTags} onToggle={(t: string) => props.setTasteTags((prev: string[]) => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])} onNext={() => props.confirmBody()} onSkip={() => props.onSkip(4)} />
                         )}
                         {props.step === 4 && (
-                            <MultiSelect options={TEMP_OPTIONS} values={props.tempKeys} field="key" onToggle={(k: string) => props.setTempKeys((prev: string[]) => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])} onNext={() => props.onNextStep(5)} onSkip={() => props.onSkip(5)} />
+                            <MultiSelect options={TEMP_OPTIONS} values={props.tempKeys} field="key" onToggle={(k: string) => props.setTempKeys((prev: string[]) => prev.includes(k) ? prev.filter(x => x !== k) : [...prev, k])} onNext={() => props.confirmTemp()} onSkip={() => props.onSkip(5)} />
                         )}
                         {props.step === 5 && (
                             <div>
