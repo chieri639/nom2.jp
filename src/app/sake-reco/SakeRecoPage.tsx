@@ -332,13 +332,14 @@ export default function SakeChatRecoPage() {
     return (
         <div
             style={{
-                height: '100svh',
+                // height: '100svh', // REMOVED for embedded use
+                height: 700, // Fixed height for embedded use
                 display: 'flex',
                 flexDirection: 'column',
                 background: '#000',
                 color: '#fff',
                 overflow: 'hidden',
-                fontFamily: 'system-ui, -apple-system',
+                // fontFamily: 'system-ui, -apple-system', // Inherit from parent
             }}
         >
             {/* 上：チャット（固定高さ or flex: 0 0 auto） */}
