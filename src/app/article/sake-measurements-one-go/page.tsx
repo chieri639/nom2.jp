@@ -74,6 +74,9 @@ export default function SakeMeasurementsOneGo() {
                         <li>Using a <strong>36ml</strong> Ochoko = Approx. 5 cups.</li>
                         <li>Using a <strong>45ml</strong> Ochoko = Approx. 4 cups.</li>
                     </ul>
+                    <div style={{ marginBottom: 32, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                        <img src="/images/traditional_ochoko_cup.png" alt="Traditional Japanese Ochoko cup and Tokkuri carafe" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                    </div>
                     <p style={{ marginBottom: 24 }}>
                         Because cup sizes can vary greatly at Izakayas (Japanese pubs), using a <i>Tokkuri</i> (sake carafe) that precisely holds 1 Go is the best way to accurately track your intake.
                     </p>
@@ -101,6 +104,9 @@ export default function SakeMeasurementsOneGo() {
                     </p>
 
                     <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16, color: '#b33939' }}>How does it compare to Beer?</h3>
+                    <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                        <img src="/images/beer_and_sake_glass.png" alt="A glass of beer next to a sake cup" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                    </div>
                     <div style={{ display: 'flex', gap: '20px', alignItems: 'center', background: '#fff', border: '1px solid #eaeaea', padding: '24px', borderRadius: 16, marginBottom: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
                         <div style={{ flex: 1, textAlign: 'center', borderRight: '1px solid #eaeaea' }}>
                             <div style={{ fontSize: 24, fontWeight: 800, color: '#111', marginBottom: 8 }}>1 Go of Sake</div>
@@ -134,6 +140,9 @@ export default function SakeMeasurementsOneGo() {
                         </div>
                         <div>
                             <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12, color: '#111' }}>How many calories are in 1 Go?</h3>
+                            <div style={{ marginBottom: 16, borderRadius: 12, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                <img src="/images/sake_and_rice_bowl.png" alt="Sake and a bowl of white rice" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                            </div>
                             <p style={{ fontSize: 16, color: '#555' }}>
                                 One Go (180ml) of standard sake contains about <strong>184 kcal</strong>. For comparison, a standard bowl of white rice (150g) is about 234 kcal, and a slice of bread (60g) is about 149 kcal. While sake is made from rice and may seem high in calories, it is relatively difficult to gain weight from sake alone as long as you stick to this moderate amount and pair it with low-carb, healthy appetizers.
                             </p>
