@@ -48,21 +48,21 @@ export default function TokyoSakeIzakayaGuidePart1() {
 
             <div style={{ fontSize: 18, lineHeight: 1.8, color: '#333' }}>
                 
-                {/* 1. Uoyakio Ni */}
+                {/* 1. SakanaYakio 2 */}
                 <section style={{ marginBottom: 80 }}>
                     <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
-                        1. Uoyakio Ni (Shimbashi)
+                        1. SakanaYakio 2 (Shimbashi)
                     </h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: 24 }}>
                         <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/uoyakio_1.jpg" alt="Uoyakio Ni Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                            <img src="/images/uoyakio_1.jpg" alt="SakanaYakio 2 Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
                         </div>
                         <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/uoyakio_2.jpg" alt="Drinks and Snacks at Uoyakio Ni" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                            <img src="/images/uoyakio_2.jpg" alt="Drinks and Snacks at SakanaYakio 2" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
                         </div>
                     </div>
                     <p style={{ marginBottom: 24 }}>
-                        Known as an "izakaya truly meant for sake lovers," Uoyakio Ni constantly stocks <strong>over 100 varieties of Japanese sake</strong> carefully selected from all 47 prefectures in Japan. They pride themselves on incredibly fresh seafood transported directly from the famous Toyosu Market.
+                        Known as an "izakaya truly meant for sake lovers," SakanaYakio 2 constantly stocks <strong>over 100 varieties of Japanese sake</strong> carefully selected from all 47 prefectures in Japan. They pride themselves on incredibly fresh seafood transported directly from the famous Toyosu Market.
                     </p>
                     <p style={{ marginBottom: 24 }}>
                         A must-try absolute favorite among regulars is their Seared Fatty Mackerel (Aburi O-Toro Shime-Saba). The interior mainly consists of counter seating, making it an incredibly welcoming and highly recommended spot for solo travelers who want to enjoy sake in an unpretentious, relaxed atmosphere.
@@ -153,14 +153,14 @@ export default function TokyoSakeIzakayaGuidePart1() {
                     </div>
                 </section>
 
-                {/* 4. Beishin */}
+                {/* 4. Maishin */}
                 <section style={{ marginBottom: 80 }}>
                     <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
-                        4. Beishin (Shibuya)
+                        4. Maishin (Shibuya)
                     </h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: 24 }}>
                         <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/beishin_1.jpg" alt="Beishin Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                            <img src="/images/beishin_1.jpg" alt="Maishin Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
                         </div>
                         <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                             <img src="/images/beishin_2.jpg" alt="Aramasa No.6 Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
@@ -169,11 +169,11 @@ export default function TokyoSakeIzakayaGuidePart1() {
                             <img src="/images/beishin_3.jpg" alt="Denshu Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
                         </div>
                         <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/beishin_4.jpg" alt="Beishin Signboard" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                            <img src="/images/beishin_4.jpg" alt="Maishin Signboard" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
                         </div>
                     </div>
                     <p style={{ marginBottom: 24 }}>
-                        Stepping into Beishin feels like escaping Tokyo. It is a quiet, modern Japanese dining space that you would scarcely believe is located right beside the bustling streets of Shibuya. 
+                        Stepping into Maishin feels like escaping Tokyo. It is a quiet, modern Japanese dining space that you would scarcely believe is located right beside the bustling streets of Shibuya. 
                     </p>
                     <p style={{ marginBottom: 24 }}>
                         Look for the large "Specialty Local Sake" (地酒専門) sign. Inside, you can find a massive curation of nearly 200 sakes, ranging from standard classics to rare sparkling and long-aged varieties. Their food focuses on Japanese fundamentals pairing beautifully with rice wine ("Rice and Heart"). It seamlessly combines atmosphere, taste, and incredible drinks into one elegant destination.
@@ -231,10 +231,10 @@ export default function TokyoSakeIzakayaGuidePart1() {
                 <section style={{ background: '#f8f9fa', padding: '32px', borderRadius: 16, border: '1px solid #eaeaea', marginBottom: 60 }}>
                     <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 16, color: '#111' }}>Summary: Your Tokyo Sake Adventure</h2>
                     <ul style={{ paddingLeft: 24, margin: 0, color: '#444', lineHeight: 1.8, fontSize: 16 }}>
-                        <li><strong>Uoyakio Ni</strong> provides 100+ types of sake matched perfectly with fresh seafood.</li>
+                        <li><strong>SakanaYakio 2</strong> provides 100+ types of sake matched perfectly with fresh seafood.</li>
                         <li><strong>Sakelab Tokyo</strong> offers a modern, stylish glass-bar system prioritizing variety.</li>
                         <li><strong>Kemuri</strong> delivers 120 all-you-can-drink varieties and DIY hot sake in cozy private rooms.</li>
-                        <li><strong>Beishin</strong> is Shibuya's hidden upscale oasis featuring sparkling and aged sake.</li>
+                        <li><strong>Maishin</strong> is Shibuya's hidden upscale oasis featuring sparkling and aged sake.</li>
                         <li><strong>SAKEICE BAR!</strong> lets you trial sake playfully via coin machines, complete with alcoholic ice cream.</li>
                     </ul>
                 </section>
