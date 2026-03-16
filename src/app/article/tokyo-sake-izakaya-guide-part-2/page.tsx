@@ -40,8 +40,8 @@ export default function TokyoSakeIzakayaGuidePart2Page() {
                         <h3 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                             1. Kappo Kakuuchi SAKE and (Shinjuku Gyoenmae)
                         </h3>
-                        <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/izakaya_sakeand.png" alt="Delicate plate and sake glass" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        <div style={{ maxWidth: 500, margin: '0 auto 24px', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/izakaya_sakeand_real.jpg" alt="Delicate plate and sake glass" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '3/4' }} />
                         </div>
                         <p style={{ marginBottom: 24 }}>
                             Tucked away in the back alleys of Shinjuku Gyoenmae, this casual <em>kappo</em> (traditional Japanese cooking) restaurant functions as a beautiful hidden retreat.
@@ -67,8 +67,8 @@ export default function TokyoSakeIzakayaGuidePart2Page() {
                         <h3 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                             2. Jizake Yuraku Uraya (Ikebukuro)
                         </h3>
-                        <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/izakaya_uraya.png" alt="Fresh sashimi and sake" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        <div style={{ maxWidth: 500, margin: '0 auto 24px', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/izakaya_uraya_real.jpg" alt="Fresh sashimi and sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '3/4' }} />
                         </div>
                         <p style={{ marginBottom: 24 }}>
                             Managed by the famous Jizake Doraku Group (who also run Maishin from our Part 1 guide), this Ikebukuro establishment offers a reliable, exceptional sake lineup.
@@ -104,8 +104,8 @@ export default function TokyoSakeIzakayaGuidePart2Page() {
                         <h3 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                             3. Junmaishu Senmon Suisui (Nihonbashi)
                         </h3>
-                        <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/izakaya_suisui.png" alt="Sake bottles and tasting glasses" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        <div style={{ maxWidth: 500, margin: '0 auto 24px', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/izakaya_suisui_real.jpg" alt="Sake bottles and tasting glasses" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '3/4' }} />
                         </div>
                         <p style={{ marginBottom: 24 }}>
                             A specialty store with an extraordinary dedication strictly to <em>Junmai-shu</em> (pure rice sake—sake made only with rice, water, and koji without added alcohol).
@@ -131,8 +131,8 @@ export default function TokyoSakeIzakayaGuidePart2Page() {
                         <h3 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                             4. Nurukan Sato Gotenyama Saryo (Shinagawa)
                         </h3>
-                        <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/izakaya_nurukan.png" alt="Sake bar inside a station" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        <div style={{ maxWidth: 500, margin: '0 auto 24px', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/izakaya_nurukan_real.jpg" alt="Sake bar inside a station" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '3/4' }} />
                         </div>
                         <p style={{ marginBottom: 24 }}>
                             Believe it or not, this premium spot is located <strong>inside the ticket gates</strong> of Shinagawa Station (Ecute Shinagawa)!
@@ -168,8 +168,8 @@ export default function TokyoSakeIzakayaGuidePart2Page() {
                         <h3 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                             5. Chill Labo Akasaka (Akasaka)
                         </h3>
-                        <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/izakaya_chilllabo.png" alt="Bartender pouring warm sake" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        <div style={{ maxWidth: 500, margin: '0 auto 24px', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/izakaya_chilllabo_real.jpg" alt="Bartender pouring warm sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '3/4' }} />
                         </div>
                         <p style={{ marginBottom: 24 }}>
                             A lovely Japanese sake bar where the manager possesses an incredibly deep knowledge of sake. They feature an especially abundant lineup of <em>Kanzake</em> (warm sake).
