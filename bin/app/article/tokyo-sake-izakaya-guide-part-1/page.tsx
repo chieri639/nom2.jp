@@ -53,8 +53,13 @@ export default function TokyoSakeIzakayaGuidePart1() {
                     <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                         1. Uoyakio Ni (Shimbashi)
                     </h2>
-                    <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                        <img src="/images/izakaya_uoyakio.png" alt="Fresh seafood and sake at Uoyakio Ni" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: 24 }}>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/uoyakio_1.jpg" alt="Uoyakio Ni Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/uoyakio_2.jpg" alt="Drinks and Snacks at Uoyakio Ni" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
                     </div>
                     <p style={{ marginBottom: 24 }}>
                         Known as an "izakaya truly meant for sake lovers," Uoyakio Ni constantly stocks <strong>over 100 varieties of Japanese sake</strong> carefully selected from all 47 prefectures in Japan. They pride themselves on incredibly fresh seafood transported directly from the famous Toyosu Market.
@@ -79,8 +84,19 @@ export default function TokyoSakeIzakayaGuidePart1() {
                     <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                         2. Sakelab Tokyo (Jujo)
                     </h2>
-                    <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                        <img src="/images/izakaya_sakelab.png" alt="Stylish sake bar interior at Sakelab Tokyo" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: 24 }}>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/sakelab_1.jpg" alt="Sakelab Tokyo Exterior" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/sakelab_2.jpg" alt="Sake Bottle" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/sakelab_3.jpg" alt="Various Sake Bottles" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/sakelab_4.jpg" alt="Sake Menu" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
                     </div>
                     <p style={{ marginBottom: 24 }}>
                         Tucked quietly in a residential neighborhood of Jujo, Sakelab Tokyo is a highly popular shop establishing a modern "sake bar" style. With over 30 varieties of local sake available to order by the single glass, it is perfect for tasting and comparing different profiles to find your favorite.
@@ -105,8 +121,19 @@ export default function TokyoSakeIzakayaGuidePart1() {
                     <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                         3. Sumibiyakitori Kemuri (Monzen-nakacho)
                     </h2>
-                    <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                        <img src="/images/izakaya_kemuri.png" alt="Yakitori and warm Kanzake at Kemuri" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: 24 }}>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/kemuri_1.jpg" alt="Kemuri Hot Pot" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/kemuri_2.jpg" alt="Kemuri Sake Warmers" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/kemuri_3.jpg" alt="Stairs to Kemuri" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/kemuri_4.jpg" alt="Daishichi Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
                     </div>
                     <p style={{ marginBottom: 24 }}>
                         If you want the ultimate all-you-can-drink Japanese sake experience, look no further than "Kemuri". This hidden gem offers a staggering <strong>120+ varieties of sake</strong> on their all-you-can-drink menu.
@@ -131,8 +158,19 @@ export default function TokyoSakeIzakayaGuidePart1() {
                     <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                         4. Beishin (Shibuya)
                     </h2>
-                    <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                        <img src="/images/izakaya_beishin.png" alt="A quiet, modern Japanese dining room at Beishin" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: 24 }}>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/beishin_1.jpg" alt="Beishin Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/beishin_2.jpg" alt="Aramasa No.6 Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/beishin_3.jpg" alt="Denshu Sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/beishin_4.jpg" alt="Beishin Signboard" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
                     </div>
                     <p style={{ marginBottom: 24 }}>
                         Stepping into Beishin feels like escaping Tokyo. It is a quiet, modern Japanese dining space that you would scarcely believe is located right beside the bustling streets of Shibuya. 
@@ -157,8 +195,19 @@ export default function TokyoSakeIzakayaGuidePart1() {
                     <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                         5. SAKEICE BAR! (Tokyo Station)
                     </h2>
-                    <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                        <img src="/images/izakaya_sakeice.png" alt="Coin-operated sake tasting machines at SAKEICE BAR" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: 24 }}>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/sakeice_1.jpg" alt="SAKEICE BAR Exterior" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/sakeice_2.jpg" alt="SAKE HUNDRED and Ice Cream" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/sakeice_3.jpg" alt="Sake Bottles" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
+                        <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/sakeice_4.jpg" alt="SAKEICE Front Views" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '4/3' }} />
+                        </div>
                     </div>
                     <p style={{ marginBottom: 24 }}>
                         Directly connected to Tokyo Station inside YANMAR TOKYO (1F), this is a completely unique, highly interactive tasting experience. The bar operates on a fun <strong>coin-operated system</strong>, allowing you to sample a vast assortment of regional sakes in tiny increments—the absolute best way to discover what type of sake you love without committing to a full glass.
