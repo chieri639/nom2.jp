@@ -40,8 +40,10 @@ export default function TokyoSakeIzakayaGuidePart3Page() {
                         <h3 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                             1. EUREKA! (Nishiazabu/Hiroo)
                         </h3>
-                        <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/izakaya_eureka.png" alt="EUREKA! Sake Pairing" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/izakaya_eureka_real_1.jpg" alt="EUREKA! Sake Pairing" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '1/1', gridColumn: 'span 2' }} />
+                            <img src="/images/izakaya_eureka_real_2.jpg" alt="EUREKA! dish" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '1/1' }} />
+                            <img src="/images/izakaya_eureka_real_3.jpg" alt="EUREKA! atmosphere" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '1/1' }} />
                         </div>
                         <p style={{ marginBottom: 24 }}>
                             Owned by Marie Chiba, a leading pioneer of sake pairing in Japan, this is an absolute must-visit spot for sake lovers (selected as one of the elite "Top 100 Izakayas").
@@ -67,8 +69,9 @@ export default function TokyoSakeIzakayaGuidePart3Page() {
                         <h3 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                             2. Sake Pairing CAMOS (Jimbocho)
                         </h3>
-                        <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/izakaya_camos.png" alt="Sake paired with seasonal dish" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/izakaya_camos_real_1.jpg" alt="Sake paired with seasonal dish" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '1/1' }} />
+                            <img src="/images/izakaya_camos_real_2.jpg" alt="CAMOS sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '1/1' }} />
                         </div>
                         <p style={{ marginBottom: 24 }}>
                             Having recently relocated from Akasaka to Jimbocho, this increasingly popular warm and at-home hidden bar is beautifully managed by its <em>okami</em> (proprietress).
@@ -104,8 +107,9 @@ export default function TokyoSakeIzakayaGuidePart3Page() {
                         <h3 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                             3. Nihonshu Tsubaki Sake BAR (Jujo)
                         </h3>
-                        <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/izakaya_tsubaki.png" alt="Luxurious Hassun platter and sake" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/izakaya_tsubaki_real_1.jpg" alt="Luxurious Hassun platter and sake" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '1/1' }} />
+                            <img src="/images/izakaya_tsubaki_real_2.jpg" alt="Tsubaki atmosphere" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '1/1' }} />
                         </div>
                         <p style={{ marginBottom: 24 }}>
                             This is the prestigious sister venue to "Sakelab Tokyo" (introduced in Part 1), designed as a highly exclusive, <strong>introduction-only (members-only)</strong> hidden bar known only to a lucky few.
@@ -132,8 +136,8 @@ export default function TokyoSakeIzakayaGuidePart3Page() {
                         <h3 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                             4. Platinum Fish KAPPO (Shimbashi)
                         </h3>
-                        <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/izakaya_platinumfish.png" alt="Upscale Sushi Kappo" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        <div style={{ maxWidth: 500, margin: '0 auto 24px', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/izakaya_platinumfish_real.jpg" alt="Upscale Sushi Kappo" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '3/4' }} />
                         </div>
                         <p style={{ marginBottom: 24 }}>
                             A serene, traditional Japanese space that will make you entirely forget you are in Shimbashi, famously known as Tokyo's chaotic haven for salarymen.
@@ -169,8 +173,9 @@ export default function TokyoSakeIzakayaGuidePart3Page() {
                         <h3 style={{ fontSize: 26, fontWeight: 800, marginBottom: 24, color: '#111', paddingBottom: 12, borderBottom: '2px solid #111' }}>
                             5. Ponshu Hall (Kiyosumi Shirakawa)
                         </h3>
-                        <div style={{ marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            <img src="/images/izakaya_ponshuhall.png" alt="Neon lights and Fugu Oden" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: 24, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            <img src="/images/izakaya_ponshuhall_real_1.jpg" alt="Neon lights and Fugu Oden" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '1/1' }} />
+                            <img src="/images/izakaya_ponshuhall_real_2.jpg" alt="Ponshuhall sake tasting" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: '1/1' }} />
                         </div>
                         <p style={{ marginBottom: 24 }}>
                             Just a 1-minute walk from Kiyosumi Shirakawa station, this highly photogenic casual pub features trendy neon signs practically practically begging to be posted on Instagram.
