@@ -64,9 +64,12 @@ export default function WashokuPairingPart2() {
                                 福井県・黒龍酒造が誇る大吟醸。大吟醸でありながら香りは穏やかで、特筆すべきは絹のような滑らかさと透明感のある上品な旨味です。上質なお出汁（一番出汁のお椀や、茶碗蒸しなど）の風味を一切邪魔せず、和食の持つ奥深い旨味の余韻を優しく、そして長く引き延ばしてくれます。<br />
                                 ※濃い味付けのおでん等の場合は、よりどっしりとした『天狗舞 山廃純米』等を選ぶのも素晴らしい選択です。
                             </p>
-                            <a href="https://hb.afl.rakuten.co.jp/hgc/..." target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', backgroundColor: '#bf0000', color: '#fff', padding: '12px 28px', borderRadius: 6, textDecoration: 'none', fontWeight: 700, fontSize: 15, fontFamily: '"Noto Sans JP", sans-serif', transition: 'opacity 0.2s' }}>
-                                楽天市場でチェックする
-                            </a>
+                            <div style={{ textAlign: 'center', marginTop: 16 }}>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <a href="https://hb.afl.rakuten.co.jp/ichiba/452f1a9d.ff7184f5.452f1a9e.70cc233b/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fhyousuke%2F336954%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                    <img src="https://hbb.afl.rakuten.co.jp/hgb/452f1a9d.ff7184f5.452f1a9e.70cc233b/?me_id=1191983&item_id=10000008&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fhyousuke%2Fcabinet%2Fkokuryu%2Fimgrc0117205400.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: '0' }} alt="" title="" />
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -99,6 +102,19 @@ export default function WashokuPairingPart2() {
                             <p style={{ fontSize: 16, lineHeight: 1.7 }}>
                                 温度を上げると、旨味が凝縮すると同時にアルコールの揮発が早くなり、後味が鋭く「キレる（スパッと消える）」ようになります。熱々のおでん、冬の鍋料理、脂の乗った焼き鳥などに熱燗を合わせると、熱で溶けた食材の脂っこさを熱燗のキレが一瞬で洗い流す「究極のウォッシュ効果」を生み出し、無限に食べ続けられるような感覚に陥ります。
                             </p>
+                            <div style={{ marginTop: 24, padding: 20, background: '#fff', borderRadius: 8, border: '1px solid #ffcccc' }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#eb2f06', marginBottom: 8 }}>💡 自宅で極上の熱燗を楽しむ便利家電</div>
+                                <h4 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>ツインバード 卓上酒燗器</h4>
+                                <p style={{ fontSize: 14, color: '#555', marginBottom: 16 }}>
+                                    お鍋を使わずに、卓上で簡単にベストな温度のお燗を作れる便利な酒燗器。これ一つあるだけで、冬の晩酌のクオリティが劇的に変わります。
+                                </p>
+                                <div style={{ textAlign: 'center' }}>
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <a href="https://hb.afl.rakuten.co.jp/ichiba/524866c3.958282f9.524866c4.16703812/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmaruyama-shop%2F4978770333894%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                        <img src="https://hbb.afl.rakuten.co.jp/hgb/524866c3.958282f9.524866c4.16703812/?me_id=1431011&item_id=10000163&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fmaruyama-shop%2Fcabinet%2Fitem%2F11660768%2F11994163%2Fimgrc0109628822.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: '0' }} alt="" title="" />
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>

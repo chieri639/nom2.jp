@@ -59,6 +59,14 @@ export default function WashokuPairingPart3() {
                             <p style={{ fontSize: 16, lineHeight: 1.8 }}>
                                 雪解けとともに芽吹く、ふきのとう、タラの芽、こごみ等の山菜たち。冬の間に眠っていた体を起こすような、山菜特有の「エグ味」や「ほろ苦さ」には、火入れ処理を行っていない（酵母が生きている）ピチピチとした<strong>「しぼりたて生酒」や「春のうすにごり（微発泡）」</strong>を合わせます。若々しくフレッシュな酸味と微炭酸が、天ぷらの油と山菜の苦味を心地よく包み込み、生命力の爆発を感じさせます。
                             </p>
+                            <div style={{ padding: 20, background: '#fcf8fa', borderRadius: 8, border: '1px solid #fce8f0', marginTop: 24, textAlign: 'center' }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#d6336c', marginBottom: 8 }}>🌸 春におすすめのペアリング銘柄</div>
+                                <h4 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>あたごのまつ はるこい 純米吟醸 生酒</h4>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <a href="https://hb.afl.rakuten.co.jp/ichiba/4d7563f8.eab4de70.4d7563f9.79e9c410/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbisyugakou%2Fhk014-n18%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                    <img src="https://hbb.afl.rakuten.co.jp/hgb/4d7563f8.eab4de70.4d7563f9.79e9c410/?me_id=1425829&item_id=10000232&pc=https%3A%2F%2Fimage.rakuten.co.jp%2Fbisyugakou%2Fcabinet%2F10584510%2F11501896%2Fimgrc0095922944.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: '0' }} alt="" title="" />
+                                </a>
+                            </div>
                         </div>
                         
                         <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 6px 24px rgba(0,0,0,0.06)', borderTop: '5px solid #6ed1e2' }}>
@@ -68,6 +76,14 @@ export default function WashokuPairingPart3() {
                             <p style={{ fontSize: 16, lineHeight: 1.8 }}>
                                 蒸し暑い日本の夏を乗り切るための、鮎の塩焼きや、骨切りされたハモの湯引き、夏野菜（トマトや茄子）やそうめんなど、涼しげで淡白な食事には<strong>「夏酒（なつざけ）」</strong>を。アルコール度数を少し低めにして軽快に仕上げたり、リンゴ酸を多く出して白ワインのような爽やかな酸味を持たせた夏酒をキリッと冷やせば、清流のせせらぎを思わせる究極の涼感ペアリングが完成します。
                             </p>
+                            <div style={{ padding: 20, background: '#f1fbfe', borderRadius: 8, border: '1px solid #d0f0f8', marginTop: 24, textAlign: 'center' }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#0070f3', marginBottom: 8 }}>🎐 夏におすすめのペアリング銘柄</div>
+                                <h4 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>日高見 純米吟醸 夏の純米吟醸</h4>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <a href="https://hb.afl.rakuten.co.jp/ichiba/52486a1a.33d53603.52486a1b.e5d72c86/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Ffujiwaraya-01%2F10001410%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                    <img src="https://hbb.afl.rakuten.co.jp/hgb/52486a1a.33d53603.52486a1b.e5d72c86/?me_id=1234735&item_id=10001410&pc=https%3A%2F%2Fimage.rakuten.co.jp%2Ffujiwaraya-01%2Fcabinet%2F00820810%2Fimgrc0079600741.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: '0' }} alt="" title="" />
+                                </a>
+                            </div>
                         </div>
                         
                         <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 6px 24px rgba(0,0,0,0.06)', borderTop: '5px solid #d35400' }}>
@@ -77,6 +93,14 @@ export default function WashokuPairingPart3() {
                             <p style={{ fontSize: 16, lineHeight: 1.8 }}>
                                 脂が乗った秋刀魚（サンマ）の塩焼きや、出汁がたっぷりと出た松茸などのキノコ料理。この「食欲の秋・実りの秋」の濃厚な旨味には、春先に一度だけ火入れ（加熱殺菌）を行い、ひと夏をひんやりとした蔵の中で越して円熟味を増した<strong>「ひやおろし（秋あがり）」</strong>がマストです。角が取れて落ち着いた香りと、深みを増したお米の旨味が、秋の豊潤な味覚と完璧に同調します。
                             </p>
+                            <div style={{ padding: 20, background: '#fdf6f0', borderRadius: 8, border: '1px solid #f6dcc1', marginTop: 24, textAlign: 'center' }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#b94000', marginBottom: 8 }}>🍂 秋におすすめのペアリング銘柄</div>
+                                <h4 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>浦霞 特別純米酒 ひやおろし</h4>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <a href="https://hb.afl.rakuten.co.jp/ichiba/3f5da7cf.fd711cd7.3f5da7d0.05e18aec/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fsyuraku-shop%2F44221%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                    <img src="https://hbb.afl.rakuten.co.jp/hgb/3f5da7cf.fd711cd7.3f5da7d0.05e18aec/?me_id=1286285&item_id=10007997&pc=https%3A%2F%2Fimage.rakuten.co.jp%2Fsyuraku-shop%2Fcabinet%2Fitem08%2F44221_02.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: '0' }} alt="" title="" />
+                                </a>
+                            </div>
                         </div>
                         
                         <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 6px 24px rgba(0,0,0,0.06)', borderTop: '5px solid #34495e' }}>
@@ -86,6 +110,14 @@ export default function WashokuPairingPart3() {
                             <p style={{ fontSize: 16, lineHeight: 1.8 }}>
                                 旨味と脂の塊である冬の味覚。カニ、牡蠣（カキ）、フグ、そしてアンコウなどの鍋料理の圧倒的なエネルギーには、酒造りが本格化して第一陣として蔵から出される力強い<strong>「しぼりたて新酒」</strong>や、米の澱をたっぷりと含んだクリーミーな<strong>「にごり酒」</strong>を。あるいは、しっかりとした純米酒の<strong>「熱燗（あつかん）」</strong>を合わせることで、体の芯から温まる冬ならではのご馳走ペアリングとなります。
                             </p>
+                            <div style={{ padding: 20, background: '#f5f7fa', borderRadius: 8, border: '1px solid #dce2e8', marginTop: 24, textAlign: 'center' }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#2c3e50', marginBottom: 8 }}>⛄ 冬におすすめのペアリング銘柄</div>
+                                <h4 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>菊姫 にごり酒</h4>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <a href="https://hb.afl.rakuten.co.jp/ichiba/3e7beada.014a49a8.3e7beadb.8db6fb82/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fono-sake%2Fkiku-nigori1800%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                    <img src="https://hbb.afl.rakuten.co.jp/hgb/3e7beada.014a49a8.3e7beadb.8db6fb82/?me_id=1238111&item_id=10000236&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fono-sake%2Fcabinet%2F00958694%2Fimgrc0082355025.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: '0' }} alt="" title="" />
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </section>
