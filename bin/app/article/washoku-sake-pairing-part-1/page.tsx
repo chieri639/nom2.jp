@@ -78,9 +78,12 @@ export default function WashokuPairingPart1() {
                             <p style={{ fontSize: 15, color: '#555', marginBottom: 20, lineHeight: 1.7 }}>
                                 宮城県・新澤醸造店が醸す、「究極の食中酒」をコンセプトにした代名詞的銘柄。あえて香りを控えめにし、米の旨味を感じさせながらも、まるで水のようにスッと切れて消えていくシャープな後味が特徴。ヒラメの薄造りに少しの塩と柑橘を絞り、キリッと冷やした伯楽星を合わせれば、これ以上ない至福の時間が訪れます。
                             </p>
-                            <a href="https://hb.afl.rakuten.co.jp/hgc/..." target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', backgroundColor: '#bf0000', color: '#fff', padding: '12px 28px', borderRadius: 6, textDecoration: 'none', fontWeight: 700, fontSize: 15, fontFamily: '"Noto Sans JP", sans-serif', transition: 'opacity 0.2s' }}>
-                                楽天市場でチェックする
-                            </a>
+                            <div style={{ textAlign: 'center', marginTop: 16 }}>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <a href="https://hb.afl.rakuten.co.jp/ichiba/442b82b1.4c2642a9.442b82b2.bfb5a5d1/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fyanagiya-sake%2F10000053%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MSwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                    <img src="https://hbb.afl.rakuten.co.jp/hgb/442b82b1.4c2642a9.442b82b2.bfb5a5d1/?me_id=1304184&item_id=10000058&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fyanagiya-sake%2Fcabinet%2F03892949%2F04190788%2Fimgrc0074119863.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: '0' }} alt="" title="" />
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -116,9 +119,12 @@ export default function WashokuPairingPart1() {
                             <p style={{ fontSize: 15, color: '#555', marginBottom: 20, lineHeight: 1.7 }}>
                                 福島県・大七酒造が誇る、江戸時代から続く世界最高峰の超伝統的製法「生酛（きもと）造り」の決定版。乳酸菌由来の豊かな酸味と、どっしりとしたお米の旨味を持っています。このお酒を「ぬる燗（40度前後）」に温めて天ぷらと合わせると、温かいアルコールと酸味が天ぷらの油を瞬時に溶かし切り、驚くほど口内をさっぱりと洗い上げてくれます。
                             </p>
-                            <a href="https://hb.afl.rakuten.co.jp/hgc/..." target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', backgroundColor: '#bf0000', color: '#fff', padding: '12px 28px', borderRadius: 6, textDecoration: 'none', fontWeight: 700, fontSize: 15, fontFamily: '"Noto Sans JP", sans-serif', transition: 'opacity 0.2s' }}>
-                                楽天市場でチェックする
-                            </a>
+                            <div style={{ textAlign: 'center', marginTop: 16 }}>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <a href="https://hb.afl.rakuten.co.jp/ichiba/52486248.d5d834b5.52486249.80762e12/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fakabekonosato-cowbe%2F167930192%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                    <img src="https://hbb.afl.rakuten.co.jp/hgb/52486248.d5d834b5.52486249.80762e12/?me_id=1411884&item_id=10000247&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fakabekonosato-cowbe%2Fcabinet%2F10521833%2F12474936%2Fdaishiti-zyunmai1800.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: '0' }} alt="" title="" />
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </section>
