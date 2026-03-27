@@ -6,6 +6,30 @@ import Link from 'next/link';
 // Array of article metadata based on previously built pages
 const articles = [
   {
+    title: "和食と日本酒ペアリングの基本（同調と補完）",
+    summary: "ユネスコ無形文化遺産の和食をもっと美味しく。お刺身や天ぷらに合わせる日本酒選びの基本「2つの方程式」をプロが解説します。",
+    path: "/article/washoku-sake-pairing-part-1",
+    image: "/images/washoku_pairing_hero_1.png",
+    category: "和食 Pairing",
+    tagColor: "#27ae60"
+  },
+  {
+    title: "和食ペアリングの真髄（だしの旨味と温度）",
+    summary: "和食の要である「だしの旨味」と、日本酒特有の「お燗（温度変化）」がもたらす爆発的な旨味の相乗効果について解説します。",
+    path: "/article/washoku-sake-pairing-part-2",
+    image: "/images/washoku_pairing_hero_2.png",
+    category: "和食 Pairing",
+    tagColor: "#27ae60"
+  },
+  {
+    title: "四季の「旬」と「テロワール」を味わう（応用編）",
+    summary: "春夏秋冬の旬の和食と季節の日本酒。そして「海の幸には海の酒」といった地産地消のテロワールの世界をご紹介します。",
+    path: "/article/washoku-sake-pairing-part-3",
+    image: "/images/washoku_pairing_hero_3.png",
+    category: "和食 Pairing",
+    tagColor: "#27ae60"
+  },
+  {
     title: "The Ultimate Guide to Sake Measurements: What is \"1 Go\"?",
     summary: "Confused by sake servings in Japan? Learn about traditional measurements like \"1 Go\", smart drinking tips, and comparing sake calories to beer.",
     path: "/article/sake-measurements-one-go",
