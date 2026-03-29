@@ -43,20 +43,20 @@ export default function HokkaidoSakeGuide() {
                 {/* Region 1: Kamikawa / Asahikawa (The Center of Hokkaido Sake) */}
                 <section style={{ marginBottom: 80 }}>
                     <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 32, color: '#1a1a1a', borderLeft: '4px solid #bfa758', paddingLeft: 16 }}>
-                        【上川・大雪エリア】名水と極寒が育む一大産地
+                        【道北・上川・留萌エリア】名水と極寒が育む一大産地
                     </h2>
                     
                     <div style={{ textAlign: 'center', marginBottom: 32 }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img 
-                            src="/images/hokkaido_map_kamikawa.png" 
-                            alt="上川・大雪エリアのマップ" 
+                            src="/images/hokkaido_map_dohoku.png" 
+                            alt="道北・上川・留萌エリアのマップ" 
                             style={{ width: '100%', maxWidth: 400, borderRadius: 12, border: '1px solid #f0f0f0' }} 
                         />
                     </div>
 
                     <p style={{ fontSize: 17, marginBottom: 40 }}>
-                        大雪山系の豊かな伏流水と盆地特有の厳しい寒暖差を併せ持つ、北海道を代表する酒造りのメッカです。
+                        大雪山系の豊かな伏流水と盆地特有の厳しい寒暖差を併せ持つ上川地方から、日本海に面した留萌地方まで。極寒の気候を活かした北海道を代表する酒造りのメッカです。
                     </p>
 
                     {/* Brewery 1: Otokoyama */}
@@ -133,6 +133,21 @@ export default function HokkaidoSakeGuide() {
                             </a>
                         </div>
                     </div>
+
+                    {/* Brewery 6: Kokumare */}
+                    <div style={{ padding: 24, background: '#fff', borderRadius: 8, border: '1px solid #e9ecef', marginBottom: 24 }}>
+                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>6. 国稀（くにまれ）酒造</h3>
+                        <p style={{ fontSize: 14, color: '#666', marginBottom: 12, fontWeight: 700 }}>📍 増毛郡増毛町 / 代表銘柄：國稀</p>
+                        <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
+                            日本最北の造り酒屋。かつてニシン漁で沸いた増毛町の歴史を今に伝え、観光客が絶えない人気の酒蔵です。暑寒別岳の伏流水を使ったお酒は、スッキリとした口当たりの中にコクがあり、エビやホタテの刺身に驚くほど合います。
+                        </p>
+                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #e9ecef', borderRadius: 8 }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <a href="https://hb.afl.rakuten.co.jp/ichiba/52570ed7.7e411bf0.52570ed8.50fe3b19/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fkitanomori%2F1504-01014%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                <img src="https://hbb.afl.rakuten.co.jp/hgb/52570ed7.7e411bf0.52570ed8.50fe3b19/?me_id=1211554&item_id=10009531&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fkitanomori%2Fcabinet%2Fosake%2F2024knizyunnmai.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: 0 }} alt="国稀酒造" title="" />
+                            </a>
+                        </div>
+                    </div>
                 </section>
 
                 <hr style={{ border: 'none', borderTop: '1px dotted #ccc', margin: '40px 0' }} />
@@ -140,21 +155,21 @@ export default function HokkaidoSakeGuide() {
                 {/* Region 2: Doo Area */}
                 <section style={{ marginBottom: 80 }}>
                     <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 32, color: '#1a1a1a', borderLeft: '4px solid #bfa758', paddingLeft: 16 }}>
-                        【道央・札幌・小樽エリア】歴史を紡ぐ開拓の魂
+                        【道央エリア】歴史を紡ぐ開拓の魂
                     </h2>
 
                     <div style={{ textAlign: 'center', marginBottom: 32 }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img 
-                            src="/images/hokkaido_map_doo.png" 
-                            alt="道央・札幌・小樽エリアのマップ" 
+                            src="/images/hokkaido_map_doo_new.png" 
+                            alt="道央エリアのマップ" 
                             style={{ width: '100%', maxWidth: 400, borderRadius: 12, border: '1px solid #f0f0f0' }} 
                         />
                     </div>
 
                     {/* Brewery 6: Nippon Seishu */}
                     <div style={{ padding: 24, background: '#fff', borderRadius: 8, border: '1px solid #e9ecef', marginBottom: 24 }}>
-                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>6. 日本清酒</h3>
+                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>7. 日本清酒</h3>
                         <p style={{ fontSize: 14, color: '#666', marginBottom: 12, fontWeight: 700 }}>📍 札幌市中央区 / 代表銘柄：千歳鶴（ちとせづる）</p>
                         <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
                             1872年創業、札幌の発展と共に歩んできた北海道を代表する老舗。全国新酒鑑評会でも数多くの金賞を受賞し、豊平川の伏流水で仕込まれた滑らかで洗練された味わいが札幌市民に愛され続けています。
@@ -169,7 +184,7 @@ export default function HokkaidoSakeGuide() {
 
                     {/* Brewery 7: Tanaka Shuzo */}
                     <div style={{ padding: 24, background: '#fff', borderRadius: 8, border: '1px solid #e9ecef', marginBottom: 24 }}>
-                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>7. 田中酒造</h3>
+                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>8. 田中酒造</h3>
                         <p style={{ fontSize: 14, color: '#666', marginBottom: 12, fontWeight: 700 }}>📍 小樽市 / 代表銘柄：宝川（たからがわ）</p>
                         <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
                             小樽で1899年から続く唯一の造り酒屋。北海道産米を100％使用することにこだわり、一年中常に新しい酒を醸造する「四季醸造」を行っている稀有な蔵です。搾りたてのフレッシュな生酒をいつでも楽しむことができます。
@@ -184,7 +199,7 @@ export default function HokkaidoSakeGuide() {
 
                     {/* Brewery 8: Kinteki */}
                     <div style={{ padding: 24, background: '#fff', borderRadius: 8, border: '1px solid #e9ecef', marginBottom: 24 }}>
-                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>8. 金滴（きんてき）酒造</h3>
+                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>9. 金滴（きんてき）酒造</h3>
                         <p style={{ fontSize: 14, color: '#666', marginBottom: 12, fontWeight: 700 }}>📍 樺戸郡新十津川町 / 代表銘柄：金滴</p>
                         <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
                             1906年創業。北海道の穀倉地帯のど真ん中に位置し、新十津川町内産の酒造好適米「吟風」の使用率が非常に高いのが特徴です。昔ながらの手造りにこだわり、ふっくらとした米の旨味を感じさせる芳醇な酒を醸します。
@@ -199,7 +214,7 @@ export default function HokkaidoSakeGuide() {
 
                     {/* Brewery 9: Kobayashi Shuzo */}
                     <div style={{ padding: 24, background: '#fff', borderRadius: 8, border: '1px solid #e9ecef', marginBottom: 24 }}>
-                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>9. 小林酒造</h3>
+                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>10. 小林酒造</h3>
                         <p style={{ fontSize: 14, color: '#666', marginBottom: 12, fontWeight: 700 }}>📍 夕張郡栗山町 / 代表銘柄：北の錦（きたのにしき）</p>
                         <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
                             炭鉱の町として栄えた夕張エリアで「坑夫たちを労う酒」として発展。現在では道産米をいち早く酒造りに取り入れたパイオニアとしても知られます。重厚で力強い、どっしりとしたお米の旨味を感じられる男酒です。
@@ -214,7 +229,7 @@ export default function HokkaidoSakeGuide() {
 
                     {/* Brewery 10: Niseko Shuzo */}
                     <div style={{ padding: 24, background: '#fff', borderRadius: 8, border: '1px solid #e9ecef', marginBottom: 24 }}>
-                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>10. 二世古（にせこ）酒造</h3>
+                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>11. 二世古（にせこ）酒造</h3>
                         <p style={{ fontSize: 14, color: '#666', marginBottom: 12, fontWeight: 700 }}>📍 虻田郡倶知安町 / 代表銘柄：二世古</p>
                         <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
                             日本有数の豪雪地帯であり世界的リゾートであるニセコ（倶知安）エリアに位置。羊蹄山の雪解け水（特有の超軟水）を使用し、加水調整をしない「原酒」にこだわっています。ふくよかで柔らかな旨味が海外のスキーヤーからも人気です。
@@ -233,31 +248,16 @@ export default function HokkaidoSakeGuide() {
                 {/* Region 3: Other Areas (North, East, South) */}
                 <section style={{ marginBottom: 80 }}>
                     <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 32, color: '#1a1a1a', borderLeft: '4px solid #bfa758', paddingLeft: 16 }}>
-                        【道北・道東・道南エリア】過酷な自然に寄り添う最果ての蔵
+                        【道南・道東エリア】過酷な自然に寄り添う最果ての蔵
                     </h2>
 
                     <div style={{ textAlign: 'center', marginBottom: 32 }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img 
-                            src="/images/hokkaido_map_others.png" 
-                            alt="道北・道東・道南エリアのマップ" 
+                            src="/images/hokkaido_map_doto_donan.png" 
+                            alt="道南・道東エリアのマップ" 
                             style={{ width: '100%', maxWidth: 400, borderRadius: 12, border: '1px solid #f0f0f0' }} 
                         />
-                    </div>
-
-                    {/* Brewery 11: Kokumare */}
-                    <div style={{ padding: 24, background: '#fff', borderRadius: 8, border: '1px solid #e9ecef', marginBottom: 24 }}>
-                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 12px' }}>11. 国稀（くにまれ）酒造</h3>
-                        <p style={{ fontSize: 14, color: '#666', marginBottom: 12, fontWeight: 700 }}>📍 増毛郡増毛町 / 代表銘柄：國稀</p>
-                        <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
-                            日本最北の造り酒屋。かつてニシン漁で沸いた増毛町の歴史を今に伝え、観光客が絶えない人気の酒蔵です。暑寒別岳の伏流水を使ったお酒は、スッキリとした口当たりの中にコクがあり、エビやホタテの刺身に驚くほど合います。
-                        </p>
-                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #e9ecef', borderRadius: 8 }}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <a href="https://hb.afl.rakuten.co.jp/ichiba/52570ed7.7e411bf0.52570ed8.50fe3b19/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fkitanomori%2F1504-01014%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
-                                <img src="https://hbb.afl.rakuten.co.jp/hgb/52570ed7.7e411bf0.52570ed8.50fe3b19/?me_id=1211554&item_id=10009531&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fkitanomori%2Fcabinet%2Fosake%2F2024knizyunnmai.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: 0 }} alt="国稀酒造" title="" />
-                            </a>
-                        </div>
                     </div>
 
                     {/* Brewery 12: Fukutsukasa */}
