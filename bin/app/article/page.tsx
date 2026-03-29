@@ -6,9 +6,9 @@ import Link from 'next/link';
 // Array of article metadata for Japanese content
 const articles = [
   {
-    title: "【2026年最新】北海道の日本酒マップ！人気3酒蔵を徹底解説",
-    summary: "かつての辛口一辺倒から、全国随一のプレミアム産地へと進化した北海道。おすすめ酒蔵「上川大雪」「男山」「国士無双」をプロが解説。",
-    path: "/article/hokkaido-sake-guide",
+    title: "【2026年最新】北海道の日本酒マップ！全14酒蔵を徹底紹介",
+    summary: "かつての辛口一辺倒から、全国随一のプレミアム産地へと進化した北海道。道内の代表的な全14酒蔵の特徴をプロが徹底解説。",
+    path: "/article/japan/hokkaido",
     image: "/images/hokkaido_sake_hero.png",
     category: "Regional Guide",
     tagColor: "#3498db"
