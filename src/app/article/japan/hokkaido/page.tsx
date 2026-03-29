@@ -219,8 +219,11 @@ export default function HokkaidoSakeGuide() {
                         <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
                             日本有数の豪雪地帯であり世界的リゾートであるニセコ（倶知安）エリアに位置。羊蹄山の雪解け水（特有の超軟水）を使用し、加水調整をしない「原酒」にこだわっています。ふくよかで柔らかな旨味が海外のスキーヤーからも人気です。
                         </p>
-                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #ccc', borderRadius: 8 }}>
-                            <p style={{ margin: 0, fontSize: 14, color: '#888' }}>[TODO: 二世古酒造の楽天アフィリエイトリンク挿入枠]</p>
+                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #e9ecef', borderRadius: 8 }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <a href="https://hb.afl.rakuten.co.jp/ichiba/4496b9bf.576d8cde.4496b9c0.ecb91bd0/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fsakemirai%2Fniseko002b%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                <img src="https://hbb.afl.rakuten.co.jp/hgb/4496b9bf.576d8cde.4496b9c0.ecb91bd0/?me_id=1353120&item_id=10001762&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fsakemirai%2Fcabinet%2Fitem_sake%2Fniseko002b.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: 0 }} alt="二世古酒造" title="" />
+                            </a>
                         </div>
                     </div>
                 </section>
@@ -249,8 +252,11 @@ export default function HokkaidoSakeGuide() {
                         <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
                             日本最北の造り酒屋。かつてニシン漁で沸いた増毛町の歴史を今に伝え、観光客が絶えない人気の酒蔵です。暑寒別岳の伏流水を使ったお酒は、スッキリとした口当たりの中にコクがあり、エビやホタテの刺身に驚くほど合います。
                         </p>
-                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #ccc', borderRadius: 8 }}>
-                            <p style={{ margin: 0, fontSize: 14, color: '#888' }}>[TODO: 国稀酒造の楽天アフィリエイトリンク挿入枠]</p>
+                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #e9ecef', borderRadius: 8 }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <a href="https://hb.afl.rakuten.co.jp/ichiba/52570ed7.7e411bf0.52570ed8.50fe3b19/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fkitanomori%2F1504-01014%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                <img src="https://hbb.afl.rakuten.co.jp/hgb/52570ed7.7e411bf0.52570ed8.50fe3b19/?me_id=1211554&item_id=10009531&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fkitanomori%2Fcabinet%2Fosake%2F2024knizyunnmai.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: 0 }} alt="国稀酒造" title="" />
+                            </a>
                         </div>
                     </div>
 
@@ -261,8 +267,11 @@ export default function HokkaidoSakeGuide() {
                         <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
                             港町・釧路を代表する酒蔵であり、道東唯一の酒蔵。海底炭鉱の坑道で長期熟成させたという非常にロマンあふれるお酒も手がけており、極寒の地らしい力強さと、海鮮に寄り添うキレが道東の食文化を支えています。
                         </p>
-                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #ccc', borderRadius: 8 }}>
-                            <p style={{ margin: 0, fontSize: 14, color: '#888' }}>[TODO: 福司酒造の楽天アフィリエイトリンク挿入枠]</p>
+                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #e9ecef', borderRadius: 8 }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <a href="https://hb.afl.rakuten.co.jp/ichiba/3fd46fdd.2856dce4.3fd46fde.a8836eb4/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2F946kitchen%2F10005209%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                <img src="https://hbb.afl.rakuten.co.jp/hgb/3fd46fdd.2856dce4.3fd46fde.a8836eb4/?me_id=1242400&item_id=10005209&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2F946kitchen%2Fcabinet%2Fkihon3%2F08514887%2Fimgrc0110683357.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: 0 }} alt="福司酒造" title="" />
+                            </a>
                         </div>
                     </div>
 
@@ -273,8 +282,11 @@ export default function HokkaidoSakeGuide() {
                         <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
                             日本最東端である根室市にある蔵。生産量が限られており地元・根室での消費が圧倒的に多いため、その他の地域ではなかなかお目にかかれない「幻の生酒」のような存在です。濃厚でありながらサラッと飲める味わいです。
                         </p>
-                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #ccc', borderRadius: 8 }}>
-                            <p style={{ margin: 0, fontSize: 14, color: '#888' }}>[TODO: 碓氷勝三郎商店（北の勝）の楽天アフィリエイトリンク挿入枠]</p>
+                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #e9ecef', borderRadius: 8 }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <a href="https://hb.afl.rakuten.co.jp/ichiba/3fd47117.a559c08f.3fd47118.a2d89de4/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fhokkaidotown%2F4940495600209%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                <img src="https://hbb.afl.rakuten.co.jp/hgb/3fd47117.a559c08f.3fd47118.a2d89de4/?me_id=1308157&item_id=10001443&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fhokkaidotown%2Fcabinet%2Fitem_image%2F4940495600209.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: 0 }} alt="北の勝" title="" />
+                            </a>
                         </div>
                     </div>
 
@@ -285,8 +297,11 @@ export default function HokkaidoSakeGuide() {
                         <p style={{ fontSize: 16, color: '#444', marginBottom: 20, lineHeight: 1.7 }}>
                             2021年に北斗市に新しく誕生したフレッシュな蔵元。「道南エリアの米と水」に強くこだわり、華やかな香りと綺麗な酸味が特徴のモダンな酒質で、全国の日本酒ファンから急速に注目を集めています。
                         </p>
-                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #ccc', borderRadius: 8 }}>
-                            <p style={{ margin: 0, fontSize: 14, color: '#888' }}>[TODO: 箱館醸蔵（郷宝）の楽天アフィリエイトリンク挿入枠]</p>
+                        <div style={{ background: '#f8f9fa', padding: '24px', textAlign: 'center', border: '1px dashed #e9ecef', borderRadius: 8 }}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <a href="https://hb.afl.rakuten.co.jp/ichiba/5257160f.6df03876.52571610.3547effb/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Ff013374-nanae%2Fnaak015%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style={{ wordWrap: 'break-word', display: 'inline-block' }}>
+                                <img src="https://hbb.afl.rakuten.co.jp/hgb/5257160f.6df03876.52571610.3547effb/?me_id=1398251&item_id=10000640&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Ff013374-nanae%2Fcabinet%2F12365823%2Fnaak015_r1.jpg%3F_ex%3D300x300&s=300x300&t=pict" style={{ margin: '2px', border: 0 }} alt="箱館醸蔵 郷宝" title="" />
+                            </a>
                         </div>
                     </div>
                 </section>
