@@ -1,0 +1,18 @@
+[
+  {
+    "id": "daishichi-kimoto",
+    "name": "大七 純米 生酛",
+    "brewery": "大七酒造株式会社",
+    "price": 1606,
+    "image": "https://example.com/mock1.png",
+    "description": "伝統的な生酛造りによる、豊かなコクと酸味が特徴。"
+  },
+  {
+    "id": "denshu-tokubetsu-junmai",
+    "name": "田酒 特別純米",
+    "brewery": "西田酒造店",
+    "price": 3150,
+    "image": "https://example.com/mock2.png",
+    "description": "日本中の愛好家を唸らせた幻の銘酒。"
+  }
+]

@@ -1,53 +1,12 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
+import { getArticles } from '@/lib/microcms';
 
-// Array of article metadata for Japanese content
-const articles = [
-  {
-    title: "【2026年最新】北海道の日本酒マップ！全14酒蔵を徹底紹介",
-    summary: "かつての辛口一辺倒から、全国随一のプレミアム産地へと進化した北海道。道内の代表的な全14酒蔵の特徴をプロが徹底解説。",
-    path: "/article/japan/hokkaido",
-    image: "/images/hokkaido_sake_hero.png",
-    category: "Regional Guide",
-    tagColor: "#3498db"
-  },
-  {
-    title: "おりがらみ日本酒とは？にごり酒との違いを徹底解説",
-    summary: "おりがらみの魅力から、にごり酒との明確な違い、一番美味しい飲み方までを日本酒のプロが徹底解説します。",
-    path: "/article/origarami-sake-guide",
-    image: "/images/origarami_sake_hero_2.png",
-    category: "Sake Guide",
-    tagColor: "#e67e22"
-  },
-  {
-    title: "和食と日本酒ペアリングの基本（同調と補完）",
-    summary: "ユネスコ無形文化遺産の和食をもっと美味しく。お刺身や天ぷらに合わせる日本酒選びの基本「2つの方程式」をプロが解説します。",
-    path: "/article/washoku-sake-pairing-part-1",
-    image: "/images/washoku_pairing_hero_1.png",
-    category: "和食 Pairing",
-    tagColor: "#27ae60"
-  },
-  {
-    title: "和食ペアリングの真髄（だしの旨味と温度）",
-    summary: "和食の要である「だしの旨味」と、日本酒特有の「お燗（温度変化）」がもたらす爆発的な旨味の相乗効果について解説します。",
-    path: "/article/washoku-sake-pairing-part-2",
-    image: "/images/washoku_pairing_hero_2.png",
-    category: "和食 Pairing",
-    tagColor: "#27ae60"
-  },
-  {
-    title: "四季の「旬」と「テロワール」を味わう（応用編）",
-    summary: "春夏秋冬の旬の和食と季節の日本酒。そして「海の幸には海の酒」といった地産地消のテロワールの世界をご紹介します。",
-    path: "/article/washoku-sake-pairing-part-3",
-    image: "/images/washoku_pairing_hero_3.png",
-    category: "和食 Pairing",
-    tagColor: "#27ae60"
-  }
-];
+export const revalidate = 0;
 
-export default function ArticleIndexPage() {
+export default async function ArticleIndexPage() {
+    const { contents: articles } = await getArticles({ limit: 100 });
+
     return (
         <div style={{ backgroundColor: '#fdfdfd', minHeight: '100vh', paddingBottom: 80, fontFamily: '"Noto Sans JP", -apple-system, sans-serif' }}>
             
@@ -85,8 +44,8 @@ export default function ArticleIndexPage() {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
                 gap: 40
             }}>
-                {articles.map((article, index) => (
-                    <Link href={article.path} key={index} style={{ textDecoration: 'none', color: 'inherit' }}>
+                {articles.map((article) => (
+                    <Link href={`/article/${article.id}`} key={article.id} style={{ textDecoration: 'none', color: 'inherit' }}>
                         <article style={{ 
                             background: '#fff', 
                             borderRadius: 16, 
@@ -97,22 +56,16 @@ export default function ArticleIndexPage() {
                             flexDirection: 'column',
                             transition: 'transform 0.3s ease, boxShadow 0.3s ease',
                             cursor: 'pointer'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-6px)';
-                            e.currentTarget.style.boxShadow = '0 16px 40px rgba(0,0,0,0.12)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.06)';
-                        }}
-                        >
+                        }}>
                             <div style={{ width: '100%', aspectRatio: '16/10', position: 'relative', overflow: 'hidden', backgroundColor: '#eee' }}>
-                                <span style={{ position: 'absolute', top: 16, left: 16, background: article.tagColor, color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 12px', borderRadius: 100, letterSpacing: 1, textTransform: 'uppercase', zIndex: 10 }}>
-                                    {article.category}
+                                <span style={{ position: 'absolute', top: 16, left: 16, background: '#bfa758', color: '#fff', fontSize: 12, fontWeight: 700, padding: '4px 12px', borderRadius: 100, letterSpacing: 1, textTransform: 'uppercase', zIndex: 10 }}>
+                                    特集記事
                                 </span>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={article.image} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.src = "/images/origarami_sake_hero_2.png"; }} />
+                                {article.imageUrl ? (
+                                    <img src={article.imageUrl} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>No Image</div>
+                                )}
                             </div>
 
                             <div style={{ padding: 24, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
@@ -120,7 +73,10 @@ export default function ArticleIndexPage() {
                                     {article.title}
                                 </h2>
                                 <p style={{ fontSize: 15, color: '#666', lineHeight: 1.6, marginBottom: 20, flexGrow: 1 }}>
-                                    {article.summary}
+                                    {(article.content || '')
+                                        .replace(/<[^>]+>/g, '')
+                                        .replace(/\n+/g, ' ')
+                                        .substring(0, 60)}...
                                 </p>
                                 <div style={{ display: 'inline-block', color: '#bfa758', fontWeight: 700, fontSize: 14, alignSelf: 'flex-start' }}>
                                     記事を読む →
@@ -131,6 +87,9 @@ export default function ArticleIndexPage() {
                 ))}
             </div>
             
+            {articles.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '4rem', color: '#6b7280' }}>記事がまだありません。</div>
+            )}
         </div>
     );
 }
