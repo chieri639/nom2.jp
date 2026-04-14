@@ -1,14 +1,7 @@
 import './globals.css'
 import Script from 'next/script'
 import type { Metadata } from 'next'
-import { Inter, Noto_Serif_JP } from 'next/font/google'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
-const notoSerifJP = Noto_Serif_JP({ 
-  weight: ['400', '500', '700', '900'],
-  subsets: ['latin'],
-  variable: '--font-serif'
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://nom2.jp'),
@@ -59,7 +52,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${inter.variable} ${notoSerifJP.variable} font-sans`}>{children}</body>
+      <body className="font-sans antialiased bg-slate-50">{children}</body>
     </html>
   )
 }
