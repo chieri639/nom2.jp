@@ -4,8 +4,8 @@ import Link from 'next/link';
 export default function Header() {
     return (
         <header className="fixed w-full top-0 left-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-bold tracking-wider font-serif text-[#1F1F1F]">
-                nom<span className="text-[#5D5D5D] mx-1">×</span>nom
+            <Link href="/" className="flex items-center">
+                <img src="/images/logo_v4.png" alt="nom × nom" className="h-6 md:h-7" />
             </Link>
             
             <nav className="hidden md:block">

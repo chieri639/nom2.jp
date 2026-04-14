@@ -152,10 +152,7 @@ export default function SearchPage() {
             <nav className="fixed w-full z-50 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50">
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight hover:opacity-80 transition-opacity">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
-                            <Wine size={18} />
-                        </span>
-                        <span>日本酒AI</span>
+                        <img src="/images/logo_v4.png" alt="nom × nom" className="h-[28px] w-auto object-contain" />
                     </Link>
                     <div className="flex items-center gap-4">
                         <Link href="/login" className="text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
