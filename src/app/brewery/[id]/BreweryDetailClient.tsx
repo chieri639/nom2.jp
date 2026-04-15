@@ -18,12 +18,98 @@ function unescapeHtml(text: string) {
         .replace(/&#x3D;/gi, "=");
 }
 
+// ── 動的クリーニング関数 ──
+function parseBreweryData(html: string, originalBrewery: any) {
+    if (!html) return { description: '', address: originalBrewery.address, phone: originalBrewery.phone, website: originalBrewery.website || originalBrewery.url };
+
+    // 1. HTMLエスケープ・タグの解除
+    let text = html
+        .replace(/<br\/?>/gi, '\n')
+        .replace(/<\/p>/gi, '\n\n')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&#x2F;/gi, "/")
+        .replace(/&#x3D;/gi, "=");
+
+    // 2. ノイズの完全削除
+    const noises = [
+        'keyboard_arrow_leftpausekeyboard_arrow_right',
+        '代表的な銘柄',
+        '代表銘柄',
+        '商品一覧',
+        '酒蔵について',
+        '酒蔵の紹介',
+        // その他ゴミになりやすい定型文
+        '購入ページへ（外部サイト）',
+        '飲める・買えるお店',
+        '該当するリストがありません'
+    ];
+    noises.forEach(n => {
+        text = text.replace(new RegExp(n, 'gi'), '');
+    });
+
+    let address: string | null = originalBrewery.address || null;
+    let phone: string | null = originalBrewery.phone || null;
+    let website: string | null = originalBrewery.website || originalBrewery.url || null;
+
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const cleanedLines = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // 3. 商品リストの残骸（値段・容量・特定名称の単独行）はスキップ
+        if (
+            /(¥|円|\(税込\)|720ml|1800ml)/.test(line) ||
+            /^(純米大吟醸|純米吟醸|大吟醸酒|特別純米|純米酒|本醸造|普通酒|生酒|にごり酒)$/.test(line)
+        ) {
+            continue;
+        }
+
+        // Webサイト抽出
+        if (/https?:\/\/[^\s]+/.test(line)) {
+            if (!website) website = line.match(/(https?:\/\/[^\s]+)/)?.[1] || null;
+            // リンクや「公式サイト」だけの行ならスキップ
+            if (line.replace(/(https?:\/\/[^\s]+)/, '').replace(/公式サイト|URL|WEB/i, '').trim().length <= 2) continue;
+        }
+
+        // 電話番号抽出
+        if (/(\d{2,4}-\d{2,4}-\d{3,4})/.test(line) || /TEL[:：]\s*\d+/.test(line)) {
+            if (!phone) phone = line.match(/(\d{2,4}-\d{2,4}-\d{3,4})/)?.[1] || line.replace(/.*TEL[:：]\s*/i, '') || null;
+            // 電話番号やTELなどのキーワードしかない短い行はスキップ
+            if (line.length < 25 && !line.includes('。')) continue;
+        }
+
+        // 住所抽出 (〒 または都道府県から始まる行)
+        if (/(〒\d{3}-\d{4}|(北海道|青森県|岩手県|宮城県|秋田県|山形県|福島県|茨城県|栃木県|群馬県|埼玉県|千葉県|東京都|神奈川県|新潟県|富山県|石川県|福井県|山梨県|長野県|岐阜県|静岡県|愛知県|三重県|滋賀県|京都府|大阪府|兵庫県|奈良県|和歌山県|鳥取県|島根県|岡山県|広島県|山口県|徳島県|香川県|愛媛県|高知県|福岡県|佐賀県|長崎県|熊本県|大分県|宮崎県|鹿児島県|沖縄県))/.test(line)) {
+            if (!address && line.length < 60) {
+                address = line.replace(/^(住所|所在地)[:：]?\s*/, '').trim();
+                if (!line.includes('。')) continue; // 住所だけの短い行はスキップ
+            }
+        }
+
+        cleanedLines.push(line);
+    }
+
+    let description = cleanedLines.join('\n\n').trim();
+
+    // 安全策（削りすぎてしまった場合は、最初の数行をフォールバック）
+    if (description.length < 20) {
+        description = lines.slice(0, 10).join('\n\n');
+    }
+
+    return { description, address, phone, website };
+}
+
 export default function BreweryDetailClient({ brewery, initialCmsSakes = [], type = 'brewery' }: { brewery: BREWERY, initialCmsSakes?: SAKE[], type?: 'brewery' | 'brand' | 'shop' }) {
     const [rakutenSakes, setRakutenSakes] = useState<any[]>([]);
     const [loadingRakuten, setLoadingRakuten] = useState(false);
 
     useEffect(() => {
-        // CMSに該当酒蔵の日本酒データがない場合、楽天APIから自動取得
         if (initialCmsSakes.length === 0) {
             setLoadingRakuten(true);
             const searchName = unescapeHtml(brewery.name).replace(/(株式会社|有限会社|合名会社|合資会社)/g, '').trim();
@@ -38,24 +124,14 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], typ
         }
     }, [brewery.name, initialCmsSakes.length]);
 
-    // contentに含まれる余分なHTMLタグや「二重レンダリング」の一因となる不正なタグ構造を除去
-    // プロトタイプ通り、whitespace-pre-wrap のプレーンテキストとして流し込む
-    const plainDescription = unescapeHtml(
-        (brewery.content || '')
-            .replace(/<br\/?>/gi, '\n')
-            .replace(/<p>/gi, '')
-            .replace(/<\/p>/gi, '\n\n')
-            .replace(/<[^>]+>/g, '') 
-            .trim()
-    );
+    // 動的パースの適用
+    const { description: cleanDescription, address: extractedAddress, phone: extractedPhone, website: extractedWebsite } = parseBreweryData(brewery.content || '', brewery);
+    
+    const prefectureDisplay = (brewery as any).prefecture || '日本';
+    const finalAddress = extractedAddress || '-';
+    const finalPhone = extractedPhone || '-';
+    const finalWebsite = extractedWebsite || '';
 
-    const breweryData = brewery as any;
-    const prefectureDisplay = breweryData.prefecture || '日本';
-    const addressDisplay = breweryData.address || '-';
-    const phoneDisplay = breweryData.phone || '-';
-    const websiteDisplay = breweryData.website || breweryData.url || '';
-
-    // 表示する日本酒リスト (第1優先: CMSデータ、第2優先: 楽天APIデータ)
     const displaySakes = initialCmsSakes.length > 0 ? initialCmsSakes : rakutenSakes;
     const isRakutenFallback = initialCmsSakes.length === 0 && rakutenSakes.length > 0;
 
@@ -74,7 +150,7 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], typ
 
             {/* ── コンテンツカード ── */}
             <section className="max-w-[900px] mx-auto -mt-[10vh] relative z-10 bg-white p-10 md:p-16 shadow-sm">
-                <Link href={`/${type === 'shop' ? 'shop/search' : type}`} className="text-sm text-gray-400 mb-10 inline-block hover:text-[#1F1F1F] transition-colors tracking-widest font-bold">
+                <Link href={`/${type === 'shop' ? 'shop/search' : type}`} className="text-sm text-gray-400 mb-10 block hover:text-[#1F1F1F] transition-colors tracking-widest font-bold">
                     ← 戻る
                 </Link>
 
@@ -92,16 +168,16 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], typ
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 border-b border-gray-100 pb-10 mb-12">
                     <div className="flex flex-col">
                         <span className="text-[10px] text-gray-400 tracking-widest uppercase mb-1">住所</span>
-                        <span className="text-sm">{addressDisplay}</span>
+                        <span className="text-sm">{finalAddress}</span>
                     </div>
                     <div className="flex flex-col">
                         <span className="text-[10px] text-gray-400 tracking-widest uppercase mb-1">電話番号</span>
-                        <span className="text-sm">{phoneDisplay}</span>
+                        <span className="text-sm">{finalPhone}</span>
                     </div>
                     <div className="flex flex-col">
                         <span className="text-[10px] text-gray-400 tracking-widest uppercase mb-1">公式サイト</span>
-                        {websiteDisplay ? (
-                            <a href={websiteDisplay} target="_blank" rel="noopener noreferrer" className="text-sm text-[#8B7D6B] hover:underline">
+                        {finalWebsite ? (
+                            <a href={finalWebsite} target="_blank" rel="noopener noreferrer" className="text-sm text-[#8B7D6B] hover:underline">
                                 リンク
                             </a>
                         ) : (
@@ -114,9 +190,11 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], typ
                     <h2 className="text-2xl font-serif mb-6 border-b border-gray-100 pb-2 text-[#1F1F1F]">
                         酒蔵について
                     </h2>
-                    <p className="text-gray-700 leading-loose text-base whitespace-pre-wrap">
-                        {plainDescription || '詳細情報がまだありません。'}
-                    </p>
+                    <div className="prose max-w-none text-gray-700 leading-loose">
+                        <p className={`whitespace-pre-wrap ${cleanDescription.length > 500 ? 'line-clamp-[15]' : ''}`}>
+                            {cleanDescription || '詳細情報がまだありません。'}
+                        </p>
+                    </div>
                 </div>
                 
                 {/* ── 代表的な銘柄・商品 ── */}
