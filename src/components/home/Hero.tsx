@@ -23,18 +23,19 @@ export default function Hero() {
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 1, delay: 0.5 }}
-                    className="bg-white/80 md:bg-white/90 backdrop-blur-sm p-8 md:p-12 lg:p-16 mt-[20vh] shadow-2xl"
+                    className="bg-white/80 md:bg-white/90 backdrop-blur-sm p-6 sm:p-8 md:p-12 lg:p-16 mt-[20vh] shadow-2xl max-w-[220px] sm:max-w-[280px] md:max-w-none"
                 >
                     <h1 
-                        className="font-serif text-[#1F1F1F] flex gap-4 md:gap-8 justify-end"
+                        className="font-serif text-[#1F1F1F] flex gap-3 sm:gap-4 md:gap-8 justify-end"
                         style={{ 
                             writingMode: 'vertical-rl',
-                            textOrientation: 'mixed'
+                            textOrientation: 'mixed',
+                            lineHeight: 1.4,
                         }}
                     >
-                        <span className="text-4xl md:text-5xl lg:text-6xl tracking-[0.5em] md:tracking-[0.8em]">新しい</span>
-                        <span className="text-4xl md:text-5xl lg:text-6xl tracking-[0.5em] md:tracking-[0.8em]">日本酒との</span>
-                        <span className="text-4xl md:text-5xl lg:text-6xl tracking-[0.5em] md:tracking-[0.8em]">出会い。</span>
+                        <span className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-[0.3em] sm:tracking-[0.5em] md:tracking-[0.8em]">新しい</span>
+                        <span className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-[0.3em] sm:tracking-[0.5em] md:tracking-[0.8em]">日本酒との</span>
+                        <span className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-[0.3em] sm:tracking-[0.5em] md:tracking-[0.8em]">出会い。</span>
                     </h1>
                 </motion.div>
             </div>

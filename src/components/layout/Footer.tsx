@@ -3,20 +3,20 @@ import Link from 'next/link';
 
 export default function Footer() {
     return (
-        <footer className="bg-[#1F1F1F] text-white py-16 text-center text-sm">
+        <footer className="bg-[#1F1F1F] text-white py-16 text-center">
             <div className="container mx-auto px-6 flex flex-col items-center gap-6">
                 <Link href="/" className="flex items-center justify-center">
-                <img src="/images/logo_v4.png" alt="nom × nom" className="h-7 brightness-0 invert" />
-            </Link>
+                    <img src="/images/logo_v4.png" alt="nom × nom" className="h-8 brightness-0 invert" />
+                </Link>
                 
-                <div className="flex flex-wrap justify-center gap-6 text-[#A0A0A0] mt-4">
+                <div className="flex flex-wrap justify-center gap-6 text-[#C0C0C0] mt-4 text-sm">
                     <Link href="#" className="hover:text-white transition-colors">運営情報</Link>
                     <Link href="#" className="hover:text-white transition-colors">利用規約</Link>
                     <Link href="#" className="hover:text-white transition-colors">プライバシーポリシー</Link>
                     <Link href="#" className="hover:text-white transition-colors">お問い合わせ</Link>
                 </div>
                 
-                <p className="text-[#5D5D5D] mt-8 tracking-wider">
+                <p className="text-[#888888] mt-8 tracking-wider text-xs">
                     &copy; 2026 nom2.jp All rights reserved.
                 </p>
             </div>

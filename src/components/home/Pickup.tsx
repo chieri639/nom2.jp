@@ -9,21 +9,21 @@ const MOCK_PICKUPS = [
         id: '1',
         tag: '特集',
         title: 'AIが選ぶ、魚料理に合う日本酒5選',
-        image: 'https://images.unsplash.com/photo-1623065611411-dc45ba3ed5f4?auto=format&fit=crop&q=80&w=600',
+        image: '/images/sake_and_rice_bowl.png',
         link: '/article/fish-pairing'
     },
     {
         id: '2',
         tag: '知識',
         title: '「純米」と「大吟醸」の違い、知っていますか？',
-        image: 'https://images.unsplash.com/photo-1541544426514-c1157297e59c?auto=format&fit=crop&q=80&w=600',
+        image: '/images/traditional_ochoko_cup.png',
         link: '/article/junmai-daiginjo'
     },
     {
         id: '3',
         tag: '蔵紹介',
         title: '歴史を紡ぐ、伝統の蔵を訪ねて',
-        image: 'https://images.unsplash.com/photo-1510419356345-42cf6347c0b0?auto=format&fit=crop&q=80&w=600',
+        image: '/images/beer_and_sake_glass.png',
         link: '/article/brewery-visit'
     }
 ];
@@ -33,7 +33,7 @@ export default function Pickup({ articles }: { articles?: any[] }) {
         id: a.id,
         tag: a.category || '特集',
         title: a.title,
-        image: a.imageUrl || 'https://images.unsplash.com/photo-1623065611411-dc45ba3ed5f4?auto=format&fit=crop&q=80&w=600',
+        image: a.imageUrl || '/images/sake_and_rice_bowl.png',
         link: `/article/${a.id}`
     })) : MOCK_PICKUPS;
 
@@ -61,10 +61,13 @@ export default function Pickup({ articles }: { articles?: any[] }) {
                         >
                             <Link href={item.link} className="block">
                                 <div className="aspect-[4/3] bg-gray-100 mb-6 overflow-hidden relative rounded-md">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img 
                                         src={item.image} 
                                         alt={item.title}
+                                        loading="lazy"
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                        onError={(e) => { (e.target as HTMLImageElement).src = '/images/sake_and_rice_bowl.png'; }}
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                                 </div>
