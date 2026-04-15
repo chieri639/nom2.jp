@@ -1,21 +1,19 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-import { createClient } from 'microcms-js-sdk';
+// microCMS API client - Direct fetch implementation
+// SDKを使わず直接fetchでAPIを呼ぶ（Vercel環境でのSSL/SDK互換性の問題を回避）
 
-if (!process.env.X_MICROCMS_SERVICE_ID) {
+const SERVICE_ID = process.env.X_MICROCMS_SERVICE_ID;
+const API_KEY = process.env.X_MICROCMS_API_KEY;
+
+if (!SERVICE_ID) {
   throw new Error('X_MICROCMS_SERVICE_ID is required');
 }
-
-if (!process.env.X_MICROCMS_API_KEY) {
+if (!API_KEY) {
   throw new Error('X_MICROCMS_API_KEY is required');
 }
 
-// Client initialization
-export const client = createClient({
-  serviceDomain: process.env.X_MICROCMS_SERVICE_ID,
-  apiKey: process.env.X_MICROCMS_API_KEY,
-});
+const BASE_URL = `https://${SERVICE_ID}.microcms.io/api/v1`;
 
-// Type definitions for our microCMS Content
+// Type definitions
 export type SAKE = {
   id: string;
   name: string;
@@ -43,45 +41,62 @@ export type BREWERY = {
   oldId: string;
 };
 
-// Brand and Shop use the same field structure as Brewery currently, but distinct API endpoints
 export type BRAND = BREWERY;
 export type SHOP = BREWERY;
 
-/**
- * Fetch functions
- */
+// Generic fetch helpers
+async function fetchList<T>(endpoint: string, queries?: any): Promise<{ contents: T[], totalCount: number, offset: number, limit: number }> {
+  const params = new URLSearchParams();
+  if (queries) {
+    Object.entries(queries).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params.set(key, String(value));
+      }
+    });
+  }
+  const url = `${BASE_URL}/${endpoint}?${params.toString()}`;
+  const res = await fetch(url, {
+    headers: { 'X-MICROCMS-API-KEY': API_KEY! },
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    throw new Error(`microCMS API error: ${res.status} ${res.statusText} for ${url}`);
+  }
+  return res.json();
+}
 
-export const getSakes = async (queries?: any) => {
-  return await client.getList<SAKE>({ endpoint: 'sake', queries });
-};
-export const getSakeDetail = async (contentId: string, queries?: any) => {
-  return await client.getListDetail<SAKE>({ endpoint: 'sake', contentId, queries });
-};
+async function fetchDetail<T>(endpoint: string, contentId: string, queries?: any): Promise<T> {
+  const params = new URLSearchParams();
+  if (queries) {
+    Object.entries(queries).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params.set(key, String(value));
+      }
+    });
+  }
+  const url = `${BASE_URL}/${endpoint}/${contentId}?${params.toString()}`;
+  const res = await fetch(url, {
+    headers: { 'X-MICROCMS-API-KEY': API_KEY! },
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    throw new Error(`microCMS API error: ${res.status} ${res.statusText} for ${url}`);
+  }
+  return res.json();
+}
 
-export const getArticles = async (queries?: any) => {
-  return await client.getList<ARTICLE>({ endpoint: 'article', queries });
-};
-export const getArticleDetail = async (contentId: string, queries?: any) => {
-  return await client.getListDetail<ARTICLE>({ endpoint: 'article', contentId, queries });
-};
+// Fetch functions
+export const getSakes = (queries?: any) => fetchList<SAKE>('sake', queries);
+export const getSakeDetail = (contentId: string, queries?: any) => fetchDetail<SAKE>('sake', contentId, queries);
 
-export const getBreweries = async (queries?: any) => {
-  return await client.getList<BREWERY>({ endpoint: 'brewery', queries });
-};
-export const getBreweryDetail = async (contentId: string, queries?: any) => {
-  return await client.getListDetail<BREWERY>({ endpoint: 'brewery', contentId, queries });
-};
+export const getArticles = (queries?: any) => fetchList<ARTICLE>('article', queries);
+export const getArticleDetail = (contentId: string, queries?: any) => fetchDetail<ARTICLE>('article', contentId, queries);
 
-export const getBrands = async (queries?: any) => {
-  return await client.getList<BRAND>({ endpoint: 'brand', queries });
-};
-export const getBrandDetail = async (contentId: string, queries?: any) => {
-  return await client.getListDetail<BRAND>({ endpoint: 'brand', contentId, queries });
-};
+export const getBreweries = (queries?: any) => fetchList<BREWERY>('brewery', queries);
+export const getBreweryDetail = (contentId: string, queries?: any) => fetchDetail<BREWERY>('brewery', contentId, queries);
 
-export const getShops = async (queries?: any) => {
-  return await client.getList<SHOP>({ endpoint: 'shop', queries });
-};
-export const getShopDetail = async (contentId: string, queries?: any) => {
-  return await client.getListDetail<SHOP>({ endpoint: 'shop', contentId, queries });
-};
+export const getBrands = (queries?: any) => fetchList<BRAND>('brand', queries);
+export const getBrandDetail = (contentId: string, queries?: any) => fetchDetail<BRAND>('brand', contentId, queries);
+
+export const getShops = (queries?: any) => fetchList<SHOP>('shop', queries);
+export const getShopDetail = (contentId: string, queries?: any) => fetchDetail<SHOP>('shop', contentId, queries);
