@@ -1,95 +1,188 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Building2, MapPin, Globe, Image as ImageIcon } from 'lucide-react';
-import { BREWERY } from '@/lib/microcms';
+import { Wine } from 'lucide-react';
+import { BREWERY, SAKE } from '@/lib/microcms';
+import { fetchRakutenSakes } from '@/lib/rakuten';
 
-export default function BreweryDetailClient({ brewery, type = 'brewery' }: { brewery: BREWERY, type?: 'brewery' | 'brand' | 'shop' }) {
-    const labels = {
-        brewery: { title: '酒蔵一覧へ戻る', tag: '酒蔵', icon: <Building2 size={16} /> },
-        brand: { title: '銘柄一覧へ戻る', tag: '銘柄', icon: <MapPin size={16} /> },
-        shop: { title: '酒販店一覧へ戻る', tag: '酒販店', icon: <Globe size={16} /> }
-    };
-    
-    const config = labels[type];
+function unescapeHtml(text: string) {
+    if (!text) return '';
+    return text
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&#x2F;/gi, "/")
+        .replace(/&#x3D;/gi, "=");
+}
+
+export default function BreweryDetailClient({ brewery, initialCmsSakes = [] }: { brewery: BREWERY, initialCmsSakes?: SAKE[] }) {
+    const [rakutenSakes, setRakutenSakes] = useState<any[]>([]);
+    const [loadingRakuten, setLoadingRakuten] = useState(false);
+
+    useEffect(() => {
+        // CMSに該当酒蔵の日本酒データがない場合、楽天APIから自動取得
+        if (initialCmsSakes.length === 0) {
+            setLoadingRakuten(true);
+            const searchName = unescapeHtml(brewery.name).replace(/(株式会社|有限会社|合名会社|合資会社)/g, '').trim();
+            
+            fetchRakutenSakes(searchName).then(sakes => {
+                setRakutenSakes(sakes);
+            }).catch(e => {
+                console.error("Rakuten fetch error:", e);
+            }).finally(() => {
+                setLoadingRakuten(false);
+            });
+        }
+    }, [brewery.name, initialCmsSakes.length]);
+
+    // contentに含まれる余分なHTMLタグや「二重レンダリング」の一因となる不正なタグ構造を除去
+    // プロトタイプ通り、whitespace-pre-wrap のプレーンテキストとして流し込む
+    const plainDescription = unescapeHtml(
+        (brewery.content || '')
+            .replace(/<br\/?>/gi, '\n')
+            .replace(/<p>/gi, '')
+            .replace(/<\/p>/gi, '\n\n')
+            .replace(/<[^>]+>/g, '') 
+            .trim()
+    );
+
+    const breweryData = brewery as any;
+    const prefectureDisplay = breweryData.prefecture || '日本';
+    const addressDisplay = breweryData.address || '-';
+    const phoneDisplay = breweryData.phone || '-';
+    const websiteDisplay = breweryData.website || breweryData.url || '';
+
+    // 表示する日本酒リスト (第1優先: CMSデータ、第2優先: 楽天APIデータ)
+    const displaySakes = initialCmsSakes.length > 0 ? initialCmsSakes : rakutenSakes;
+    const isRakutenFallback = initialCmsSakes.length === 0 && rakutenSakes.length > 0;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-50">
-            {/* Minimalist Top Nav */}
-            <nav className="fixed w-full z-50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-md border-b border-white/20 dark:border-slate-800/50">
-                <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-                    <Link href={`/${type === 'shop' ? 'shop/search' : type}`} className="inline-flex items-center text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-amber-400 transition-colors">
-                        <ArrowLeft size={16} className="mr-2" />
-                        {config.title}
-                    </Link>
+        <div className="min-h-screen bg-[#FDFDFD] font-sans text-[#1F1F1F] pb-24">
+            {/* ── ヒーロー画像 ── */}
+            <section className="w-full h-[45vh] overflow-hidden bg-[#F9F9F8]">
+                {brewery.imageUrl ? (
+                    <img src={brewery.imageUrl} alt={unescapeHtml(brewery.name)} className="w-full h-full object-cover" />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                        <Wine size={64} strokeWidth={1} />
+                    </div>
+                )}
+            </section>
+
+            {/* ── コンテンツカード ── */}
+            <section className="max-w-[900px] mx-auto -mt-[10vh] relative z-10 bg-white p-10 md:p-16 shadow-sm">
+                <Link href="/brewery" className="text-sm text-gray-400 mb-10 inline-block hover:text-[#1F1F1F] transition-colors tracking-widest font-bold">
+                    ← 酒蔵一覧へ
+                </Link>
+
+                <div className="text-center mb-10">
+                    <p className="text-xs text-[#8B7D6B] tracking-[0.2em] uppercase mb-2">
+                        {prefectureDisplay}
+                    </p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-[#1F1F1F] font-serif leading-tight">
+                        {unescapeHtml(brewery.name)}
+                    </h1>
                 </div>
-            </nav>
 
-            <main className="pt-20 pb-24">
-                {/* Hero Section */}
-                <div className="relative w-full h-[40vh] min-h-[300px] max-h-[500px] bg-slate-900 overflow-hidden">
-                    {brewery.imageUrl ? (
-                        <motion.img 
-                            initial={{ scale: 1.1, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 0.6 }}
-                            transition={{ duration: 1.5, ease: "easeOut" }}
-                            src={brewery.imageUrl} 
-                            alt={brewery.name}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-slate-800 opacity-50">
-                            <ImageIcon size={64} className="text-slate-600" />
-                        </div>
-                    )}
-                    
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-slate-50/20 to-transparent dark:from-slate-900 dark:via-slate-900/40" />
-                    
-                    <div className="absolute bottom-0 left-0 w-full p-8 md:p-16 flex flex-col items-center text-center">
-                        <motion.div 
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ duration: 0.7, delay: 0.2 }}
-                            className="flex items-center gap-2 mb-4 text-indigo-600 dark:text-amber-400 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-bold shadow-lg"
-                        >
-                            {config.icon}
-                            <span>{config.tag}</span>
-                        </motion.div>
+                <hr className="border-t border-gray-100 mb-10" />
 
-                        <motion.h1 
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ duration: 0.7, delay: 0.3 }}
-                            className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white drop-shadow-sm tracking-tight"
-                        >
-                            {brewery.name}
-                        </motion.h1>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 border-b border-gray-100 pb-10 mb-12">
+                    <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-400 tracking-widest uppercase mb-1">住所</span>
+                        <span className="text-sm">{addressDisplay}</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-400 tracking-widest uppercase mb-1">電話番号</span>
+                        <span className="text-sm">{phoneDisplay}</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-400 tracking-widest uppercase mb-1">公式サイト</span>
+                        {websiteDisplay ? (
+                            <a href={websiteDisplay} target="_blank" rel="noopener noreferrer" className="text-sm text-[#8B7D6B] hover:underline">
+                                リンク
+                            </a>
+                        ) : (
+                            <span className="text-sm text-gray-300">-</span>
+                        )}
                     </div>
                 </div>
 
-                {/* Content Section */}
-                <article className="container mx-auto px-4 max-w-4xl -mt-8 relative z-10">
-                    <motion.div 
-                        initial={{ y: 30, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.7, delay: 0.5 }}
-                        className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 p-8 md:p-12 lg:p-16"
-                    >
-                        {brewery.content && String(brewery.content).includes('<') ? (
-                            <div 
-                                className="custom-prose text-slate-700 dark:text-slate-300 rich-text"
-                                dangerouslySetInnerHTML={{ __html: brewery.content }}
-                            />
+                <div className="mb-16">
+                    <h2 className="text-2xl font-serif mb-6 border-b border-gray-100 pb-2 text-[#1F1F1F]">
+                        酒蔵について
+                    </h2>
+                    <p className="text-gray-700 leading-loose text-base whitespace-pre-wrap">
+                        {plainDescription || '詳細情報がまだありません。'}
+                    </p>
+                </div>
+                
+                {/* ── 代表的な銘柄・商品 ── */}
+                {(displaySakes.length > 0 || loadingRakuten) && (
+                    <div className="mt-20">
+                        <div className="flex items-end justify-between mb-8 border-b border-gray-100 pb-2">
+                            <h2 className="text-2xl font-serif text-[#1F1F1F]">
+                                代表的な銘柄
+                            </h2>
+                            {isRakutenFallback && (
+                                <span className="text-[10px] text-gray-400">※楽天から自動取得</span>
+                            )}
+                        </div>
+
+                        {loadingRakuten ? (
+                            <div className="text-center py-10 text-gray-400 text-sm tracking-widest animate-pulse">
+                                Loading items...
+                            </div>
                         ) : (
-                            <div className="custom-prose text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-                                {brewery.content || '詳細情報がまだ登録されていません。'}
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                {displaySakes.map((sake: any) => {
+                                    const id = sake.id;
+                                    const name = unescapeHtml(sake.name);
+                                    const price = sake.price ? `¥${sake.price.toLocaleString()}` : 'オープン価格';
+                                    const imageUrl = sake.imageUrl;
+                                    
+                                    const href = isRakutenFallback ? sake.affiliateUrl : `/nihonshu/${id}`;
+                                    const targetProps = isRakutenFallback ? { target: "_blank", rel: "noopener noreferrer" } : {};
+
+                                    const CardComponent = () => (
+                                        <>
+                                            <div className="aspect-[3/4] bg-[#F9F9F8] flex items-center justify-center p-4 overflow-hidden mb-4 transition-opacity group-hover:opacity-80">
+                                                {imageUrl ? (
+                                                    <img src={imageUrl} alt={name} className="max-h-full object-contain" />
+                                                ) : (
+                                                    <div className="text-gray-300">
+                                                        <Wine size={32} strokeWidth={1} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="text-center px-2">
+                                                <h3 className="text-sm font-bold text-[#1F1F1F] font-serif leading-relaxed h-[3em] overflow-hidden mb-1">
+                                                    {name}
+                                                </h3>
+                                                <p className="text-[11px] text-gray-400">
+                                                    {price}
+                                                </p>
+                                            </div>
+                                        </>
+                                    );
+
+                                    return isRakutenFallback ? (
+                                        <a href={href} key={id} {...targetProps} className="group block">
+                                            <CardComponent />
+                                        </a>
+                                    ) : (
+                                        <Link href={href} key={id} className="group block">
+                                            <CardComponent />
+                                        </Link>
+                                    );
+                                })}
                             </div>
                         )}
-                    </motion.div>
-                </article>
-            </main>
+                    </div>
+                )}
+            </section>
         </div>
     );
 }
