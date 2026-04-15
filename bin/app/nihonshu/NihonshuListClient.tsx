@@ -230,14 +230,22 @@ export default function NihonshuListClient({ sakes }: { sakes: SAKE[] }) {
           gap: '1.25rem'
         }}>
           {filtered.map((sake) => {
-            // descriptionからHTMLタグを除去してプレーンテキスト化
+            // descriptionからHTMLタグ・定型テキストを除去してプレーンテキスト化
             const plainDesc = (sake.description || '')
               .replace(/<[^>]+>/g, ' ')
               .replace(/&amp;/g, '&')
               .replace(/&lt;/g, '<')
               .replace(/&gt;/g, '>')
+              .replace(/購入ページへ（外部サイト）[\s\S]*/g, '')
+              .replace(/その他商品一覧[\s\S]*/g, '')
+              .replace(/飲める・買えるお店[\s\S]*/g, '')
+              .replace(/該当するリストがありません/g, '')
+              .replace(/^商品詳細\s*/, '')
               .replace(/\s+/g, ' ')
               .trim();
+
+            // breweryが「価格」等の不正データの場合は非表示
+            const breweryDisplay = sake.brewery && sake.brewery !== '価格' ? sake.brewery : '';
 
             // 名前から種類タグを推定
             const tags = deriveTags(sake);
@@ -297,16 +305,15 @@ export default function NihonshuListClient({ sakes }: { sakes: SAKE[] }) {
                     flexDirection: 'column'
                   }}>
                     {/* 蔵元名 */}
-                    {sake.brewery && (
+                    {breweryDisplay && (
                       <p style={{
                         fontSize: 11,
                         color: '#8b7355',
                         fontWeight: 700,
                         marginBottom: 4,
-                        textTransform: 'uppercase',
                         letterSpacing: '0.06em'
                       }}>
-                        {sake.brewery}
+                        {breweryDisplay}
                       </p>
                     )}
 
