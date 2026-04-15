@@ -32,8 +32,13 @@ export default function NihonshuListClient({ sakes }: { sakes: SAKE[] }) {
   return (
     <div className="min-h-screen bg-[#FDFDFD]">
       {/* ── ヘッダー ── */}
-      <header className="px-6 py-16 text-center">
+      <header className="px-6 py-16 text-center relative">
         <div className="max-w-4xl mx-auto">
+          <div className="absolute top-6 left-6 md:left-12">
+            <Link href="/" className="inline-flex items-center text-xs text-gray-400 hover:text-[#1F1F1F] transition-colors tracking-widest uppercase font-bold">
+              ← TOP
+            </Link>
+          </div>
           <h1 className="text-3xl font-serif font-black tracking-widest text-[#1F1F1F] mb-4">
             SAKE DATABASE
           </h1>
