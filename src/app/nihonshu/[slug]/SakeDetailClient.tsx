@@ -79,7 +79,7 @@ export default function SakeDetailClient({ sake }: { sake: SAKE }) {
                                     </div>
                                     
                                     <a 
-                                        href={`https://search.rakuten.co.jp/search/mall/${encodeURIComponent(sake.name)}/?v=2&scid=af_pc_etc&sc2id=af_103_1_10000645`}
+                                        href={sake.purchaseUrl || `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(sake.name)}/?v=2&scid=af_pc_etc&sc2id=af_103_1_10000645`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-700 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-slate-900 text-base font-bold rounded-2xl transition-all duration-300 shadow-lg shadow-indigo-600/20 dark:shadow-amber-500/20 hover:shadow-xl hover:-translate-y-1 cursor-pointer"

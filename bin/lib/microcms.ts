@@ -22,6 +22,7 @@ export type SAKE = {
   description: string;
   imageUrl: string;
   oldId: string;
+  purchaseUrl?: string;
 };
 
 export type ARTICLE = {
