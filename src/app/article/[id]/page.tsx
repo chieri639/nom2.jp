@@ -5,49 +5,6 @@ import { getArticleDetail } from '@/lib/microcms';
 
 export const revalidate = 0;
 
-/**
- * STUDIOから移行したHTMLコンテンツをクリーンアップする関数
- * - STUDIOのヘッダー/ナビゲーション/フッターを除去
- * - position: sticky/fixed な要素を除去（STUDIOのナビ残骸）
- * - 本文（<main> or <article>）だけを抽出
- */
-function cleanStudioHTML(rawHTML: string): string {
-  if (!rawHTML) return '';
-
-  let html = rawHTML;
-
-  // STUDIOのヘッダー（ナビゲーション含む）を除去
-  // <header ...>...</header> パターンをすべて除去
-  html = html.replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '');
-
-  // STUDIOのフッターを除去
-  html = html.replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '');
-
-  // <nav> タグを除去
-  html = html.replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '');
-
-  // position:sticky や position:fixed を含む div を無害化（display:none に）
-  html = html.replace(/position:\s*sticky/gi, 'position:relative');
-  html = html.replace(/position:\s*fixed/gi, 'position:relative');
-
-  // z-index: 50 以上の要素のz-indexを無効化（STUDIOのオーバーレイ対策）
-  html = html.replace(/z-index:\s*\d{2,}/gi, 'z-index:1');
-
-  // <main> タグの中身だけ抽出を試みる（もしあれば）
-  const mainMatch = html.match(/<main[^>]*>([\s\S]*)<\/main>/i);
-  if (mainMatch) {
-    html = mainMatch[1];
-  }
-
-  // <article> タグの中身だけ抽出を試みる（もしあれば）
-  const articleMatch = html.match(/<article[^>]*>([\s\S]*)<\/article>/i);
-  if (articleMatch) {
-    html = articleMatch[1];
-  }
-
-  return html;
-}
-
 export default async function ArticleDetailPage({ params }: { params: { id: string } }) {
   try {
     const article = await getArticleDetail(params.id);
@@ -55,8 +12,6 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
     if (!article) {
       notFound();
     }
-
-    const cleanedContent = cleanStudioHTML(article.content || '');
 
     return (
       <div style={{ backgroundColor: '#fdfdfd', minHeight: '100vh', paddingBottom: 80, fontFamily: '"Noto Sans JP", -apple-system, sans-serif' }}>
@@ -91,11 +46,10 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
               ← 記事一覧に戻る
             </Link>
 
-            {/* STUDIOのHTMLをCSS隔離された領域で表示 */}
             <article 
-              className="studio-content rich-text" 
+              className="rich-text" 
               style={{ fontSize: 17, lineHeight: 1.9, color: '#333' }} 
-              dangerouslySetInnerHTML={{ __html: cleanedContent }} 
+              dangerouslySetInnerHTML={{ __html: article.content || '' }} 
             />
 
             {/* Read More / Next Actions */}
