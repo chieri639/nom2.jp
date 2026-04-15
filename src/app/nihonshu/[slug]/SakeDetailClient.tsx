@@ -87,7 +87,7 @@ export default function SakeDetailClient({ sake }: { sake: SAKE }) {
                       href={purchaseUrl} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="block w-full text-center bg-[#BF0000] text-white py-4 text-sm font-bold tracking-widest hover:bg-[#990000] transition-colors mb-12 shadow-sm shadow-red-900/10"
+                      className="block w-full text-center bg-[#1F1F1F] text-white py-4 text-sm font-bold tracking-widest hover:bg-black transition-colors mb-12 shadow-sm shadow-gray-900/10"
                   >
                     楽天で探す
                   </a>
