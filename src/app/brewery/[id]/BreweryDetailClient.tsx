@@ -22,10 +22,10 @@ function unescapeHtml(text: string) {
 function parseBreweryData(html: string, originalBrewery: any) {
     if (!html) return { description: '', address: originalBrewery.address, phone: originalBrewery.phone, website: originalBrewery.website || originalBrewery.url };
 
-    // 1. HTMLエスケープ・タグの解除
     let text = html
         .replace(/<br\/?>/gi, '\n')
         .replace(/<\/p>/gi, '\n\n')
+        .replace(/<figcaption>.*?<\/figcaption>/gi, '') // 画像のキャプションなどを除去
         .replace(/<[^>]+>/g, ' ')
         .replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
@@ -35,7 +35,6 @@ function parseBreweryData(html: string, originalBrewery: any) {
         .replace(/&#x2F;/gi, "/")
         .replace(/&#x3D;/gi, "=");
 
-    // 2. ノイズの完全削除
     const noises = [
         'keyboard_arrow_leftpausekeyboard_arrow_right',
         '代表的な銘柄',
@@ -43,7 +42,6 @@ function parseBreweryData(html: string, originalBrewery: any) {
         '商品一覧',
         '酒蔵について',
         '酒蔵の紹介',
-        // その他ゴミになりやすい定型文
         '購入ページへ（外部サイト）',
         '飲める・買えるお店',
         '該当するリストがありません'
@@ -62,7 +60,7 @@ function parseBreweryData(html: string, originalBrewery: any) {
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
 
-        // 3. 商品リストの残骸（値段・容量・特定名称の単独行）はスキップ
+        // 商品の残骸をスキップ
         if (
             /(¥|円|\(税込\)|720ml|1800ml)/.test(line) ||
             /^(純米大吟醸|純米吟醸|大吟醸酒|特別純米|純米酒|本醸造|普通酒|生酒|にごり酒)$/.test(line)
@@ -70,37 +68,38 @@ function parseBreweryData(html: string, originalBrewery: any) {
             continue;
         }
 
+        // ラベルのみの行をスキップ
+        if (/^(住所|所在地|電話番号|TEL|公式サイト|WEB|URL|営業時間|定休日)$/i.test(line)) {
+            continue;
+        }
+
         // Webサイト抽出
         if (/https?:\/\/[^\s]+/.test(line)) {
             if (!website) website = line.match(/(https?:\/\/[^\s]+)/)?.[1] || null;
-            // リンクや「公式サイト」だけの行ならスキップ
             if (line.replace(/(https?:\/\/[^\s]+)/, '').replace(/公式サイト|URL|WEB/i, '').trim().length <= 2) continue;
         }
 
         // 電話番号抽出
         if (/(\d{2,4}-\d{2,4}-\d{3,4})/.test(line) || /TEL[:：]\s*\d+/.test(line)) {
             if (!phone) phone = line.match(/(\d{2,4}-\d{2,4}-\d{3,4})/)?.[1] || line.replace(/.*TEL[:：]\s*/i, '') || null;
-            // 電話番号やTELなどのキーワードしかない短い行はスキップ
             if (line.length < 25 && !line.includes('。')) continue;
         }
 
-        // 住所抽出 (〒 または都道府県から始まる行)
-        if (/(〒\d{3}-\d{4}|(北海道|青森県|岩手県|宮城県|秋田県|山形県|福島県|茨城県|栃木県|群馬県|埼玉県|千葉県|東京都|神奈川県|新潟県|富山県|石川県|福井県|山梨県|長野県|岐阜県|静岡県|愛知県|三重県|滋賀県|京都府|大阪府|兵庫県|奈良県|和歌山県|鳥取県|島根県|岡山県|広島県|山口県|徳島県|香川県|愛媛県|高知県|福岡県|佐賀県|長崎県|熊本県|大分県|宮崎県|鹿児島県|沖縄県))/.test(line)) {
-            if (!address && line.length < 60) {
-                address = line.replace(/^(住所|所在地)[:：]?\s*/, '').trim();
-                if (!line.includes('。')) continue; // 住所だけの短い行はスキップ
-            }
+        // 住所抽出 (〒 か 住所というキーワード)
+        if (/(〒\d{3}-\d{4})/.test(line)) {
+            if (!address) address = line.replace(/^(住所|所在地)[:：]?\s*/, '').trim();
+            if (!line.includes('。')) continue; // 住所だけの行はスキップ
+        }
+
+        // "[名前] / [地域] 住所" のようなCMS特有のヘッダー行をスキップ
+        if (line.includes(originalBrewery.name) && line.includes('/') && (line.includes('市') || line.includes('県') || line.includes('道')) && line.length < 50 && !line.includes('。')) {
+            continue;
         }
 
         cleanedLines.push(line);
     }
 
     let description = cleanedLines.join('\n\n').trim();
-
-    // 安全策（削りすぎてしまった場合は、最初の数行をフォールバック）
-    if (description.length < 20) {
-        description = lines.slice(0, 10).join('\n\n');
-    }
 
     return { description, address, phone, website };
 }
@@ -124,13 +123,24 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], typ
         }
     }, [brewery.name, initialCmsSakes.length]);
 
-    // 動的パースの適用
     const { description: cleanDescription, address: extractedAddress, phone: extractedPhone, website: extractedWebsite } = parseBreweryData(brewery.content || '', brewery);
     
+    // URL表示の整形
+    let displayUrlText = extractedWebsite || '';
+    if (displayUrlText.startsWith('http')) {
+        try {
+            const urlObj = new URL(displayUrlText);
+            displayUrlText = urlObj.hostname;
+        } catch (e) {
+            // ignore
+        }
+    }
+
     const prefectureDisplay = (brewery as any).prefecture || '日本';
     const finalAddress = extractedAddress || '-';
     const finalPhone = extractedPhone || '-';
     const finalWebsite = extractedWebsite || '';
+
 
     const displaySakes = initialCmsSakes.length > 0 ? initialCmsSakes : rakutenSakes;
     const isRakutenFallback = initialCmsSakes.length === 0 && rakutenSakes.length > 0;
@@ -177,8 +187,8 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], typ
                     <div className="flex flex-col">
                         <span className="text-[10px] text-gray-400 tracking-widest uppercase mb-1">公式サイト</span>
                         {finalWebsite ? (
-                            <a href={finalWebsite} target="_blank" rel="noopener noreferrer" className="text-sm text-[#8B7D6B] hover:underline">
-                                リンク
+                            <a href={finalWebsite} target="_blank" rel="noopener noreferrer" className="text-sm text-[#8B7D6B] hover:underline break-all">
+                                {displayUrlText}
                             </a>
                         ) : (
                             <span className="text-sm text-gray-300">-</span>
@@ -191,7 +201,7 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], typ
                         酒蔵について
                     </h2>
                     <div className="prose max-w-none text-gray-700 leading-loose">
-                        <p className={`whitespace-pre-wrap ${cleanDescription.length > 500 ? 'line-clamp-[15]' : ''}`}>
+                        <p className="whitespace-pre-wrap">
                             {cleanDescription || '詳細情報がまだありません。'}
                         </p>
                     </div>
