@@ -5,6 +5,49 @@ import { getArticleDetail } from '@/lib/microcms';
 
 export const revalidate = 0;
 
+/**
+ * STUDIOから移行したHTMLコンテンツをクリーンアップする関数
+ * - STUDIOのヘッダー/ナビゲーション/フッターを除去
+ * - position: sticky/fixed な要素を除去（STUDIOのナビ残骸）
+ * - 本文（<main> or <article>）だけを抽出
+ */
+function cleanStudioHTML(rawHTML: string): string {
+  if (!rawHTML) return '';
+
+  let html = rawHTML;
+
+  // STUDIOのヘッダー（ナビゲーション含む）を除去
+  // <header ...>...</header> パターンをすべて除去
+  html = html.replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '');
+
+  // STUDIOのフッターを除去
+  html = html.replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '');
+
+  // <nav> タグを除去
+  html = html.replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '');
+
+  // position:sticky や position:fixed を含む div を無害化（display:none に）
+  html = html.replace(/position:\s*sticky/gi, 'position:relative');
+  html = html.replace(/position:\s*fixed/gi, 'position:relative');
+
+  // z-index: 50 以上の要素のz-indexを無効化（STUDIOのオーバーレイ対策）
+  html = html.replace(/z-index:\s*\d{2,}/gi, 'z-index:1');
+
+  // <main> タグの中身だけ抽出を試みる（もしあれば）
+  const mainMatch = html.match(/<main[^>]*>([\s\S]*)<\/main>/i);
+  if (mainMatch) {
+    html = mainMatch[1];
+  }
+
+  // <article> タグの中身だけ抽出を試みる（もしあれば）
+  const articleMatch = html.match(/<article[^>]*>([\s\S]*)<\/article>/i);
+  if (articleMatch) {
+    html = articleMatch[1];
+  }
+
+  return html;
+}
+
 export default async function ArticleDetailPage({ params }: { params: { id: string } }) {
   try {
     const article = await getArticleDetail(params.id);
@@ -12,6 +55,8 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
     if (!article) {
       notFound();
     }
+
+    const cleanedContent = cleanStudioHTML(article.content || '');
 
     return (
       <div style={{ backgroundColor: '#fdfdfd', minHeight: '100vh', paddingBottom: 80, fontFamily: '"Noto Sans JP", -apple-system, sans-serif' }}>
@@ -46,16 +91,21 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
               ← 記事一覧に戻る
             </Link>
 
-            <article className="rich-text" style={{ fontSize: 17, lineHeight: 1.9, color: '#333' }} dangerouslySetInnerHTML={{ __html: article.content || '' }} />
+            {/* STUDIOのHTMLをCSS隔離された領域で表示 */}
+            <article 
+              className="studio-content rich-text" 
+              style={{ fontSize: 17, lineHeight: 1.9, color: '#333' }} 
+              dangerouslySetInnerHTML={{ __html: cleanedContent }} 
+            />
 
             {/* Read More / Next Actions */}
             <div style={{ marginTop: 60, paddingTop: 40, borderTop: '1px solid #eee', textAlign: 'center' }}>
               <h3 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>日本酒を探す</h3>
               <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link href="/nihonshu" style={{ padding: '14px 32px', backgroundColor: '#1A1A1D', color: '#white', borderRadius: 100, fontWeight: 700, textDecoration: 'none' }}>
+                <Link href="/nihonshu" style={{ padding: '14px 32px', backgroundColor: '#1A1A1D', color: 'white', borderRadius: 100, fontWeight: 700, textDecoration: 'none' }}>
                   日本酒一覧を見る
                 </Link>
-                <Link href="/similar" style={{ padding: '14px 32px', backgroundColor: '#bfa758', color: '#white', borderRadius: 100, fontWeight: 700, textDecoration: 'none' }}>
+                <Link href="/similar" style={{ padding: '14px 32px', backgroundColor: '#bfa758', color: 'white', borderRadius: 100, fontWeight: 700, textDecoration: 'none' }}>
                   AIにおすすめを聞く
                 </Link>
               </div>

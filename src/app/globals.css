@@ -229,3 +229,80 @@ canvas {
   border-radius: 0.5rem;
   width: 100%;
 }
+
+/* ============================================
+   STUDIO移行コンテンツのCSS隔離
+   STUDIOのインラインスタイルが新サイトのレイアウトを壊さないようにする
+   ============================================ */
+.studio-content {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* STUDIOの固定ポジション要素を無害化 */
+.studio-content * {
+  position: static !important;
+  z-index: auto !important;
+}
+
+/* ただし relative と absolute は許可（レイアウトに必要） */
+.studio-content [style*="position: relative"],
+.studio-content [style*="position:relative"] {
+  position: relative !important;
+}
+.studio-content [style*="position: absolute"],
+.studio-content [style*="position:absolute"] {
+  position: absolute !important;
+}
+
+/* STUDIOのbackdrop-filterを除去 */
+.studio-content [style*="backdrop-filter"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 画像のレスポンシブ対応 */
+.studio-content img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 8px;
+  margin: 1em 0;
+}
+
+/* STUDIOの全画面幅要素を制限 */
+.studio-content [style*="width: 100vw"],
+.studio-content [style*="width:100vw"] {
+  width: 100% !important;
+}
+
+/* STUDIOのネガティブマージンを無害化 */
+.studio-content [style*="margin-left: -"] {
+  margin-left: 0 !important;
+}
+.studio-content [style*="margin-right: -"] {
+  margin-right: 0 !important;
+}
+
+/* リンクの視認性確保 */
+.studio-content a {
+  color: #bfa758;
+  word-break: break-all;
+}
+.studio-content a:hover {
+  opacity: 0.8;
+}
+
+/* テーブルのレスポンシブ対応 */
+.studio-content table {
+  width: 100% !important;
+  display: block;
+  overflow-x: auto;
+}
+
+/* フォントサイズの最低保証 */
+.studio-content p,
+.studio-content span,
+.studio-content div {
+  min-height: 0;
+}
