@@ -18,7 +18,7 @@ function unescapeHtml(text: string) {
         .replace(/&#x3D;/gi, "=");
 }
 
-export default function BreweryDetailClient({ brewery, initialCmsSakes = [] }: { brewery: BREWERY, initialCmsSakes?: SAKE[] }) {
+export default function BreweryDetailClient({ brewery, initialCmsSakes = [], type = 'brewery' }: { brewery: BREWERY, initialCmsSakes?: SAKE[], type?: 'brewery' | 'brand' | 'shop' }) {
     const [rakutenSakes, setRakutenSakes] = useState<any[]>([]);
     const [loadingRakuten, setLoadingRakuten] = useState(false);
 
@@ -74,8 +74,8 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [] }: {
 
             {/* ── コンテンツカード ── */}
             <section className="max-w-[900px] mx-auto -mt-[10vh] relative z-10 bg-white p-10 md:p-16 shadow-sm">
-                <Link href="/brewery" className="text-sm text-gray-400 mb-10 inline-block hover:text-[#1F1F1F] transition-colors tracking-widest font-bold">
-                    ← 酒蔵一覧へ
+                <Link href={`/${type === 'shop' ? 'shop/search' : type}`} className="text-sm text-gray-400 mb-10 inline-block hover:text-[#1F1F1F] transition-colors tracking-widest font-bold">
+                    ← 戻る
                 </Link>
 
                 <div className="text-center mb-10">
