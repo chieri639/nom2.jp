@@ -5,11 +5,8 @@ import SakeDetailClient from "./SakeDetailClient";
 
 export const revalidate = 0;
 
-export default async function NihonshuDetailPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function NihonshuDetailPage(props: any) {
+  const params = await props.params;
   try {
     const sake = await getSakeDetail(params.slug);
 

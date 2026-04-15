@@ -5,7 +5,8 @@ import BreweryDetailClient from '@/app/brewery/[id]/BreweryDetailClient';
 
 export const revalidate = 0;
 
-export default async function BrandDetailPage({ params }: { params: { id: string } }) {
+export default async function BrandDetailPage(props: any) {
+  const params = await props.params;
   try {
     const brand = await getBrandDetail(params.id);
 

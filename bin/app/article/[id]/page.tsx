@@ -4,27 +4,36 @@ import { getArticleDetail } from '@/lib/microcms';
 
 export const revalidate = 0;
 
-export default async function ArticleDetailPage({ params }: { params: { id: string } }) {
+export default async function ArticleDetailPage(props: any) {
+  // Next.js 14+ App Router: params may need to be awaited
+  const params = await props.params;
+  const id = params?.id;
+
   let article: any = null;
   let errorMsg: string | null = null;
 
-  try {
-    article = await getArticleDetail(params.id);
-  } catch (error: any) {
-    errorMsg = error?.message || JSON.stringify(error);
-    console.error('詳細取得エラー:', errorMsg);
+  if (!id) {
+    return (
+      <div style={{ padding: 80, fontFamily: 'monospace' }}>
+        <h1 style={{ color: 'red' }}>Error: No article ID provided</h1>
+        <p>params: {JSON.stringify(params)}</p>
+        <Link href="/article">← 記事一覧に戻る</Link>
+      </div>
+    );
   }
 
-  // デバッグ: データが取得できなかった場合の情報を表示
+  try {
+    article = await getArticleDetail(id);
+  } catch (error: any) {
+    errorMsg = error?.message || JSON.stringify(error);
+  }
+
   if (!article || errorMsg) {
     return (
       <div style={{ padding: 80, fontFamily: 'monospace', maxWidth: 800, margin: '0 auto' }}>
-        <h1 style={{ color: 'red' }}>Debug: Article Data Issue</h1>
-        <p><strong>Requested ID:</strong> {params.id}</p>
-        <p><strong>Error:</strong> {errorMsg || 'No error, but article is null/undefined'}</p>
-        <p><strong>Article value:</strong> {JSON.stringify(article)}</p>
-        <p><strong>ENV check:</strong> SERVICE_ID={process.env.X_MICROCMS_SERVICE_ID ? 'SET' : 'MISSING'}, API_KEY={process.env.X_MICROCMS_API_KEY ? 'SET' : 'MISSING'}</p>
-        <hr />
+        <h1 style={{ color: 'red' }}>記事が見つかりませんでした</h1>
+        <p>ID: {id}</p>
+        {errorMsg && <p style={{ color: '#666' }}>{errorMsg}</p>}
         <Link href="/article">← 記事一覧に戻る</Link>
       </div>
     );
@@ -46,7 +55,7 @@ export default async function ArticleDetailPage({ params }: { params: { id: stri
                   特集記事
               </span>
               <h1 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 800, marginBottom: 24, letterSpacing: '-0.02em', lineHeight: 1.4 }}>
-                  {article.title || '(タイトル未取得)'}
+                  {article.title}
               </h1>
           </div>
           {article.imageUrl && (
