@@ -217,6 +217,25 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
                     </div>
                 </div>
                 
+                {/* ── ブランド一覧 (銘柄データがある場合) ── */}
+                {brands.length > 0 && (
+                    <div className="mb-24">
+                        <div className="flex items-center gap-4 mb-8">
+                            <h2 className="text-2xl font-serif-jp font-bold text-[#8B7D6B] whitespace-nowrap">
+                                主要銘柄
+                            </h2>
+                            <div className="h-px flex-1 bg-gray-100"></div>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                            {brands.map((brand) => (
+                                <div key={brand.id} className="bg-white border border-[#8B7D6B]/20 px-6 py-3 rounded-lg shadow-sm">
+                                    <span className="text-[#8B7D6B] font-bold font-serif-jp">{unescapeHtml(brand.name)}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                
                 {/* ── 商品ラインナップ (銘柄別セクション) ── */}
                 {(isRakutenFallback || Object.keys(sakesByBrand).length > 0 || loadingRakuten) && (
                     <div className="space-y-24">
@@ -229,7 +248,7 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
                             <div>
                                 <div className="flex items-center gap-4 mb-12">
                                     <h2 className="text-2xl font-serif-jp font-bold text-[#8B7D6B] whitespace-nowrap">
-                                        銘柄一覧
+                                        関連製品（自動取得）
                                     </h2>
                                     <div className="h-px flex-1 bg-gray-100"></div>
                                     <span className="text-[10px] text-gray-300">※楽天から自動取得</span>

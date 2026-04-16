@@ -17,8 +17,12 @@ export default async function BreweryDetailPage(props: any) {
       notFound();
     }
 
-    // 2. 検索名のクリーンアップ
-    const searchName = brewery.name.replace(/(株式会社|有限会社|合名会社|合資会社)/g, '').trim();
+    // 2. 検索名のクリーンアップ（ヒット率向上のため）
+    // 「（銘柄名）」や「株式会社」などのノイズを徹底的に排除
+    const searchName = brewery.name
+      .split(/[（(]/)[0] // 括弧（...）以降を削除
+      .replace(/(株式会社|有限会社|合名会社|合資会社|酒造|醸造|酒造場)/g, '')
+      .trim();
     
     // 3. 関連ブランドと日本酒を【並列】で取得
     // 個別のリクエストに cache: 'force-cache' や next: { revalidate } を指定可能
