@@ -51,7 +51,7 @@ export type BRAND = BREWERY;
 export type SHOP = BREWERY;
 
 // Generic fetch helpers
-async function fetchList<T>(endpoint: string, queries?: any): Promise<{ contents: T[], totalCount: number, offset: number, limit: number }> {
+async function fetchList<T>(endpoint: string, queries?: any, options: RequestInit = {}): Promise<{ contents: T[], totalCount: number, offset: number, limit: number }> {
   const serviceId = process.env.X_MICROCMS_SERVICE_ID || 'nom2';
   const apiKey = process.env.X_MICROCMS_API_KEY || '9jTt1rBZrk5OfQ9QL2MdwxjgAGDOq1qUAvMA';
   
@@ -69,12 +69,14 @@ async function fetchList<T>(endpoint: string, queries?: any): Promise<{ contents
   
   try {
     const res = await fetch(url, {
+      ...options,
       headers: { 
         'X-MICROCMS-API-KEY': apiKey,
-        'User-Agent': 'node-fetch'
+        'User-Agent': 'node-fetch',
+        ...(options.headers || {})
       },
-      cache: 'no-store',
-      // keepalive: true, // Node.jsのfetchで安定性を高める場合がある
+      // デフォルトではキャッシュを有効にし、必要に応じて上書き可能にする
+      cache: options.cache || (options.next ? undefined : 'no-store'),
     });
 
     if (!res.ok) {
@@ -83,13 +85,16 @@ async function fetchList<T>(endpoint: string, queries?: any): Promise<{ contents
     }
     return res.json();
   } catch (err) {
-    // ネットワークエラーなどを詳細に記録
     console.error(`Fetch failed for ${url}:`, err);
     throw err;
   }
 }
 
-async function fetchDetail<T>(endpoint: string, contentId: string, queries?: any): Promise<T> {
+async function fetchDetail<T>(endpoint: string, contentId: string, queries?: any, options: RequestInit = {}): Promise<T> {
+  const serviceId = process.env.X_MICROCMS_SERVICE_ID || 'nom2';
+  const apiKey = process.env.X_MICROCMS_API_KEY || '9jTt1rBZrk5OfQ9QL2MdwxjgAGDOq1qUAvMA';
+  
+  const baseUrl = `https://${serviceId}.microcms.io/api/v1`;
   const params = new URLSearchParams();
   if (queries) {
     Object.entries(queries).forEach(([key, value]) => {
@@ -98,29 +103,41 @@ async function fetchDetail<T>(endpoint: string, contentId: string, queries?: any
       }
     });
   }
-  const url = `${BASE_URL}/${endpoint}/${contentId}?${params.toString()}`;
-  const res = await fetch(url, {
-    headers: { 'X-MICROCMS-API-KEY': API_KEY! },
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    throw new Error(`microCMS API error: ${res.status} ${res.statusText} for ${url}`);
+  const url = `${baseUrl}/${endpoint}/${contentId}${params.toString() ? '?' + params.toString() : ''}`;
+  
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers: { 
+        'X-MICROCMS-API-KEY': apiKey,
+        'User-Agent': 'node-fetch',
+        ...(options.headers || {})
+      },
+      cache: options.cache || (options.next ? undefined : 'no-store'),
+    });
+
+    if (!res.ok) {
+      throw new Error(`microCMS API error: ${res.status} ${res.statusText} for ${url}`);
+    }
+    return res.json();
+  } catch (err) {
+    console.error(`Fetch failed for ${url}:`, err);
+    throw err;
   }
-  return res.json();
 }
 
 // Fetch functions
-export const getSakes = (queries?: any) => fetchList<SAKE>('sake', queries);
-export const getSakeDetail = (contentId: string, queries?: any) => fetchDetail<SAKE>('sake', contentId, queries);
+export const getSakes = (queries?: any, options?: RequestInit) => fetchList<SAKE>('sake', queries, options);
+export const getSakeDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<SAKE>('sake', contentId, queries, options);
 
-export const getArticles = (queries?: any) => fetchList<ARTICLE>('article', queries);
-export const getArticleDetail = (contentId: string, queries?: any) => fetchDetail<ARTICLE>('article', contentId, queries);
+export const getArticles = (queries?: any, options?: RequestInit) => fetchList<ARTICLE>('article', queries, options);
+export const getArticleDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<ARTICLE>('article', contentId, queries, options);
 
-export const getBreweries = (queries?: any) => fetchList<BREWERY>('brewery', queries);
-export const getBreweryDetail = (contentId: string, queries?: any) => fetchDetail<BREWERY>('brewery', contentId, queries);
+export const getBreweries = (queries?: any, options?: RequestInit) => fetchList<BREWERY>('brewery', queries, options);
+export const getBreweryDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<BREWERY>('brewery', contentId, queries, options);
 
-export const getBrands = (queries?: any) => fetchList<BRAND>('brand', queries);
-export const getBrandDetail = (contentId: string, queries?: any) => fetchDetail<BRAND>('brand', contentId, queries);
+export const getBrands = (queries?: any, options?: RequestInit) => fetchList<BRAND>('brand', queries, options);
+export const getBrandDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<BRAND>('brand', contentId, queries, options);
 
-export const getShops = (queries?: any) => fetchList<SHOP>('shop', queries);
-export const getShopDetail = (contentId: string, queries?: any) => fetchDetail<SHOP>('shop', contentId, queries);
+export const getShops = (queries?: any, options?: RequestInit) => fetchList<SHOP>('shop', queries, options);
+export const getShopDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<SHOP>('shop', contentId, queries, options);
