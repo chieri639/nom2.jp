@@ -293,5 +293,5 @@ const SakeCard = React.memo(({ sake, isRakuten }: { sake: any, isRakuten: boolea
             </div>
         </Link>
     );
-}
+});
 
