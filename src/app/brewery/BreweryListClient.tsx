@@ -168,7 +168,7 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
 
             return (
               <Link 
-                href={`/brewery/${brewery.id}`} 
+                href={`/brewery/${brewery.oldId || brewery.id}`} 
                 key={brewery.id} 
                 className="brewery-card group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl transition-[box-shadow,transform] duration-500 flex flex-col h-full overflow-hidden"
               >

@@ -35,11 +35,12 @@ export default function FeaturedSakes({ sakes = MOCK_SAKES }: { sakes?: any[] })
     // Override with real data if provided
     const displaySakes = sakes && sakes.length > 0 ? sakes.slice(0, 3).map(s => ({
         id: s.id,
+        oldId: s.oldId,
         brewery: s.brewery || '不明',
         name: s.name,
         tags: ['#おすすめ'], // Simplified tag logic for real data
         image: s.imageUrl || 'https://images.unsplash.com/photo-1569485741656-78e87ad3eb28?auto=format&fit=crop&q=80&w=400',
-        rakutenUrl: s.affiliate_url || `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(s.name)}/`
+        rakutenUrl: s.purchaseUrl || `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(s.name)}/`
     })) : MOCK_SAKES;
 
     return (
@@ -64,7 +65,7 @@ export default function FeaturedSakes({ sakes = MOCK_SAKES }: { sakes?: any[] })
                             transition={{ delay: index * 0.1, duration: 0.6 }}
                             className="flex flex-col h-full"
                         >
-                            <Link href={`/nihonshu/${sake.id}`} className="block flex-grow group">
+                            <Link href={`/nihonshu/${sake.oldId || sake.id}`} className="block flex-grow group">
                                 <div className="aspect-square bg-gray-100 mb-6 overflow-hidden relative shadow-sm rounded-md">
                                     <img 
                                         src={sake.image} 

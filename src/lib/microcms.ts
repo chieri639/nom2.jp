@@ -159,6 +159,22 @@ export const getArticleDetail = (contentId: string, queries?: any, options?: Req
 export const getBreweries = (queries?: any, options?: RequestInit) => fetchList<BREWERY>('brewery', queries, options);
 export const getBreweryDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<BREWERY>('brewery', contentId, queries, options);
 
+/**
+ * slug (oldId) を指定して酒蔵を1件取得する
+ */
+export async function getBreweryByOldId(oldId: string): Promise<BREWERY | null> {
+  try {
+    const res = await getBreweries({
+      filters: `oldId[equals]${oldId}`,
+      limit: 1
+    });
+    return res.contents[0] || null;
+  } catch (err) {
+    console.error(`Failed to fetch brewery by oldId: ${oldId}`, err);
+    return null;
+  }
+}
+
 export const getBrands = (queries?: any, options?: RequestInit) => fetchList<BRAND>('brand', queries, options);
 export const getBrandDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<BRAND>('brand', contentId, queries, options);
 
