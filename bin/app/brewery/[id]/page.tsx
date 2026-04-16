@@ -40,10 +40,11 @@ export default async function BreweryDetailPage(props: any) {
     const brands = brandsRes.contents || [];
     const cmsSakes = sakesRes.contents || [];
 
-    // BreweryDetailClient にデータを渡す
+    // BreweryDetailClient にデータを渡し、1時間キャッシュ
     return <BreweryDetailClient brewery={brewery} initialCmsSakes={cmsSakes} brands={brands} />;
   } catch (error) {
+    // 予期せぬエラーは再試行可能な error.tsx に任せる
     console.error('酒蔵詳細取得エラー:', error);
-    notFound();
+    throw error;
   }
 }

@@ -75,8 +75,8 @@ async function fetchList<T>(endpoint: string, queries?: any, options: RequestIni
         'User-Agent': 'node-fetch',
         ...(options.headers || {})
       },
-      // デフォルトではキャッシュを有効にし、必要に応じて上書き可能にする
-      cache: options.cache || (options.next ? undefined : 'no-store'),
+      // options.cache が明示されていない場合は、Next.jsのタグ/時間ベースのキャッシュを許可する
+      cache: options.cache,
     });
 
     if (!res.ok) {
@@ -113,7 +113,7 @@ async function fetchDetail<T>(endpoint: string, contentId: string, queries?: any
         'User-Agent': 'node-fetch',
         ...(options.headers || {})
       },
-      cache: options.cache || (options.next ? undefined : 'no-store'),
+      cache: options.cache,
     });
 
     if (!res.ok) {
