@@ -39,6 +39,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-KRD526KNEV"
           strategy="afterInteractive"

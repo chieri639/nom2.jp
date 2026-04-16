@@ -18,6 +18,7 @@ export type SAKE = {
   id: string;
   name: string;
   brewery: string;
+  brand?: string;
   price: number;
   description: string;
   imageUrl: string;
@@ -39,6 +40,10 @@ export type BREWERY = {
   name: string;
   content: string;
   imageUrl: string;
+  prefecture?: string;
+  address?: string;
+  phone?: string;
+  website?: string;
   oldId: string;
 };
 
@@ -47,6 +52,10 @@ export type SHOP = BREWERY;
 
 // Generic fetch helpers
 async function fetchList<T>(endpoint: string, queries?: any): Promise<{ contents: T[], totalCount: number, offset: number, limit: number }> {
+  const serviceId = process.env.X_MICROCMS_SERVICE_ID || 'nom2';
+  const apiKey = process.env.X_MICROCMS_API_KEY || '9jTt1rBZrk5OfQ9QL2MdwxjgAGDOq1qUAvMA';
+  
+  const baseUrl = `https://${serviceId}.microcms.io/api/v1`;
   const params = new URLSearchParams();
   if (queries) {
     Object.entries(queries).forEach(([key, value]) => {
@@ -55,15 +64,29 @@ async function fetchList<T>(endpoint: string, queries?: any): Promise<{ contents
       }
     });
   }
-  const url = `${BASE_URL}/${endpoint}?${params.toString()}`;
-  const res = await fetch(url, {
-    headers: { 'X-MICROCMS-API-KEY': API_KEY! },
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    throw new Error(`microCMS API error: ${res.status} ${res.statusText} for ${url}`);
+  
+  const url = `${baseUrl}/${endpoint}${params.toString() ? '?' + params.toString() : ''}`;
+  
+  try {
+    const res = await fetch(url, {
+      headers: { 
+        'X-MICROCMS-API-KEY': apiKey,
+        'User-Agent': 'node-fetch'
+      },
+      cache: 'no-store',
+      // keepalive: true, // Node.jsのfetchで安定性を高める場合がある
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => 'No error body');
+      throw new Error(`microCMS API error: ${res.status} ${res.statusText}. Response: ${errorText}`);
+    }
+    return res.json();
+  } catch (err) {
+    // ネットワークエラーなどを詳細に記録
+    console.error(`Fetch failed for ${url}:`, err);
+    throw err;
   }
-  return res.json();
 }
 
 async function fetchDetail<T>(endpoint: string, contentId: string, queries?: any): Promise<T> {

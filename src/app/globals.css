@@ -30,6 +30,13 @@ body {
   .font-serif {
     font-family: var(--font-serif), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif !important;
   }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 
@@ -37,9 +44,13 @@ body {
   touch-action: pan-y;
   -webkit-text-size-adjust: 100%;
   -webkit-overflow-scrolling: touch;
-  color: rgb(var(--foreground-rgb));
-  background: white;
-  /* default to white */
+  color: #333;
+  background: #F9F8F6; /* 新しいベージュ基調の背景 */
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.font-serif-jp {
+  font-family: 'Noto Serif JP', serif;
 }
 
 * {
