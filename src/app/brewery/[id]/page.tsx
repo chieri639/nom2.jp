@@ -1,51 +1,10 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getBreweryDetail, getBreweries, getSakes, getBrands, BREWERY } from '@/lib/microcms';
+import { getBreweryDetail, getBreweries, getSakes, getBrands, BREWERY, cleanBreweryData } from '@/lib/microcms';
 import BreweryDetailClient from './BreweryDetailClient';
 
 // キャッシュ有効化：1時間（3600秒）
 export const revalidate = 3600;
-
-// ── サーバーサイドでのデータクリーンアップ関数 ──
-function cleanBreweryData(html: string, brewery: BREWERY) {
-  if (!html) return { description: '', address: brewery.address, phone: brewery.phone, website: brewery.website };
-
-  // HTMLタグ除去などの処理をサーバーで行う
-  let text = html
-    .replace(/<br\/?>/gi, '\n')
-    .replace(/<\/p>/gi, '\n\n')
-    .replace(/<figcaption>.*?<\/figcaption>/gi, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-
-  const noises = ['keyboard_arrow_leftpausekeyboard_arrow_right', '代表的な銘柄', '代表銘柄', '商品一覧', '酒蔵について'];
-  noises.forEach(n => { text = text.replace(new RegExp(n, 'gi'), ''); });
-
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-  const cleanedLines = [];
-  
-  let address = brewery.address || '';
-  let phone = brewery.phone || '';
-  let website = brewery.website || '';
-
-  for (const line of lines) {
-    if (/(¥|円|\(税込\)|720ml|1800ml)/.test(line)) continue;
-    if (/https?:\/\/[^\s]+/.test(line) && !website) website = line.match(/(https?:\/\/[^\s]+)/)?.[1] || '';
-    if (/(\d{2,4}-\d{2,4}-\d{3,4})/.test(line) && !phone) phone = line.match(/(\d{2,4}-\d{2,4}-\d{3,4})/)?.[1] || '';
-    cleanedLines.push(line);
-  }
-
-  return {
-    description: cleanedLines.join('\n\n').trim(),
-    address: address || '-',
-    phone: phone || '-',
-    website: website || ''
-  };
-}
 
 export default async function BreweryDetailPage(props: any) {
   const params = await props.params;

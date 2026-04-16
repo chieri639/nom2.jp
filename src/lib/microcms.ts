@@ -180,3 +180,45 @@ export const getBrandDetail = (contentId: string, queries?: any, options?: Reque
 
 export const getShops = (queries?: any, options?: RequestInit) => fetchList<SHOP>('shop', queries, options);
 export const getShopDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<SHOP>('shop', contentId, queries, options);
+
+/**
+ * 酒蔵・銘柄・ショップのHTMLコンテンツをサーバーサイドでクリーンアップする
+ */
+export function cleanBreweryData(html: string, entity: BREWERY) {
+  if (!html) return { description: '', address: entity.address, phone: entity.phone, website: entity.website };
+
+  let text = html
+    .replace(/<br\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<figcaption>.*?<\/figcaption>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+
+  const noises = ['keyboard_arrow_leftpausekeyboard_arrow_right', '代表的な銘柄', '代表銘柄', '商品一覧', '酒蔵について', '銘柄について'];
+  noises.forEach(n => { text = text.replace(new RegExp(n, 'gi'), ''); });
+
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const cleanedLines = [];
+  
+  let address = entity.address || '';
+  let phone = entity.phone || '';
+  let website = entity.website || '';
+
+  for (const line of lines) {
+    if (/(¥|円|\(税込\)|720ml|1800ml)/.test(line)) continue;
+    if (/https?:\/\/[^\s]+/.test(line) && !website) website = line.match(/(https?:\/\/[^\s]+)/)?.[1] || '';
+    if (/(\d{2,4}-\d{2,4}-\d{3,4})/.test(line) && !phone) phone = line.match(/(\d{2,4}-\d{2,4}-\d{3,4})/)?.[1] || '';
+    cleanedLines.push(line);
+  }
+
+  return {
+    description: cleanedLines.join('\n\n').trim(),
+    address: address || '-',
+    phone: phone || '-',
+    website: website || ''
+  };
+}
