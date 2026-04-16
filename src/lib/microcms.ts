@@ -24,6 +24,7 @@ export type SAKE = {
   imageUrl: string;
   oldId: string;
   purchaseUrl?: string;
+  prefecture?: string; // 都道府県フィールドを追加
 };
 
 export type ARTICLE = {

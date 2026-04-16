@@ -17,6 +17,7 @@ export type SakeData = {
   imageUrl?: string;
   purchaseUrl?: string;
   prefecture?: string;
+  oldId?: string;
 };
 
 /**

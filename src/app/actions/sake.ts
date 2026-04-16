@@ -22,7 +22,7 @@ export async function fetchAllSakesAction(): Promise<SakeData[]> {
       imageUrl: item.imageUrl,
       purchaseUrl: item.purchaseUrl,
       prefecture: item.prefecture,
-      oldId: item.oldId, // スラッグとして利用
+      oldId: item.oldId, 
     }));
   } catch (error) {
     console.error('Failed to fetch sakes from microCMS:', error);
