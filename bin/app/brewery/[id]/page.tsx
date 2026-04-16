@@ -28,26 +28,36 @@ export default async function BreweryDetailPage(props: any) {
 
     // 2. 検索キーワードの生成
     // 「男山株式会社（男山）」→「男山」のように極限までシンプルにする
+    const originalName = brewery.name.trim();
     let cleanedName = brewery.name
       .replace(/[（(].*?[）)]/g, '') // 括弧内を削除
       .replace(/(株式会社|有限会社|合名会社|合資会社|酒造|醸造|酒造場|（株）|\(株\))/g, '')
       .trim();
     
-    // キーワードが空になった場合（例：名前が「株式会社」のみだった場合など）は元の名前を使う
     if (!cleanedName || cleanedName.length < 1) {
-      cleanedName = brewery.name.trim();
+      cleanedName = originalName;
     }
     
     // 3. サーバー側でデータを極限までクリーンアップ
     const cleanedData = cleanBreweryData(brewery.content || '', brewery);
 
-    // 4. 関連データの取得（堅牢化：エラーが発生してもページ全体の表示は止めない）
+    // 4. 関連データの取得（検索ロジックを大幅に強化）
     let brands: BREWERY[] = [];
     let cmsSakes: SAKE[] = [];
     
     try {
-      // brewery, brand, name のいずれかに cleanedName が含まれるものを検索
-      const filters = `brewery[contains]${cleanedName}[or]brand[contains]${cleanedName}[or]name[contains]${cleanedName}`;
+      // originalName と cleanedName の両方を使って、より広い範囲を検索する
+      // brewery, brand, name のいずれかに一致するものを探す
+      const searchTerms = [cleanedName];
+      if (originalName !== cleanedName) {
+        searchTerms.push(originalName);
+      }
+
+      // microCMSのフィルタ文字列を構築（[or]で連結）
+      const filterGroups = searchTerms.map(term => 
+        `brewery[contains]${term}[or]brand[contains]${term}[or]name[contains]${term}`
+      );
+      const filters = filterGroups.join('[or]');
       
       const [brandsRes, sakesRes] = await Promise.all([
         getBrands({ filters, limit: 20 }).catch(() => ({ contents: [] })),
@@ -56,9 +66,17 @@ export default async function BreweryDetailPage(props: any) {
 
       brands = brandsRes.contents || [];
       cmsSakes = sakesRes.contents || [];
+      
+      // もし名称ベースで見つからない場合、念のため brewery フィールドが ID ベースで入っている可能性も考慮
+      if (cmsSakes.length === 0) {
+        const idFilters = `brewery[equals]${brewery.id}[or]brewery[equals]${brewery.oldId}`;
+        const fallbackSakes = await getSakes({ filters: idFilters, limit: 100 }).catch(() => ({ contents: [] }));
+        if (fallbackSakes.contents.length > 0) {
+          cmsSakes = fallbackSakes.contents;
+        }
+      }
     } catch (apiErr) {
       console.error('Related data fetch error (non-fatal):', apiErr);
-      // 空配列のまま継続
     }
 
     return (
