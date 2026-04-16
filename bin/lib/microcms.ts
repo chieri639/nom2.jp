@@ -61,7 +61,7 @@ async function robustFetch(url: string, options: RequestInit = {}, retries = 1):
       ...options,
       signal: controller.signal,
       headers: {
-        'Connection': 'keep-alive', // 明示的にコネクション維持を試行
+        'Connection': 'close', // 不安定な接続の再利用を避けるため「使い捨て」設定に変更
         ...(options.headers || {})
       }
     });
@@ -76,13 +76,21 @@ async function robustFetch(url: string, options: RequestInit = {}, retries = 1):
   } catch (err: any) {
     clearTimeout(id);
     
+    // エラー詳細をより詳しくログ出力
+    const errorDetail = {
+      message: err.message,
+      name: err.name,
+      code: err.code,
+      cause: err.cause, // Node.jsのfetchエラーの根本原因が含まれる場合がある
+    };
+    
     // 接続断（Connection closed）の場合は1回だけリトライ
     if (retries > 0 && (err.message?.includes('closed') || err.name === 'AbortError' || err.code === 'ECONNRESET')) {
-      console.warn(`Retrying fetch for ${url} due to connection issue:`, err.message);
+      console.warn(`Retrying fetch for ${url} due to connection issue:`, errorDetail);
       return robustFetch(url, options, retries - 1);
     }
     
-    console.error(`Fetch failed for ${url}:`, err.message);
+    console.error(`Fetch failed for ${url}:`, errorDetail);
     throw err;
   }
 }
