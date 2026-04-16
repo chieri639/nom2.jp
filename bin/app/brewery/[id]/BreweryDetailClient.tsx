@@ -18,103 +18,36 @@ function unescapeHtml(text: string) {
         .replace(/&#x3D;/gi, "=");
 }
 
-// ── 動的クリーニング関数 ──
-function parseBreweryData(html: string, originalBrewery: any) {
-    if (!html) return { description: '', address: originalBrewery.address, phone: originalBrewery.phone, website: originalBrewery.website || originalBrewery.url };
+// サーバー側で処理するため、クライアント側のパース関数は削除しました
 
-    let text = html
-        .replace(/<br\/?>/gi, '\n')
-        .replace(/<\/p>/gi, '\n\n')
-        .replace(/<figcaption>.*?<\/figcaption>/gi, '') // 画像のキャプションなどを除去
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
-        .replace(/&#x2F;/gi, "/")
-        .replace(/&#x3D;/gi, "=");
-
-    const noises = [
-        'keyboard_arrow_leftpausekeyboard_arrow_right',
-        '代表的な銘柄',
-        '代表銘柄',
-        '商品一覧',
-        '酒蔵について',
-        '酒蔵の紹介',
-        '購入ページへ（外部サイト）',
-        '飲める・買えるお店',
-        '該当するリストがありません'
-    ];
-    noises.forEach(n => {
-        text = text.replace(new RegExp(n, 'gi'), '');
-    });
-
-    let address: string | null = originalBrewery.address || null;
-    let phone: string | null = originalBrewery.phone || null;
-    let website: string | null = originalBrewery.website || originalBrewery.url || null;
-
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-    const cleanedLines = [];
-
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-
-        // 商品の残骸をスキップ
-        if (
-            /(¥|円|\(税込\)|720ml|1800ml)/.test(line) ||
-            /^(純米大吟醸|純米吟醸|大吟醸酒|特別純米|純米酒|本醸造|普通酒|生酒|にごり酒)$/.test(line)
-        ) {
-            continue;
-        }
-
-        // ラベルのみの行をスキップ
-        if (/^(住所|所在地|電話番号|TEL|公式サイト|WEB|URL|営業時間|定休日)$/i.test(line)) {
-            continue;
-        }
-
-        // Webサイト抽出
-        if (/https?:\/\/[^\s]+/.test(line)) {
-            if (!website) website = line.match(/(https?:\/\/[^\s]+)/)?.[1] || null;
-            if (line.replace(/(https?:\/\/[^\s]+)/, '').replace(/公式サイト|URL|WEB/i, '').trim().length <= 2) continue;
-        }
-
-        // 電話番号抽出
-        if (/(\d{2,4}-\d{2,4}-\d{3,4})/.test(line) || /TEL[:：]\s*\d+/.test(line)) {
-            if (!phone) phone = line.match(/(\d{2,4}-\d{2,4}-\d{3,4})/)?.[1] || line.replace(/.*TEL[:：]\s*/i, '') || null;
-            if (line.length < 25 && !line.includes('。')) continue;
-        }
-
-        // 住所抽出 (〒 か 住所というキーワード)
-        if (/(〒\d{3}-\d{4})/.test(line)) {
-            if (!address) address = line.replace(/^(住所|所在地)[:：]?\s*/, '').trim();
-            if (!line.includes('。')) continue; // 住所だけの行はスキップ
-        }
-
-        // "[名前] / [地域] 住所" のようなCMS特有のヘッダー行をスキップ
-        if (line.includes(originalBrewery.name) && line.includes('/') && (line.includes('市') || line.includes('県') || line.includes('道')) && line.length < 50 && !line.includes('。')) {
-            continue;
-        }
-
-        cleanedLines.push(line);
-    }
-
-    let description = cleanedLines.join('\n\n').trim();
-
-    return { description, address, phone, website };
-}
-
-export default function BreweryDetailClient({ brewery, initialCmsSakes = [], brands = [], type = 'brewery' }: { brewery: BREWERY, initialCmsSakes?: SAKE[], brands?: BRAND[], type?: 'brewery' | 'brand' | 'shop' }) {
+export default function BreweryDetailClient({ 
+    brewery, 
+    initialCmsSakes = [], 
+    brands = [], 
+    serverCleanedData,
+    type = 'brewery' 
+}: { 
+    brewery: BREWERY, 
+    initialCmsSakes?: SAKE[], 
+    brands?: BRAND[], 
+    serverCleanedData: { description: string, address: string, phone: string, website: string },
+    type?: 'brewery' | 'brand' | 'shop' 
+}) {
     const [rakutenSakes, setRakutenSakes] = useState<any[]>([]);
     const [loadingRakuten, setLoadingRakuten] = useState(false);
 
     useEffect(() => {
+        // CMSデータが1件もない場合のみ楽天から取得
         if (initialCmsSakes.length === 0) {
             setLoadingRakuten(true);
-            const searchName = unescapeHtml(brewery.name).replace(/(株式会社|有限会社|合名会社|合資会社)/g, '').trim();
+            // 検索ワードを極力シンプルに（括弧を消す）
+            const searchName = unescapeHtml(brewery.name)
+                .replace(/[（(].*?[）)]/g, '')
+                .replace(/(株式会社|有限会社|合名会社|合資会社|（株）|\(株\))/g, '')
+                .trim();
             
             fetchRakutenSakes(searchName).then(sakes => {
-                setRakutenSakes(sakes);
+                setRakutenSakes(sakes || []);
             }).catch(e => {
                 console.error("Rakuten fetch error:", e);
             }).finally(() => {
@@ -123,42 +56,30 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
         }
     }, [brewery.name, initialCmsSakes.length]);
 
-    // ── データのメモ化処理 ──
-    const { 
-        description: cleanDescription, 
-        address: extractedAddress, 
-        phone: extractedPhone, 
-        website: extractedWebsite 
-    } = React.useMemo(() => parseBreweryData(brewery.content || '', brewery), [brewery.content, brewery.name]);
+    // サーバーから渡されたクリーンなデータを使用
+    const { description, address, phone, website } = serverCleanedData;
     
-    // URL表示の整形をメモ化
+    // URL表示の整形
     const displayUrlText = React.useMemo(() => {
-        let text = extractedWebsite || '';
-        if (text.startsWith('http')) {
-            try {
-                const urlObj = new URL(text);
-                return urlObj.hostname;
-            } catch (e) {
-                return text;
-            }
+        if (!website) return '';
+        try {
+            const urlObj = new URL(website.startsWith('http') ? website : `https://${website}`);
+            return urlObj.hostname;
+        } catch (e) {
+            return website;
         }
-        return text;
-    }, [extractedWebsite]);
+    }, [website]);
 
     const prefectureDisplay = brewery.prefecture || '日本';
-    const finalAddress = extractedAddress || '-';
-    const finalPhone = extractedPhone || '-';
-    const finalWebsite = extractedWebsite || '';
-
     const displaySakes = initialCmsSakes.length > 0 ? initialCmsSakes : rakutenSakes;
     const isRakutenFallback = initialCmsSakes.length === 0 && rakutenSakes.length > 0;
 
-    // 日本酒を銘柄ごとにグループ化（メモ化）
+    // 日本酒を銘柄ごとにグループ化
     const sakesByBrand = React.useMemo(() => {
         const groups: Record<string, SAKE[]> = {};
-        if (!isRakutenFallback) {
+        if (!isRakutenFallback && displaySakes.length > 0) {
             displaySakes.forEach((sake: SAKE) => {
-                const bName = sake.brand || 'その他のお酒';
+                const bName = sake.brand || 'その他の日本酒';
                 if (!groups[bName]) groups[bName] = [];
                 groups[bName].push(sake);
             });
@@ -166,12 +87,15 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
         return groups;
     }, [displaySakes, isRakutenFallback]);
 
+    // セクションを表示すべきかどうかの判定を緩和
+    const showLineupSection = loadingRakuten || isRakutenFallback || Object.keys(sakesByBrand).length > 0;
+
     return (
         <div className="min-h-screen bg-[#F9F8F6] font-['Noto_Sans_JP'] text-[#333] pb-24">
             {/* ── ヒーロー画像 ── */}
             <section className="w-full h-[40vh] md:h-[50vh] overflow-hidden bg-[#F2F1EF]">
                 {brewery.imageUrl ? (
-                    <img src={brewery.imageUrl} alt={unescapeHtml(brewery.name)} className="w-full h-full object-cover" />
+                    <img src={brewery.imageUrl} alt={unescapeHtml(brewery.name)} className="w-full h-full object-cover" loading="lazy" />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300">
                         <Wine size={64} strokeWidth={1} />
@@ -197,16 +121,16 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-10 border-y border-gray-100 mb-16">
                     <div className="flex flex-col gap-1">
                         <span className="text-[10px] text-[#8B7D6B] tracking-widest uppercase font-bold">住所</span>
-                        <span className="text-sm leading-relaxed">{finalAddress}</span>
+                        <span className="text-sm leading-relaxed">{address || '-'}</span>
                     </div>
                     <div className="flex flex-col gap-1">
                         <span className="text-[10px] text-[#8B7D6B] tracking-widest uppercase font-bold">電話番号</span>
-                        <span className="text-sm font-medium">{finalPhone}</span>
+                        <span className="text-sm font-medium">{phone || '-'}</span>
                     </div>
                     <div className="flex flex-col gap-1">
                         <span className="text-[10px] text-[#8B7D6B] tracking-widest uppercase font-bold">公式サイト</span>
-                        {finalWebsite ? (
-                            <a href={finalWebsite} target="_blank" rel="noopener noreferrer" className="text-sm text-[#8B7D6B] hover:underline break-all font-medium">
+                        {website ? (
+                            <a href={website} target="_blank" rel="noopener noreferrer" className="text-sm text-[#8B7D6B] hover:underline break-all font-medium">
                                 {displayUrlText}
                             </a>
                         ) : (
@@ -224,7 +148,7 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
                     </div>
                     <div className="prose max-w-none text-gray-600 leading-loose text-sm md:text-base">
                         <p className="whitespace-pre-wrap">
-                            {cleanDescription || '詳細情報がまだありません。'}
+                            {description || '詳細情報がまだありません。'}
                         </p>
                     </div>
                 </div>
@@ -249,7 +173,7 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
                 )}
                 
                 {/* ── 商品ラインナップ (銘柄別セクション) ── */}
-                {(isRakutenFallback || Object.keys(sakesByBrand).length > 0 || loadingRakuten) && (
+                {showLineupSection && (
                     <div className="space-y-24">
                         {loadingRakuten ? (
                             <div className="text-center py-20">
@@ -260,18 +184,18 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
                             <div>
                                 <div className="flex items-center gap-4 mb-12">
                                     <h2 className="text-2xl font-serif-jp font-bold text-[#8B7D6B] whitespace-nowrap">
-                                        関連製品（自動取得）
+                                        関連製品（外部サイト）
                                     </h2>
                                     <div className="h-px flex-1 bg-gray-100"></div>
-                                    <span className="text-[10px] text-gray-300">※楽天から自動取得</span>
+                                    <span className="text-[10px] text-gray-300">※酒蔵名による自動検索</span>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                    {displaySakes.map((sake: any) => (
+                                    {rakutenSakes.map((sake: any) => (
                                         <SakeCard key={sake.id} sake={sake} isRakuten={true} />
                                     ))}
                                 </div>
                             </div>
-                        ) : (
+                        ) : Object.keys(sakesByBrand).length > 0 ? (
                             Object.entries(sakesByBrand).map(([brandName, sakes]) => (
                                 <section key={brandName}>
                                     <div className="flex items-center gap-4 mb-12">
@@ -287,7 +211,7 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
                                     </div>
                                 </section>
                             ))
-                        )}
+                        ) : null}
                     </div>
                 )}
             </section>
@@ -323,6 +247,7 @@ const SakeCard = React.memo(({ sake, isRakuten }: { sake: any, isRakuten: boolea
                         src={imageUrl} 
                         alt={name} 
                         className="w-full h-full object-cover md:object-contain p-2 group-hover:scale-105 transition-transform duration-500" 
+                        loading="lazy"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-200">
@@ -368,5 +293,5 @@ const SakeCard = React.memo(({ sake, isRakuten }: { sake: any, isRakuten: boolea
             </div>
         </Link>
     );
-}
+});
 

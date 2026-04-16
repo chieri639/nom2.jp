@@ -1,43 +1,26 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import Link from 'next/link';
+import { fetchAllSakesAction } from '@/app/actions/sake';
+import { SakeData, calculateSimilarity } from '@/lib/sake-logic';
 
-type Sake = {
-    id: string;
-    name: string;
-    brewery: string;
-    prefecture: string;
-    taste_tags: string[];
-    style_tags: string[];
-    serve_temp: string[];
-    reason?: string; // recommend_reason
-    rakuten: {
-        image_url?: string;
-        affiliate_url?: string;
-    };
-};
-
-type SimilarSake = Sake & {
+type SimilarSake = SakeData & {
     similarityScore: number;
     similarPoints: string[];
 };
 
-const API_URL = 'https://script.google.com/macros/s/AKfycbw3C6mroyk4Sr46I8qD86b_QYDjQKzDGDhdMtSWYNw66eWPOZIfUYDKHu-R0f8xnNL-/exec';
-
 export default function SakeSimilarPage() {
-    const [allSakes, setAllSakes] = useState<Sake[]>([]);
-    const [baseSake, setBaseSake] = useState<Sake | null>(null);
+    const [allSakes, setAllSakes] = useState<SakeData[]>([]);
+    const [baseSake, setBaseSake] = useState<SakeData | null>(null);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        fetch(API_URL)
-            .then(res => res.json())
-            .then(data => {
-                if (data.ok) setAllSakes(data.items);
-                setLoading(false);
-            })
-            .catch(() => setLoading(false));
+        fetchAllSakesAction().then(items => {
+            setAllSakes(items);
+            setLoading(false);
+        }).catch(() => setLoading(false));
     }, []);
 
     const filteredSakes = useMemo(() => {
@@ -45,8 +28,7 @@ export default function SakeSimilarPage() {
         const q = searchQuery.toLowerCase();
         return allSakes.filter(s =>
             s.name.toLowerCase().includes(q) ||
-            s.brewery.toLowerCase().includes(q) ||
-            s.prefecture.toLowerCase().includes(q)
+            s.brewery.toLowerCase().includes(q)
         );
     }, [allSakes, searchQuery]);
 
@@ -55,7 +37,7 @@ export default function SakeSimilarPage() {
         return allSakes
             .filter(s => s.id !== baseSake.id)
             .map(s => {
-                const { score, similarPoints } = calcSimilarity(baseSake, s);
+                const { score, similarPoints } = calculateSimilarity(baseSake, s);
                 return { ...s, similarityScore: score, similarPoints };
             })
             .filter(s => s.similarityScore > 0)
@@ -77,7 +59,7 @@ export default function SakeSimilarPage() {
                     <div style={{ marginBottom: 20 }}>
                         <input
                             type="text"
-                            placeholder="例: 来福, 新政, 茨城..."
+                            placeholder="例: 浦霞, 獺祭, 新政..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             style={{
@@ -105,7 +87,7 @@ export default function SakeSimilarPage() {
                                 style={sakeSelectBtn}
                             >
                                 <div style={{ fontWeight: 700 }}>{s.name}</div>
-                                <div style={{ fontSize: 11, opacity: 0.6 }}>{s.brewery} / {s.prefecture}</div>
+                                <div style={{ fontSize: 11, opacity: 0.6 }}>{s.brewery}</div>
                             </button>
                         ))}
                         {filteredSakes.length === 0 && (
@@ -128,8 +110,8 @@ export default function SakeSimilarPage() {
                             <span style={{ fontSize: 18, opacity: 0.9 }}>が好きな方におすすめの日本酒</span>
                         </h2>
                         <p style={{ opacity: 0.75, marginTop: 12, fontSize: 14, lineHeight: 1.6 }}>
-                            AIが味わいデータをもとに分析し、<br />
-                            nom2.jp編集部の基準で選びました。
+                            AI診断システムが最新の銘柄データベース（全{allSakes.length}件）を分析し、<br />
+                            味わいの傾向から最適な銘柄を選びました。
                         </p>
                     </div>
 
@@ -141,7 +123,8 @@ export default function SakeSimilarPage() {
 
                     {similarSakes.length === 0 && (
                         <div style={{ padding: 40, textAlign: 'center', opacity: 0.5 }}>
-                            似ているお酒が見つかりませんでした。
+                            似ているお酒が見つかりませんでした。<br/>
+                            説明文のキーワードから判定しています。
                         </div>
                     )}
                 </div>
@@ -161,47 +144,62 @@ function SakeItemCard({ sake, rank }: { sake: SimilarSake; rank: number }) {
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
         }}>
             <div style={{ display: 'flex', gap: 14 }}>
-                {/* 画像（補助） */}
-                {sake.rakuten.image_url && (
-                    <img
-                        src={sake.rakuten.image_url}
-                        alt={sake.name}
-                        style={{
-                            width: 80,
-                            height: 80,
-                            objectFit: 'cover',
-                            borderRadius: 14,
-                            flexShrink: 0,
-                            background: '#f5f5f5'
-                        }}
-                    />
-                )}
+                {/* 画像 */}
+                <div style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 14,
+                    flexShrink: 0,
+                    background: '#f5f5f5',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                  {sake.imageUrl ? (
+                      <img
+                          src={sake.imageUrl}
+                          alt={sake.name}
+                          style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                          }}
+                      />
+                  ) : (
+                    <span style={{ fontSize: 10, opacity: 0.3 }}>No Image</span>
+                  )}
+                </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 800, fontSize: 17, lineHeight: 1.2 }}>
-                        {rank}. {sake.name}
+                        <Link href={`/nihonshu/${sake.oldId || sake.id}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:underline">
+                            {rank}. {sake.name}
+                        </Link>
                     </div>
                     <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4, marginBottom: 12 }}>
-                        {sake.brewery} / {sake.prefecture}
+                        {sake.brewery}
                     </div>
 
                     <div style={{ fontSize: 13, marginBottom: 12, background: '#fcfcfc', padding: '10px 12px', borderRadius: 12, border: '1px solid #f0f0f0' }}>
                         <div style={{ fontWeight: 800, fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>似ているポイント</div>
                         <ul style={{ paddingLeft: 16, margin: 0, color: '#444' }}>
-                            {sake.similarPoints.map(p => (
-                                <li key={p} style={{ marginBottom: 2 }}>{p}</li>
+                            {sake.similarPoints.map((p, i) => (
+                                <li key={i} style={{ marginBottom: 2 }}>{p}</li>
                             ))}
                         </ul>
                     </div>
 
                     <div style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
-                        <div style={{ fontWeight: 800, fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>おすすめ理由</div>
-                        <div style={{ color: '#222' }}>{sake.reason || '共通点が多く、同じような満足感を得られる一本です。'}</div>
+                        <div style={{ fontWeight: 800, fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>このお酒について</div>
+                        <div style={{ color: '#222', fontSize: 12, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          {sake.description || '芳醇な味わいとともに、作り手のこだわりが感じられる一本です。'}
+                        </div>
                     </div>
 
-                    {sake.rakuten.affiliate_url && (
+                    {sake.purchaseUrl && (
                         <a
-                            href={sake.rakuten.affiliate_url}
+                            href={sake.purchaseUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{
@@ -222,34 +220,6 @@ function SakeItemCard({ sake, rank }: { sake: SimilarSake; rank: number }) {
             </div>
         </section>
     );
-}
-
-function calcSimilarity(base: Sake, target: Sake): {
-    score: number;
-    similarPoints: string[];
-} {
-    const tasteMatch = base.taste_tags.filter(t =>
-        target.taste_tags.includes(t)
-    );
-    const styleMatch = base.style_tags.filter(t =>
-        target.style_tags.includes(t)
-    );
-    const tempMatch = base.serve_temp.filter(t =>
-        target.serve_temp.includes(t)
-    );
-
-    const score =
-        tasteMatch.length * 2 +
-        styleMatch.length * 1.5 +
-        tempMatch.length * 1;
-
-    const similarPoints = [
-        ...tasteMatch.map(t => `味わいが「${t}」`),
-        ...styleMatch.map(t => `スタイルが「${t}」`),
-        ...tempMatch.map(t => `「${t}」で楽しめる`),
-    ].slice(0, 3); // 読みやすさ優先
-
-    return { score, similarPoints };
 }
 
 const sakeSelectBtn: React.CSSProperties = {

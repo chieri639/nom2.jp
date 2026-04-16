@@ -1,23 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-
-type SakeItem = {
-    id: string;
-    name: string;
-    brewery?: string;
-    prefecture?: string;
-    style_tags: string[];
-    taste_tags: string[];
-    serve_temp: string[];
-    reason?: string;
-    rakuten: {
-        affiliate_url?: string;
-        image_url?: string;
-        item_url?: string;
-        item_code?: string;
-    };
-};
+import { fetchAllSakesAction } from '@/app/actions/sake';
+import { SakeData, scoreByKeywords } from '@/lib/sake-logic';
 
 type ChatRole = 'bot' | 'user';
 
@@ -26,8 +11,6 @@ type ChatMessage = {
     role: ChatRole;
     text: string;
 };
-
-const API_URL = 'https://script.google.com/macros/s/AKfycbw3C6mroyk4Sr46I8qD86b_QYDjQKzDGDhdMtSWYNw66eWPOZIfUYDKHu-R0f8xnNL-/exec';
 
 const TEMP_OPTIONS_MAP: Record<string, string> = { cold: '冷やして', room: '常温', warm: '燗' };
 const STEP_TOTAL = 5;
@@ -41,7 +24,7 @@ const MOOD_OPTIONS = [
 ];
 
 const DIRECTION_OPTIONS = [
-    { label: 'フルーティ', tag: 'フルーティ' },
+    { label: 'フルーティー', tag: 'フルーティー' },
     { label: 'すっきり', tag: 'すっきり' },
     { label: '辛口', tag: '辛口' },
     { label: '甘口', tag: '甘口' },
@@ -65,7 +48,7 @@ function uid(prefix = 'm') {
 }
 
 export default function SakeChatRecoPage() {
-    const [items, setItems] = useState<SakeItem[]>([]);
+    const [items, setItems] = useState<SakeData[]>([]);
     const [loadingData, setLoadingData] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -93,10 +76,8 @@ export default function SakeChatRecoPage() {
         setLoadingData(true);
         setError(null);
         try {
-            const res = await fetch(API_URL, { cache: 'no-store' });
-            const data = await res.json();
-            if (data.ok) setItems(data.items || []);
-            else throw new Error('API Error');
+            const sakes = await fetchAllSakesAction();
+            setItems(sakes);
         } catch (e: any) {
             setError(e?.message ?? 'Failed to fetch');
         } finally {
@@ -135,7 +116,7 @@ export default function SakeChatRecoPage() {
 
     const submit = async () => {
         userSay(freeText.trim() ? freeText.trim() : '（特になし）');
-        await botSay('承知しました！おすすめの銘柄をまとめます。');
+        await botSay('承知しました！最新の320銘柄から、あなたへのおすすめをまとめます。');
         setSubmitted(true);
     };
 
@@ -150,17 +131,19 @@ export default function SakeChatRecoPage() {
     // Filter Logic
     const filtered = useMemo(() => {
         if (!submitted) return [];
-        let res = [...items];
-        if (tempKeys.length) res = res.filter(s => (s.serve_temp || []).some(t => tempKeys.includes(t)));
-        const tokens = [...styleTags, ...tasteTags].filter(Boolean);
-        if (tokens.length) {
-            res = res.filter(s => {
-                const all = new Set([...(s.style_tags || []), ...(s.taste_tags || [])]);
-                return tokens.some(t => all.has(t));
-            });
-        }
-        return res.slice(0, 20);
-    }, [submitted, items, styleTags, tasteTags, tempKeys]);
+        
+        // ユーザーの回答を集約
+        const keywords = [...styleTags, ...tasteTags, ...freeText.split(/[ ,、。　]/)].filter(Boolean);
+        
+        return items
+            .map(s => ({
+                ...s,
+                score: scoreByKeywords(keywords, s)
+            }))
+            .filter(s => s.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 20);
+    }, [submitted, items, styleTags, tasteTags, freeText]);
 
     const summaryLine = useMemo(() => {
         const parts: string[] = [];
@@ -326,7 +309,7 @@ function ChatPanel(props: any) {
                                 />
                                 <div style={{ display: 'flex', gap: 8 }}>
                                     <button onClick={props.onSubmit} style={{ flex: 1, padding: 10, borderRadius: 12, background: '#22c55e', color: '#000', fontWeight: 700, border: 'none', cursor: 'pointer' }}>送信する</button>
-                                    <button onClick={props.onSubmit} style={{ padding: 10, borderRadius: 12, background: '#333', color: '#ccc', border: 'none', cursor: 'pointer' }}>スキップ</button>
+                                    <button onClick={props.onReset} style={{ padding: 10, borderRadius: 12, background: '#333', color: '#ccc', border: 'none', cursor: 'pointer' }}>やり直す</button>
                                 </div>
                             </div>
                         )}
@@ -417,29 +400,32 @@ function MultiSelect({ options, values, onToggle, onNext, onSkip, field = 'tag' 
     );
 }
 
-function SakeCard({ item }: { item: SakeItem }) {
-    const buy = item.rakuten?.affiliate_url || item.rakuten?.item_url;
+function SakeCard({ item }: { item: SakeData }) {
     return (
         <div style={{ background: '#fff', borderRadius: 14, padding: 12, color: '#111', display: 'grid', gridTemplateColumns: '80px 1fr', gap: 12 }}>
             <div style={{ width: 80, height: 80, borderRadius: 10, background: '#f5f5f5', overflow: 'hidden' }}>
-                {item.rakuten?.image_url ? (
-                    <img src={item.rakuten.image_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                {item.imageUrl ? (
+                    <img src={item.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
                 ) : (
                     <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.2, fontSize: 10 }}>No Image</div>
                 )}
             </div>
             <div style={{ minWidth: 0 }}>
-                <div style={{ fontWeight: 800, fontSize: 14, lineHeight: 1.2 }}>{item.name}</div>
-                <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>
-                    {item.brewery}{item.prefecture ? ` / ${item.prefecture}` : ''}
+                <div style={{ fontWeight: 800, fontSize: 14, lineHeight: 1.2 }}>
+                    <Link href={`/nihonshu/${item.oldId || item.id}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:underline">
+                        {item.name}
+                    </Link>
                 </div>
-                {item.reason && (
-                    <div style={{ fontSize: 12, lineHeight: 1.4, color: '#444', marginTop: 8, background: '#f9f9f9', padding: '8px', borderRadius: '8px' }}>
-                        {item.reason}
-                    </div>
-                )}
+                <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>
+                    {item.brewery}
+                </div>
+                <div style={{ fontSize: 12, lineHeight: 1.4, color: '#444', marginTop: 8, background: '#f9f9f9', padding: '8px', borderRadius: '8px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {item.description || '共通点が多く、あなたにぴったりの一本です。'}
+                </div>
                 <div style={{ marginTop: 10 }}>
-                    <a href={buy} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '6px 14px', borderRadius: 8, background: '#111', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>購入する</a>
+                    {item.purchaseUrl && (
+                        <a href={item.purchaseUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '6px 14px', borderRadius: 8, background: '#111', color: '#fff', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>購入する</a>
+                    )}
                 </div>
             </div>
         </div>
@@ -457,5 +443,3 @@ const chipBtn: React.CSSProperties = {
     cursor: 'pointer',
     width: '100%',
 };
-
-const linkBtn: React.CSSProperties = { background: 'none', border: 'none', color: '#888', textDecoration: 'underline', fontSize: 11, cursor: 'pointer' };
