@@ -1,6 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getBreweryDetail, getSakes } from '@/lib/microcms';
+import { getBreweryDetail, getSakes, getBrands } from '@/lib/microcms';
 import BreweryDetailClient from './BreweryDetailClient';
 
 export const revalidate = 0;
