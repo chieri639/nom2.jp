@@ -1,6 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { getBreweryDetail, getBreweries, getSakes, getBrands, BREWERY, cleanBreweryData } from '@/lib/microcms';
+import { getBreweryDetail, getBreweries, getSakes, getBrands, BREWERY, SAKE, cleanBreweryData } from '@/lib/microcms';
 import BreweryDetailClient from './BreweryDetailClient';
 
 // キャッシュ有効化：1時間（3600秒）
