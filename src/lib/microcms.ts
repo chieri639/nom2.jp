@@ -50,6 +50,43 @@ export type BREWERY = {
 export type BRAND = BREWERY;
 export type SHOP = BREWERY;
 
+// Common private fetcher with retry and timeout
+async function robustFetch(url: string, options: RequestInit = {}, retries = 1): Promise<any> {
+  const timeout = 10000; // 10秒タイムアウト
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const res = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'Connection': 'keep-alive', // 明示的にコネクション維持を試行
+        ...(options.headers || {})
+      }
+    });
+
+    clearTimeout(id);
+
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => 'No error body');
+      throw new Error(`microCMS API error: ${res.status} ${res.statusText}. Response: ${errorText}`);
+    }
+    return res.json();
+  } catch (err: any) {
+    clearTimeout(id);
+    
+    // 接続断（Connection closed）の場合は1回だけリトライ
+    if (retries > 0 && (err.message?.includes('closed') || err.name === 'AbortError' || err.code === 'ECONNRESET')) {
+      console.warn(`Retrying fetch for ${url} due to connection issue:`, err.message);
+      return robustFetch(url, options, retries - 1);
+    }
+    
+    console.error(`Fetch failed for ${url}:`, err.message);
+    throw err;
+  }
+}
+
 // Generic fetch helpers
 async function fetchList<T>(endpoint: string, queries?: any, options: RequestInit = {}): Promise<{ contents: T[], totalCount: number, offset: number, limit: number }> {
   const serviceId = process.env.X_MICROCMS_SERVICE_ID || 'nom2';
@@ -67,27 +104,15 @@ async function fetchList<T>(endpoint: string, queries?: any, options: RequestIni
   
   const url = `${baseUrl}/${endpoint}${params.toString() ? '?' + params.toString() : ''}`;
   
-  try {
-    const res = await fetch(url, {
-      ...options,
-      headers: { 
-        'X-MICROCMS-API-KEY': apiKey,
-        'User-Agent': 'node-fetch',
-        ...(options.headers || {})
-      },
-      // options.cache が明示されていない場合は、Next.jsのタグ/時間ベースのキャッシュを許可する
-      cache: options.cache,
-    });
-
-    if (!res.ok) {
-      const errorText = await res.text().catch(() => 'No error body');
-      throw new Error(`microCMS API error: ${res.status} ${res.statusText}. Response: ${errorText}`);
-    }
-    return res.json();
-  } catch (err) {
-    console.error(`Fetch failed for ${url}:`, err);
-    throw err;
-  }
+  return robustFetch(url, {
+    ...options,
+    headers: { 
+      'X-MICROCMS-API-KEY': apiKey,
+      'User-Agent': 'node-fetch',
+      ...(options.headers || {})
+    },
+    cache: options.cache,
+  });
 }
 
 async function fetchDetail<T>(endpoint: string, contentId: string, queries?: any, options: RequestInit = {}): Promise<T> {
@@ -105,25 +130,15 @@ async function fetchDetail<T>(endpoint: string, contentId: string, queries?: any
   }
   const url = `${baseUrl}/${endpoint}/${contentId}${params.toString() ? '?' + params.toString() : ''}`;
   
-  try {
-    const res = await fetch(url, {
-      ...options,
-      headers: { 
-        'X-MICROCMS-API-KEY': apiKey,
-        'User-Agent': 'node-fetch',
-        ...(options.headers || {})
-      },
-      cache: options.cache,
-    });
-
-    if (!res.ok) {
-      throw new Error(`microCMS API error: ${res.status} ${res.statusText} for ${url}`);
-    }
-    return res.json();
-  } catch (err) {
-    console.error(`Fetch failed for ${url}:`, err);
-    throw err;
-  }
+  return robustFetch(url, {
+    ...options,
+    headers: { 
+      'X-MICROCMS-API-KEY': apiKey,
+      'User-Agent': 'node-fetch',
+      ...(options.headers || {})
+    },
+    cache: options.cache,
+  });
 }
 
 // Fetch functions

@@ -25,15 +25,21 @@ export default async function BreweryDetailPage(props: any) {
       .trim();
     
     // 3. 関連ブランドと日本酒を【並列】で取得
-    // 個別のリクエストに cache: 'force-cache' や next: { revalidate } を指定可能
+    // 個別の失敗が全体に波及しないよう、それぞれを個別にハンドル
     const [brandsRes, sakesRes] = await Promise.all([
       getBrands({
         filters: `brewery[contains]${searchName}`,
         limit: 10
+      }).catch(e => {
+        console.warn('Brand fetch failed:', e.message);
+        return { contents: [] };
       }),
       getSakes({
         filters: `brewery[contains]${searchName}`,
         limit: 20
+      }).catch(e => {
+        console.warn('Sake fetch failed:', e.message);
+        return { contents: [] };
       })
     ]);
 
@@ -43,7 +49,7 @@ export default async function BreweryDetailPage(props: any) {
     // BreweryDetailClient にデータを渡し、1時間キャッシュ
     return <BreweryDetailClient brewery={brewery} initialCmsSakes={cmsSakes} brands={brands} />;
   } catch (error) {
-    // 予期せぬエラーは再試行可能な error.tsx に任せる
+    // 主要なデータ取得（BreweryDetail）自体の失敗は error.tsx に任せる
     console.error('酒蔵詳細取得エラー:', error);
     throw error;
   }
