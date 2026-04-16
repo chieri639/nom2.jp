@@ -41,40 +41,33 @@ export default async function BreweryDetailPage(props: any) {
     // 3. サーバー側でデータを極限までクリーンアップ
     const cleanedData = cleanBreweryData(brewery.content || '', brewery);
 
-    // 4. 関連データの取得（検索ロジックを大幅に強化）
+    // 4. 関連データの取得（IDベースの厳密な紐付けを優先）
     let brands: BREWERY[] = [];
     let cmsSakes: SAKE[] = [];
     
     try {
-      // originalName と cleanedName の両方を使って、より広い範囲を検索する
-      // brewery, brand, name のいずれかに一致するものを探す
-      const searchTerms = [cleanedName];
-      if (originalName !== cleanedName) {
-        searchTerms.push(originalName);
-      }
+      // 酒蔵IDに紐づく銘柄を取得
+      const brandsRes = await getBrands({ 
+        filters: `brewery[equals]${brewery.id}`, 
+        limit: 50 
+      }).catch(() => ({ contents: [] }));
+      brands = brandsRes.contents;
 
-      // microCMSのフィルタ文字列を構築（[or]で連結）
-      const filterGroups = searchTerms.map(term => 
-        `brewery[contains]${term}[or]brand[contains]${term}[or]name[contains]${term}`
-      );
-      const filters = filterGroups.join('[or]');
+      // 酒蔵IDに紐づく日本酒を取得（IDベース、および名称ベースの両方でカバー）
+      const idFilters = `brewery[equals]${brewery.id}`;
+      const nameFilters = `brewery[contains]${cleanedName}[or]brand[contains]${cleanedName}[or]name[contains]${cleanedName}`;
       
-      const [brandsRes, sakesRes] = await Promise.all([
-        getBrands({ filters, limit: 20 }).catch(() => ({ contents: [] })),
-        getSakes({ filters, limit: 100 }).catch(() => ({ contents: [] }))
+      const [idSakes, nameSakes] = await Promise.all([
+        getSakes({ filters: idFilters, limit: 100 }).catch(() => ({ contents: [] })),
+        getSakes({ filters: nameFilters, limit: 100 }).catch(() => ({ contents: [] }))
       ]);
 
-      brands = brandsRes.contents || [];
-      cmsSakes = sakesRes.contents || [];
-      
-      // もし名称ベースで見つからない場合、念のため brewery フィールドが ID ベースで入っている可能性も考慮
-      if (cmsSakes.length === 0) {
-        const idFilters = `brewery[equals]${brewery.id}[or]brewery[equals]${brewery.oldId}`;
-        const fallbackSakes = await getSakes({ filters: idFilters, limit: 100 }).catch(() => ({ contents: [] }));
-        if (fallbackSakes.contents.length > 0) {
-          cmsSakes = fallbackSakes.contents;
-        }
-      }
+      // 重複を除去して結合
+      const allSakesMap = new Map();
+      idSakes.contents.forEach(s => allSakesMap.set(s.id, s));
+      nameSakes.contents.forEach(s => allSakesMap.set(s.id, s));
+      cmsSakes = Array.from(allSakesMap.values());
+
     } catch (apiErr) {
       console.error('Related data fetch error (non-fatal):', apiErr);
     }

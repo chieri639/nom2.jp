@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Wine } from 'lucide-react';
 import { BREWERY, SAKE, BRAND } from '@/lib/microcms';
@@ -17,8 +17,6 @@ function unescapeHtml(text: string) {
         .replace(/&#x2F;/gi, "/")
         .replace(/&#x3D;/gi, "=");
 }
-
-// サーバー側で処理するため、クライアント側のパース関数は削除しました
 
 export default function BreweryDetailClient({ 
     brewery, 
@@ -40,7 +38,6 @@ export default function BreweryDetailClient({
         // CMSデータが1件もない場合のみ楽天から取得
         if (initialCmsSakes.length === 0) {
             setLoadingRakuten(true);
-            // 検索ワードを極力シンプルに（括弧を消す）
             const searchName = unescapeHtml(brewery.name)
                 .replace(/[（(].*?[）)]/g, '')
                 .replace(/(株式会社|有限会社|合名会社|合資会社|（株）|\(株\))/g, '')
@@ -56,11 +53,9 @@ export default function BreweryDetailClient({
         }
     }, [brewery.name, initialCmsSakes.length]);
 
-    // サーバーから渡されたクリーンなデータを使用
     const { description, address, phone, website } = serverCleanedData;
     
-    // URL表示の整形
-    const displayUrlText = React.useMemo(() => {
+    const displayUrlText = useMemo(() => {
         if (!website) return '';
         try {
             const urlObj = new URL(website.startsWith('http') ? website : `https://${website}`);
@@ -74,20 +69,39 @@ export default function BreweryDetailClient({
     const displaySakes = initialCmsSakes.length > 0 ? initialCmsSakes : rakutenSakes;
     const isRakutenFallback = initialCmsSakes.length === 0 && rakutenSakes.length > 0;
 
+    // 銘柄ID -> 名称 のマップを作成
+    const brandNameMap = useMemo(() => {
+        const map: Record<string, string> = {};
+        brands.forEach(b => {
+            map[b.id] = b.name;
+        });
+        return map;
+    }, [brands]);
+
     // 日本酒を銘柄ごとにグループ化
-    const sakesByBrand = React.useMemo(() => {
+    const sakesByBrand = useMemo(() => {
         const groups: Record<string, SAKE[]> = {};
         if (!isRakutenFallback && displaySakes.length > 0) {
             displaySakes.forEach((sake: SAKE) => {
-                const bName = sake.brand || 'その他の日本酒';
+                // sake.brand がIDの場合は、名称に変換。見つからなければ brewery.name かデフォルト値を使用
+                let bName = 'その他の日本酒';
+                if (sake.brand && brandNameMap[sake.brand]) {
+                    bName = brandNameMap[sake.brand];
+                } else if (sake.brand && sake.brand.length > 10) {
+                    // IDっぽくない場合はそのまま使う
+                    bName = sake.brand;
+                } else if (brands.length > 0) {
+                    // 銘柄が1つしかない場合はそれをデフォルトにする
+                    bName = brands[0].name;
+                }
+                
                 if (!groups[bName]) groups[bName] = [];
                 groups[bName].push(sake);
             });
         }
         return groups;
-    }, [displaySakes, isRakutenFallback]);
+    }, [displaySakes, isRakutenFallback, brandNameMap, brands]);
 
-    // セクションを表示すべきかどうかの判定を緩和
     const showLineupSection = loadingRakuten || isRakutenFallback || Object.keys(sakesByBrand).length > 0;
 
     return (
@@ -104,9 +118,9 @@ export default function BreweryDetailClient({
             </section>
 
             {/* ── コンテンツカード ── */}
-            <section className="max-w-[1024px] mx-auto -mt-[8vh] relative z-10 bg-white p-8 md:p-16 rounded-xl shadow-sm border border-gray-100/50">
+            <section className="max-w-[1024px] mx-auto -mt-[8vh] relative z-10 bg-white p-8 md:p-16 rounded-xl shadow-sm border border-gray-100/50 mb-12">
                 <Link href={`/${type === 'shop' ? 'shop/search' : type}`} className="text-sm text-[#8B7D6B] mb-12 flex items-center gap-2 hover:opacity-70 transition-opacity duration-200 font-medium">
-                    <span className="text-xs">←</span> 酒蔵一覧へ戻る
+                    <span className="text-xs">←</span> {type === 'shop' ? 'ショップ一覧' : '酒蔵一覧'}へ戻る
                 </Link>
 
                 <div className="text-center mb-12">
@@ -152,26 +166,7 @@ export default function BreweryDetailClient({
                         </p>
                     </div>
                 </div>
-                
-                {/* ── ブランド一覧 (銘柄データがある場合) ── */}
-                {brands.length > 0 && (
-                    <div className="mb-24">
-                        <div className="flex items-center gap-4 mb-8">
-                            <h2 className="text-2xl font-serif-jp font-bold text-[#8B7D6B] whitespace-nowrap">
-                                主要銘柄
-                            </h2>
-                            <div className="h-px flex-1 bg-gray-100"></div>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                            {brands.map((brand) => (
-                                <div key={brand.id} className="bg-white border border-[#8B7D6B]/20 px-6 py-3 rounded-lg shadow-sm">
-                                    <span className="text-[#8B7D6B] font-bold font-serif-jp">{unescapeHtml(brand.name)}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-                
+
                 {/* ── 商品ラインナップ (銘柄別セクション) ── */}
                 {showLineupSection && (
                     <div className="space-y-24">
@@ -182,36 +177,39 @@ export default function BreweryDetailClient({
                             </div>
                         ) : isRakutenFallback ? (
                             <div>
-                                <div className="flex items-center gap-4 mb-12">
+                                <div className="flex items-center gap-4 mb-10">
                                     <h2 className="text-2xl font-serif-jp font-bold text-[#8B7D6B] whitespace-nowrap">
                                         関連製品（外部サイト）
                                     </h2>
-                                    <div className="h-px flex-1 bg-gray-100"></div>
-                                    <span className="text-[10px] text-gray-300">※酒蔵名による自動検索</span>
+                                    <div className="h-[1px] flex-1 bg-gray-200"></div>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                     {rakutenSakes.map((sake: any) => (
-                                        <SakeCard key={sake.id} sake={sake} isRakuten={true} />
+                                        <SakeCard key={sake.id} sake={sake} isRakuten={true} breweryName={unescapeHtml(brewery.name)} />
                                     ))}
                                 </div>
                             </div>
                         ) : Object.keys(sakesByBrand).length > 0 ? (
                             Object.entries(sakesByBrand).map(([brandName, sakes]) => (
                                 <section key={brandName}>
-                                    <div className="flex items-center gap-4 mb-12">
+                                    <div className="flex items-center gap-4 mb-10">
                                         <h2 className="text-2xl font-serif-jp font-bold text-[#8B7D6B] whitespace-nowrap">
                                             銘柄：{unescapeHtml(brandName)}
                                         </h2>
-                                        <div className="h-px flex-1 bg-gray-100"></div>
+                                        <div className="h-[1px] flex-1 bg-gray-200"></div>
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                         {sakes.map((sake) => (
-                                            <SakeCard key={sake.id} sake={sake} isRakuten={false} />
+                                            <SakeCard key={sake.id} sake={sake} isRakuten={false} breweryName={unescapeHtml(brewery.name)} />
                                         ))}
                                     </div>
                                 </section>
                             ))
-                        ) : null}
+                        ) : (
+                            <div className="text-center py-12 text-gray-400">
+                                日本酒の情報がまだありません。
+                            </div>
+                        )}
                     </div>
                 )}
             </section>
@@ -219,75 +217,76 @@ export default function BreweryDetailClient({
     );
 }
 
-// 酒蔵内の個別の日本酒カード（メモ化）
-const SakeCard = React.memo(({ sake, isRakuten }: { sake: any, isRakuten: boolean }) => {
+// 指示書に基づいた新しい酒販カードUI
+const SakeCard = React.memo(({ sake, isRakuten, breweryName }: { sake: any, isRakuten: boolean, breweryName: string }) => {
     const name = unescapeHtml(sake.name);
     const imageUrl = sake.imageUrl;
     
-    // 文字処理のメモ化
-    const description = React.useMemo(() => 
+    const description = useMemo(() => 
         sake.description ? unescapeHtml(sake.description).replace(/<[^>]+>/g, '').trim() : ''
     , [sake.description]);
 
-    const href = isRakuten ? sake.affiliateUrl : `/nihonshu/${sake.id}`;
+    const href = isRakuten ? sake.affiliateUrl : `/nihonshu/${sake.oldId || sake.id}`;
     const targetProps = isRakuten ? { target: "_blank", rel: "noopener noreferrer" } : {};
 
-    // スペックタグの抽出ロジック（メモ化）
-    const tags = React.useMemo(() => {
+    const tags = useMemo(() => {
         const keywords = ["純米大吟醸", "大吟醸", "純米吟醸", "吟醸", "特別純米", "純米", "特別本醸造", "本醸造", "普通酒", "生酒", "原酒", "にごり", "スパークリング", "無濾過", "生原酒"];
         const found = keywords.filter(k => name.includes(k));
+        // より長い名前を優先（例：純米大吟醸が含まれていたら純米は含めない）
         return found.filter((tag, index) => !found.some((other, otherIndex) => index !== otherIndex && other.includes(tag) && other !== tag));
     }, [name]);
 
     return (
-        <Link href={href} {...targetProps} className="group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col h-full">
-            <div className="aspect-[3/4] bg-[#f9f9f9] overflow-hidden relative border-b border-gray-50/50">
+        <Link href={href} {...targetProps} className="group bg-white rounded-lg border border-[#F3F4F6] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col h-full transform-gpu">
+            {/* 3:4比率の画像エリア */}
+            <div className="aspect-[3/4] bg-[#f9f9f9] overflow-hidden relative">
                 {imageUrl ? (
                     <img 
                         src={imageUrl} 
                         alt={name} 
-                        className="w-full h-full object-cover md:object-contain p-2 group-hover:scale-105 transition-transform duration-500" 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                         loading="lazy"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-200">
-                        <Wine size={48} strokeWidth={1} />
+                    <div className="w-full h-full flex items-center justify-center text-gray-100 bg-gray-50">
+                        <Wine size={64} strokeWidth={1} />
                     </div>
                 )}
-                {isRakuten && (
-                    <div className="absolute top-3 left-3">
-                        <span className="bg-red-500/80 text-white text-[9px] px-2 py-0.5 rounded-full backdrop-blur-sm font-bold tracking-wider">RAKUTEN</span>
-                    </div>
-                )}
+                <div className="absolute top-3 left-3">
+                    <span className="bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm tracking-wider">
+                        {isRakuten ? 'RAKUTEN' : 'OFFICIAL'}
+                    </span>
+                </div>
             </div>
             
             <div className="p-5 flex flex-col flex-1">
-                <div className="flex flex-wrap gap-1.5 mb-3">
+                {/* タブ形式の属性表示 */}
+                <div className="flex flex-wrap gap-1 mb-3">
                     {tags.length > 0 ? tags.map(tag => (
-                        <span key={tag} className="text-[9px] font-bold px-2 py-0.5 bg-[#8B7D6B]/10 text-[#8B7D6B] rounded tracking-tighter">
+                        <span key={tag} className="text-[10px] font-medium px-2 py-0.5 bg-[#8B7D6B]/10 text-[#8B7D6B] rounded">
                             {tag}
                         </span>
                     )) : (
-                        <span className="text-[9px] font-bold px-2 py-0.5 bg-gray-100 text-gray-400 rounded tracking-tighter">
-                            REGULAR
+                        <span className="text-[10px] font-medium px-2 py-0.5 bg-gray-100 text-gray-500 rounded">
+                            製品
                         </span>
                     )}
                 </div>
                 
-                <h3 className="font-bold text-base leading-snug group-hover:text-[#8B7D6B] transition-colors mb-2 font-serif-jp h-[2.5em] overflow-hidden">
+                <h3 className="font-bold text-lg leading-tight group-hover:text-[#8B7D6B] transition-colors mb-2 font-serif-jp line-clamp-2 h-[2.5em]">
                     {name}
                 </h3>
                 
-                <p className="text-[11px] text-gray-500 leading-relaxed line-clamp-3 mb-4 flex-1">
-                    {description || `${unescapeHtml(sake.brewery)}が醸す、こだわりの一本です。`}
+                <p className="text-xs text-gray-500 leading-relaxed line-clamp-3 mb-4 flex-1">
+                    {description || `${breweryName}が醸す、こだわりの一本です。`}
                 </p>
                 
-                <div className="pt-3 flex items-center justify-between border-t border-gray-50">
-                    <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
-                        {isRakuten ? 'Purchase' : 'Detail'}
+                <div className="pt-2 flex items-center justify-between border-t border-gray-50 mt-2">
+                    <span className="text-xs font-bold text-gray-300">
+                        {isRakuten ? (sake.price ? `約¥${sake.price.toLocaleString()}` : '720ml / 1.8L') : '720ml / 1.8L'}
                     </span>
-                    <span className="text-[11px] text-[#8B7D6B] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        {isRakuten ? '楽天で探す' : '詳細を見る'} <span className="text-[8px]">→</span>
+                    <span className="text-xs text-[#8B7D6B] font-bold group-hover:translate-x-1 transition-transform">
+                        詳細を見る →
                     </span>
                 </div>
             </div>
