@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { fetchAllSakesAction } from '@/app/actions/sake';
 import { SakeData, scoreByKeywords } from '@/lib/sake-logic';
 
