@@ -123,18 +123,27 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
         }
     }, [brewery.name, initialCmsSakes.length]);
 
-    const { description: cleanDescription, address: extractedAddress, phone: extractedPhone, website: extractedWebsite } = parseBreweryData(brewery.content || '', brewery);
+    // ── データのメモ化処理 ──
+    const { 
+        description: cleanDescription, 
+        address: extractedAddress, 
+        phone: extractedPhone, 
+        website: extractedWebsite 
+    } = React.useMemo(() => parseBreweryData(brewery.content || '', brewery), [brewery.content, brewery.name]);
     
-    // URL表示の整形
-    let displayUrlText = extractedWebsite || '';
-    if (displayUrlText.startsWith('http')) {
-        try {
-            const urlObj = new URL(displayUrlText);
-            displayUrlText = urlObj.hostname;
-        } catch (e) {
-            // ignore
+    // URL表示の整形をメモ化
+    const displayUrlText = React.useMemo(() => {
+        let text = extractedWebsite || '';
+        if (text.startsWith('http')) {
+            try {
+                const urlObj = new URL(text);
+                return urlObj.hostname;
+            } catch (e) {
+                return text;
+            }
         }
-    }
+        return text;
+    }, [extractedWebsite]);
 
     const prefectureDisplay = brewery.prefecture || '日本';
     const finalAddress = extractedAddress || '-';
@@ -144,15 +153,18 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
     const displaySakes = initialCmsSakes.length > 0 ? initialCmsSakes : rakutenSakes;
     const isRakutenFallback = initialCmsSakes.length === 0 && rakutenSakes.length > 0;
 
-    // 日本酒を銘柄ごとにグループ化
-    const sakesByBrand: Record<string, SAKE[]> = {};
-    if (!isRakutenFallback) {
-        displaySakes.forEach((sake: SAKE) => {
-            const bName = sake.brand || 'その他のお酒';
-            if (!sakesByBrand[bName]) sakesByBrand[bName] = [];
-            sakesByBrand[bName].push(sake);
-        });
-    }
+    // 日本酒を銘柄ごとにグループ化（メモ化）
+    const sakesByBrand = React.useMemo(() => {
+        const groups: Record<string, SAKE[]> = {};
+        if (!isRakutenFallback) {
+            displaySakes.forEach((sake: SAKE) => {
+                const bName = sake.brand || 'その他のお酒';
+                if (!groups[bName]) groups[bName] = [];
+                groups[bName].push(sake);
+            });
+        }
+        return groups;
+    }, [displaySakes, isRakutenFallback]);
 
     return (
         <div className="min-h-screen bg-[#F9F8F6] font-['Noto_Sans_JP'] text-[#333] pb-24">
@@ -169,7 +181,7 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
 
             {/* ── コンテンツカード ── */}
             <section className="max-w-[1024px] mx-auto -mt-[8vh] relative z-10 bg-white p-8 md:p-16 rounded-xl shadow-sm border border-gray-100/50">
-                <Link href={`/${type === 'shop' ? 'shop/search' : type}`} className="text-sm text-[#8B7D6B] mb-12 flex items-center gap-2 hover:opacity-70 transition-opacity font-medium">
+                <Link href={`/${type === 'shop' ? 'shop/search' : type}`} className="text-sm text-[#8B7D6B] mb-12 flex items-center gap-2 hover:opacity-70 transition-opacity duration-200 font-medium">
                     <span className="text-xs">←</span> 酒蔵一覧へ戻る
                 </Link>
 
@@ -283,25 +295,28 @@ export default function BreweryDetailClient({ brewery, initialCmsSakes = [], bra
     );
 }
 
-function SakeCard({ sake, isRakuten }: { sake: any, isRakuten: boolean }) {
+// 酒蔵内の個別の日本酒カード（メモ化）
+const SakeCard = React.memo(({ sake, isRakuten }: { sake: any, isRakuten: boolean }) => {
     const name = unescapeHtml(sake.name);
     const imageUrl = sake.imageUrl;
-    const description = sake.description ? unescapeHtml(sake.description).replace(/<[^>]+>/g, '').trim() : '';
+    
+    // 文字処理のメモ化
+    const description = React.useMemo(() => 
+        sake.description ? unescapeHtml(sake.description).replace(/<[^>]+>/g, '').trim() : ''
+    , [sake.description]);
+
     const href = isRakuten ? sake.affiliateUrl : `/nihonshu/${sake.id}`;
     const targetProps = isRakuten ? { target: "_blank", rel: "noopener noreferrer" } : {};
 
-    // スペックタグの抽出ロジック
-    const extractTags = (text: string) => {
+    // スペックタグの抽出ロジック（メモ化）
+    const tags = React.useMemo(() => {
         const keywords = ["純米大吟醸", "大吟醸", "純米吟醸", "吟醸", "特別純米", "純米", "特別本醸造", "本醸造", "普通酒", "生酒", "原酒", "にごり", "スパークリング", "無濾過", "生原酒"];
-        const found = keywords.filter(k => text.includes(k));
-        // 重複除去（例：純米大吟醸が含まれるなら純米は表示しないなど）
+        const found = keywords.filter(k => name.includes(k));
         return found.filter((tag, index) => !found.some((other, otherIndex) => index !== otherIndex && other.includes(tag) && other !== tag));
-    };
-
-    const tags = extractTags(name);
+    }, [name]);
 
     return (
-        <Link href={href} {...targetProps} className="group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full">
+        <Link href={href} {...targetProps} className="group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col h-full">
             <div className="aspect-[3/4] bg-[#f9f9f9] overflow-hidden relative border-b border-gray-50/50">
                 {imageUrl ? (
                     <img 

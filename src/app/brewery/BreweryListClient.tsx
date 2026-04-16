@@ -120,7 +120,7 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
   return (
     <div className="min-h-screen bg-[#F9F8F6]">
       {/* ── Sticky Header ── */}
-      <div className="sticky top-0 z-40 bg-[#F9F8F6]/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
+      <div className="sticky top-0 z-40 bg-[#F9F8F6]/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-shadow duration-300">
         <div className="max-w-7xl mx-auto px-6 py-4 space-y-4">
           {/* Search Input */}
           <div className="relative group">
@@ -170,7 +170,7 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
               <Link 
                 href={`/brewery/${brewery.id}`} 
                 key={brewery.id} 
-                className="brewery-card group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col h-full overflow-hidden"
+                className="brewery-card group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl transition-[box-shadow,transform] duration-500 flex flex-col h-full overflow-hidden"
               >
                 {/* 16:9 Image Area */}
                 <div className="aspect-[16/9] relative overflow-hidden bg-gray-50 border-b border-gray-50">
@@ -204,7 +204,7 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
 
                 {/* Content Area */}
                 <div className="p-5 flex flex-col flex-grow">
-                  <h3 className="font-serif font-bold text-base text-[#1F1F1F] mb-1.5 group-hover:text-[#8B7D6B] transition-colors line-clamp-1">
+                  <h3 className="font-serif font-bold text-base text-[#1F1F1F] mb-1.5 group-hover:text-[#8B7D6B] transition-colors duration-200 line-clamp-1">
                     {unescapeHtml(brewery.name)}
                   </h3>
                   {brewery.address && (
@@ -218,7 +218,7 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
                   </p>
                   
                   <div className="mt-auto pt-3 border-t border-gray-50 flex justify-end">
-                    <span className="text-[10px] font-bold text-[#8B7D6B] flex items-center group-hover:translate-x-1 transition-transform">
+                    <span className="text-[10px] font-bold text-[#8B7D6B] flex items-center group-hover:translate-x-1 transition-transform duration-300">
                       VIEW DETAIL <span className="ml-1">→</span>
                     </span>
                   </div>
