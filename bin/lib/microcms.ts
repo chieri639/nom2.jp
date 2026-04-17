@@ -49,7 +49,14 @@ export type BREWERY = {
 };
 
 export type BRAND = BREWERY;
-export type SHOP = BREWERY;
+export type SHOP = BREWERY & {
+  business_hours?: string;
+  holiday?: string;
+  facilities?: string;
+  payment_method?: string;
+  instagram?: string;
+  facebook?: string;
+};
 
 // Common private fetcher with retry and timeout
 async function robustFetch(url: string, options: RequestInit = {}, retries = 1): Promise<any> {
@@ -221,5 +228,51 @@ export function cleanBreweryData(html: string, entity: BREWERY) {
     address: address || '-',
     phone: phone || '-',
     website: website || ''
+  };
+}
+
+/**
+ * ショップ詳細向けに、紹介文(content)から営業情報を抽出・クリーンアップする
+ */
+export function cleanShopData(html: string, entity: SHOP) {
+  const base = cleanBreweryData(html, entity);
+// ...
+  
+  const text = base.description;
+  const lines = text.split('\n\n');
+  
+  let business_hours = entity.business_hours || '';
+  let holiday = entity.holiday || '';
+  let payment_method = entity.payment_method || '';
+  let facilities = entity.facilities || '';
+
+  // 抽出ロジック
+  for (const line of lines) {
+    // 営業時間
+    if (!business_hours && /(営業時間|OPEN|10:00|11:00|12:00)/i.test(line)) {
+      business_hours = line.replace(/^(営業時間|OPEN)[:：\s]*/i, '').trim();
+    }
+    // 定休日
+    if (!holiday && /(定休日|CLOSED|休み|水曜|日曜)/i.test(line)) {
+      holiday = line.replace(/^(定休日|CLOSED)[:：\s]*/i, '').trim();
+    }
+    // 決済
+    if (!payment_method && /(決済|支払い|カード|PayPay|電子マネー)/i.test(line)) {
+      payment_method = line.replace(/^(決済方式|決済方法|支払い方法|決済)[:：\s]*/i, '').trim();
+    }
+    // 設備
+    if (!facilities && /(設備|Wi-Fi|駐車場|席数)/i.test(line)) {
+      facilities = line.replace(/^(設備|付帯設備)[:：\s]*/i, '').trim();
+    }
+  }
+
+  return {
+    ...base,
+    business_hours: business_hours || '-',
+    holiday: holiday || '-',
+    payment_method: payment_method || '-',
+    facilities: facilities || '-',
+    instagram: entity.instagram,
+    facebook: entity.facebook
   };
 }
