@@ -18,51 +18,70 @@ type Props = {
 export default function ShopDetailClient({ shop, serverCleanedData }: Props) {
     const { description } = serverCleanedData;
 
-    // スマート・パース (Smart Parser) ロジック
+    // スマート・パース (Smart Parser) ロジック：改行がない場合でもキーワードでスキャンする方式に強化
     const { introText, details } = useMemo(() => {
-        const rawContent = shop.content || '';
-        // HTMLタグを除去しつつ、改行や読点で分割
-        const lines = rawContent
+        let text = (shop.content || '')
+            .replace(/&amp;/g, '&')
             .replace(/<br\s*\/?>/gi, '\n')
             .replace(/<\/p>/gi, '\n')
-            .replace(/<[^>]+>/g, '')
-            .split(/\n|、/);
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ') // 連続する空白を1つに
+            .trim();
         
-        const detailKeywords = ['住所', '電話', 'TEL', '営業', '定休', '席数', '決済', 'アクセス', '駐車場', '支払い', 'メニュー', '予算'];
-        
+        const detailKeywords = ['住所', '電話番号', 'TEL', '電話', '営業時間', '定休日', '公式サイト', 'アクセス', '駐車場', '決済方法', '支払い', 'メニュー', '予算'];
         const tempDetails: { label: string; value: string }[] = [];
-        const tempIntro: string[] = [];
         
-        lines.forEach(line => {
-            const trimmedLine = line.trim();
-            if (!trimmedLine) return;
-
-            const foundKeyword = detailKeywords.find(k => trimmedLine.includes(k));
-            const hasColon = trimmedLine.includes('：') || trimmedLine.includes(':');
-
-            if (foundKeyword && hasColon) {
-                const separator = trimmedLine.includes('：') ? '：' : ':';
-                const parts = trimmedLine.split(separator);
-                const label = parts[0].trim();
-                const value = parts.slice(1).join(separator).trim();
-                
-                if (label && value) {
-                    tempDetails.push({ label, value });
-                } else {
-                    tempIntro.push(trimmedLine);
-                }
-            } else {
-                tempIntro.push(trimmedLine);
+        // 1. 各キーワードの出現位置を特定し、文章を分割
+        let remainingText = text;
+        
+        // キーワードが見つかった位置で文章を切り分ける
+        const foundItems: { label: string; start: number; value: string }[] = [];
+        
+        detailKeywords.forEach(k => {
+            const regex = new RegExp(k + '[:：\\s]', 'g');
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                foundItems.push({ label: k, start: match.index, value: '' });
             }
         });
 
-        // IntroTextが空だった場合のフォールバック（全体を表示）
-        const finalIntro = tempIntro.length > 0 
-            ? tempIntro.join(' ') 
-            : (tempDetails.length === 0 ? rawContent.replace(/<[^>]+>/g, ' ') : '');
+        // 位置順にソート
+        foundItems.sort((a, b) => a.start - b.start);
+
+        // 各項目の値を切り出す
+        for (let i = 0; i < foundItems.length; i++) {
+            const current = foundItems[i];
+            const next = foundItems[i + 1];
+            const end = next ? next.start : text.length;
+            
+            // 「住所 〒...」などの形式からラベル以降を抽出
+            let val = text.substring(current.start + current.label.length, end).trim();
+            val = val.replace(/^[:：\s]+/, ''); // 先頭の記号を削除
+            
+            // 商品一覧やHOME以降のノイズを除去（必要に応じて）
+            if (val.includes('商品一覧')) val = val.split('商品一覧')[0].trim();
+            if (val.includes('HOME')) val = val.split('HOME')[0].trim();
+
+            current.value = val;
+            tempDetails.push({ label: current.label, value: val });
+        }
+
+        // 2. イントロテキストの抽出（最初のキーワードより前の部分）
+        let finalIntro = '';
+        if (foundItems.length > 0) {
+            finalIntro = text.substring(0, foundItems[0].start).trim();
+        } else {
+            finalIntro = text;
+        }
+
+        // 「商品一覧」以降に長文がある場合は、それもイントロ（または末尾）として扱う
+        if (text.includes('酒蔵について')) {
+            const aboutPart = text.split('酒蔵について')[1]?.split('商品一覧')[0] || '';
+            if (aboutPart) finalIntro += (finalIntro ? '\n\n' : '') + aboutPart.trim();
+        }
 
         return {
-            introText: finalIntro,
+            introText: finalIntro.replace(/MENU|TABI BAR & CAFE SUZUVEL/g, '').trim(),
             details: tempDetails
         };
     }, [shop.content]);
