@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { fetchAllSakesAction } from '@/app/actions/sake';
 import { SakeData, calculateSimilarity } from '@/lib/sake-logic';
+import { Search, RefreshCw, Wine, ArrowRight, Star, MapPin } from 'lucide-react';
 
 type SimilarSake = SakeData & {
     similarityScore: number;
@@ -46,37 +47,39 @@ export default function SakeSimilarPage() {
     }, [baseSake, allSakes]);
 
     if (loading) {
-        return <div style={{ color: '#fff', padding: 40, textAlign: 'center' }}>読み込み中...</div>;
+        return (
+            <div className="py-24 flex flex-col items-center justify-center gap-4 text-gray-400">
+                <RefreshCw className="animate-spin" size={32} />
+                <p className="text-sm font-bold tracking-[0.2em]">ANALYZING DATABASE...</p>
+            </div>
+        );
     }
 
     return (
-        <div style={{ color: '#fff' }}>
+        <div className="bg-white">
             {!baseSake ? (
-                <div>
-                    <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>基準となる日本酒を選んでください</h2>
-                    <p style={{ fontSize: 13, opacity: 0.6, marginBottom: 16 }}>銘柄名や酒蔵名で検索できます</p>
-
-                    <div style={{ marginBottom: 20 }}>
-                        <input
-                            type="text"
-                            placeholder="例: 浦霞, 獺祭, 新政..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '12px 16px',
-                                borderRadius: 12,
-                                background: '#222',
-                                border: '1px solid #444',
-                                color: '#fff',
-                                fontSize: 15,
-                                outline: 'none',
-                                boxSizing: 'border-box'
-                            }}
-                        />
+                <div className="p-8 md:p-12">
+                    <div className="mb-10 text-center md:text-left">
+                        <h2 className="text-xl md:text-2xl font-serif-jp font-bold text-[#1F1F1F] mb-4">
+                            基準となる日本酒を選択
+                        </h2>
+                        <p className="text-xs text-gray-400 font-bold tracking-widest uppercase mb-8">
+                            SELECT YOUR FAVORITE BRAND
+                        </p>
+                        
+                        <div className="relative max-w-2xl mx-auto md:mx-0">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                placeholder="銘柄名、酒蔵名で検索..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-12 pr-6 py-4 rounded-full bg-gray-50 border border-gray-100 focus:outline-none focus:ring-2 focus:ring-[#8B7D6B]/20 focus:bg-white transition-all text-sm"
+                            />
+                        </div>
                     </div>
 
-                    <div style={{ display: 'grid', gap: 10, maxHeight: 500, overflowY: 'auto', paddingRight: 4 }}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto pr-2 no-scrollbar">
                         {filteredSakes.map(s => (
                             <button
                                 key={s.id}
@@ -84,49 +87,63 @@ export default function SakeSimilarPage() {
                                     setBaseSake(s);
                                     window.scrollTo({ top: 0, behavior: 'smooth' });
                                 }}
-                                style={sakeSelectBtn}
+                                className="group flex flex-col p-6 text-left bg-white border border-gray-100 rounded-lg hover:border-[#8B7D6B] hover:shadow-md transition-all duration-300"
                             >
-                                <div style={{ fontWeight: 700 }}>{s.name}</div>
-                                <div style={{ fontSize: 11, opacity: 0.6 }}>{s.brewery}</div>
+                                <span className="text-[10px] font-bold text-[#8B7D6B]/60 tracking-widest uppercase mb-1">BRAND</span>
+                                <div className="font-bold text-[#1F1F1F] group-hover:text-[#8B7D6B] transition-colors mb-2">{s.name}</div>
+                                <div className="text-[11px] text-gray-400 flex items-center gap-1.5 mt-auto">
+                                    <MapPin size={10} /> {s.brewery}
+                                </div>
                             </button>
                         ))}
                         {filteredSakes.length === 0 && (
-                            <div style={{ textAlign: 'center', padding: '40px 0', opacity: 0.5 }}>一致する銘柄が見つかりませんでした</div>
+                            <div className="col-span-full py-12 text-center text-gray-400 italic text-sm">
+                                一致する銘柄が見つかりませんでした。
+                            </div>
                         )}
                     </div>
                 </div>
             ) : (
-                <div className="anim-fade-in">
-                    <button
-                        onClick={() => setBaseSake(null)}
-                        style={{ background: 'none', border: 'none', color: '#888', marginBottom: 16, cursor: 'pointer', fontSize: 13 }}
-                    >
-                        ← 選び直す
-                    </button>
+                <div className="anim-fade-in divide-y divide-gray-50">
+                    <div className="p-8 md:p-12">
+                        <button
+                            onClick={() => setBaseSake(null)}
+                            className="inline-flex items-center gap-2 text-xs font-bold text-[#8B7D6B] hover:opacity-70 transition-opacity mb-8 tracking-widest uppercase"
+                        >
+                            <RefreshCw size={12} /> CHANGE SELECTION
+                        </button>
 
-                    <div style={{ marginBottom: 24 }}>
-                        <h2 style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.3 }}>
-                            「{baseSake.name}」<br />
-                            <span style={{ fontSize: 18, opacity: 0.9 }}>が好きな方におすすめの日本酒</span>
-                        </h2>
-                        <p style={{ opacity: 0.75, marginTop: 12, fontSize: 14, lineHeight: 1.6 }}>
-                            AI診断システムが最新の銘柄データベース（全{allSakes.length}件）を分析し、<br />
-                            味わいの傾向から最適な銘柄を選びました。
+                        <div className="mb-10">
+                            <span className="text-[10px] font-bold text-[#8B7D6B] tracking-[0.2em] uppercase mb-4 block">RECOMMENDATION ENGINE</span>
+                            <h2 className="text-2xl md:text-3xl font-serif-jp font-bold text-[#1F1F1F] leading-tight mb-6">
+                                「{baseSake.name}」をお好みの方へ<br className="hidden md:block" />
+                                味わいの近い推奨銘柄
+                            </h2>
+                            <p className="text-sm text-gray-500 leading-relaxed max-w-2xl">
+                                AIによる成分解析とデータベース（全{allSakes.length}件）との照合により、
+                                特徴の類似性が高いトップ5銘柄を選定しました。
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-8">
+                            {similarSakes.map((s, idx) => (
+                                <SakeItemCard key={s.id} sake={s} rank={idx + 1} />
+                            ))}
+                        </div>
+
+                        {similarSakes.length === 0 && (
+                            <div className="py-24 text-center text-gray-400 text-sm italic">
+                                似ているお酒が現在データベースに見つかりませんでした。
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="p-8 md:p-12 bg-gray-50/50 flex flex-col items-center">
+                        <div className="w-10 h-px bg-gray-200 mb-6"></div>
+                        <p className="text-[10px] text-gray-400 tracking-[0.4em] uppercase font-bold text-center">
+                            nom × nom ai analytical database
                         </p>
                     </div>
-
-                    <div>
-                        {similarSakes.map((s, idx) => (
-                            <SakeItemCard key={s.id} sake={s} rank={idx + 1} />
-                        ))}
-                    </div>
-
-                    {similarSakes.length === 0 && (
-                        <div style={{ padding: 40, textAlign: 'center', opacity: 0.5 }}>
-                            似ているお酒が見つかりませんでした。<br/>
-                            説明文のキーワードから判定しています。
-                        </div>
-                    )}
                 </div>
             )}
         </div>
@@ -135,102 +152,91 @@ export default function SakeSimilarPage() {
 
 function SakeItemCard({ sake, rank }: { sake: SimilarSake; rank: number }) {
     return (
-        <section style={{
-            background: '#fff',
-            color: '#111',
-            borderRadius: 20,
-            padding: 20,
-            marginBottom: 16,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        }}>
-            <div style={{ display: 'flex', gap: 14 }}>
-                {/* 画像 */}
-                <div style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 14,
-                    flexShrink: 0,
-                    background: '#f5f5f5',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                  {sake.imageUrl ? (
-                      <img
-                          src={sake.imageUrl}
-                          alt={sake.name}
-                          style={{
-                              width: '100%',
-                              height: '100%',
-                              objectFit: 'cover',
-                          }}
-                      />
-                  ) : (
-                    <span style={{ fontSize: 10, opacity: 0.3 }}>No Image</span>
-                  )}
+        <section className="flex flex-col md:flex-row gap-8 py-8 first:pt-0 group border-b border-gray-50 last:border-0 last:pb-0">
+            {/* Image Area */}
+            <div className="w-full md:w-48 aspect-[4/3] rounded-lg bg-gray-50 overflow-hidden relative flex-shrink-0 border border-gray-100 shadow-sm transform transition-transform duration-500 group-hover:scale-[1.02]">
+                {sake.imageUrl ? (
+                    <img
+                        src={sake.imageUrl}
+                        alt={sake.name}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-200 gap-2">
+                        <Wine size={48} strokeWidth={1} />
+                        <span className="text-[10px] font-bold tracking-widest">NO IMAGE</span>
+                    </div>
+                )}
+                <div className="absolute top-4 left-4 w-8 h-8 rounded-full bg-[#1F1F1F] text-white flex items-center justify-center font-serif-jp text-sm font-bold shadow-lg">
+                    {rank}
+                </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-grow flex flex-col">
+                <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <Star size={12} className="text-[#8B7D6B]" fill="currentColor" />
+                        <span className="text-[10px] font-bold text-[#8B7D6B] tracking-[0.2em] uppercase">MATCH RECOMMEND</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-[#1F1F1F] mb-1 font-serif-jp group-hover:text-[#8B7D6B] transition-colors">
+                        <Link href={`/nihonshu/${sake.oldId || sake.id}`} className="hover:underline">
+                            {sake.name}
+                        </Link>
+                    </h3>
+                    <p className="text-xs text-gray-400 font-bold">{sake.brewery}</p>
                 </div>
 
-                <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 800, fontSize: 17, lineHeight: 1.2 }}>
-                        <Link href={`/nihonshu/${sake.oldId || sake.id}`} style={{ color: 'inherit', textDecoration: 'none' }} className="hover:underline">
-                            {rank}. {sake.name}
-                        </Link>
-                    </div>
-                    <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4, marginBottom: 12 }}>
-                        {sake.brewery}
-                    </div>
+                {/* Similarity Reason */}
+                <div className="bg-[#F9F8F6] p-5 rounded-lg border border-gray-100/50 mb-6">
+                    <p className="text-[10px] font-bold text-[#8B7D6B] tracking-widest uppercase mb-3 flex items-center gap-2">
+                        <SparkleIcon /> SIMILAR POINTS
+                    </p>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                        {sake.similarPoints.map((p, i) => (
+                            <li key={i} className="text-[13px] text-gray-600 flex items-center gap-2">
+                                <span className="w-1 h-1 rounded-full bg-[#8B7D6B] flex-shrink-0"></span>
+                                {p}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-                    <div style={{ fontSize: 13, marginBottom: 12, background: '#fcfcfc', padding: '10px 12px', borderRadius: 12, border: '1px solid #f0f0f0' }}>
-                        <div style={{ fontWeight: 800, fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>似ているポイント</div>
-                        <ul style={{ paddingLeft: 16, margin: 0, color: '#444' }}>
-                            {sake.similarPoints.map((p, i) => (
-                                <li key={i} style={{ marginBottom: 2 }}>{p}</li>
-                            ))}
-                        </ul>
-                    </div>
+                <div className="text-sm text-gray-500 leading-relaxed mb-8 flex-grow">
+                    {sake.description ? (
+                        <p className="line-clamp-3">{sake.description}</p>
+                    ) : (
+                        <p className="italic text-gray-400">説明文の解析結果に基づき、香りと味わいの構成が基準銘柄と極めて近いことから選出されました。</p>
+                    )}
+                </div>
 
-                    <div style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
-                        <div style={{ fontWeight: 800, fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>このお酒について</div>
-                        <div style={{ color: '#222', fontSize: 12, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                          {sake.description || '芳醇な味わいとともに、作り手のこだわりが感じられる一本です。'}
-                        </div>
-                    </div>
-
+                <div className="flex flex-wrap items-center gap-4 mt-auto">
                     {sake.purchaseUrl && (
                         <a
                             href={sake.purchaseUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{
-                                display: 'inline-block',
-                                padding: '10px 18px',
-                                borderRadius: 999,
-                                background: '#111',
-                                color: '#fff',
-                                fontSize: 12,
-                                fontWeight: 700,
-                                textDecoration: 'none',
-                            }}
+                            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#1F1F1F] text-white text-[11px] font-bold tracking-widest hover:bg-[#333] transition-all transform hover:-translate-y-0.5"
                         >
-                            楽天で購入する
+                            RAKUTEN SHOP <ArrowRight size={12} />
                         </a>
                     )}
+                    <Link 
+                        href={`/nihonshu/${sake.oldId || sake.id}`}
+                        className="text-[11px] font-bold text-gray-400 hover:text-[#1F1F1F] transition-colors tracking-widest uppercase flex items-center gap-2"
+                    >
+                        DETAIL VIEW <ArrowRight size={12} />
+                    </Link>
                 </div>
             </div>
         </section>
     );
 }
 
-const sakeSelectBtn: React.CSSProperties = {
-    background: '#1a1a1a',
-    border: '1px solid #333',
-    borderRadius: 12,
-    padding: '12px 16px',
-    color: '#fff',
-    textAlign: 'left',
-    cursor: 'pointer',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 4
-};
+function SparkleIcon() {
+    return (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+        </svg>
+    );
+}
