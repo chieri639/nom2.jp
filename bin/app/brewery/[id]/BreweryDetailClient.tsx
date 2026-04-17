@@ -83,16 +83,20 @@ export default function BreweryDetailClient({
         const groups: Record<string, SAKE[]> = {};
         if (!isRakutenFallback && displaySakes.length > 0) {
             displaySakes.forEach((sake: SAKE) => {
-                // sake.brand がIDの場合は、名称に変換。見つからなければ brewery.name かデフォルト値を使用
-                let bName = 'その他の日本酒';
+                // 1. 銘柄IDからの名称変換
+                let bName = '';
                 if (sake.brand && brandNameMap[sake.brand]) {
                     bName = brandNameMap[sake.brand];
-                } else if (sake.brand && sake.brand.length > 10) {
-                    // IDっぽくない場合はそのまま使う
-                    bName = sake.brand;
-                } else if (brands.length > 0) {
-                    // 銘柄が1つしかない場合はそれをデフォルトにする
+                } 
+                // 2. sake.brand フィールド自体に名称が入っている場合（「来福」「真向勝負」など）
+                else if (sake.brand && sake.brand.trim().length > 0) {
+                    bName = sake.brand.trim();
+                }
+                // 3. どちらもダメな場合、銘柄リストの1つ目、またはデフォルト
+                else if (brands.length > 0) {
                     bName = brands[0].name;
+                } else {
+                    bName = 'その他の日本酒';
                 }
                 
                 if (!groups[bName]) groups[bName] = [];
