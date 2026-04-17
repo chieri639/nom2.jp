@@ -5,7 +5,7 @@ import { Noto_Sans_JP, Noto_Serif_JP } from 'next/font/google'
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ['latin'],
-  weight: ['400', '500', '700'],
+  weight: ['400', '700'], // ウェイトを 400 と 700 に限定
   display: 'swap',
   variable: '--font-noto-sans-jp',
 })
@@ -15,6 +15,7 @@ const notoSerifJP = Noto_Serif_JP({
   weight: ['700'],
   display: 'swap',
   variable: '--font-noto-serif-jp',
+  preload: false, // タイトル用フォントのプリロードを無効化して初期通信を軽量化
 })
 
 export const metadata: Metadata = {
