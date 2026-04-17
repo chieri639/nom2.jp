@@ -56,35 +56,47 @@ export default async function BreweryDetailPage(props: any) {
     // 3. サーバー側でデータを極限までクリーンアップ
     const cleanedData = cleanBreweryData(brewery.content || '', brewery);
 
-    // 4. 関連データの取得（IDベースの厳密な紐付けを優先）
+    // 4. 関連データの取得（全文検索 q と ID検索 のハイブリッド戦略）
     let brands: BREWERY[] = [];
     let cmsSakes: SAKE[] = [];
     
     try {
-      // microCMSのフィルタ文字列を構築（[or]で連結）
-      // searchTerms内の各単語につき brewery, brand, name のいずれかに含まれるかを検索
-      const filterConditions: string[] = [];
-      searchTerms.forEach(term => {
-        if (term.length > 0) {
-          filterConditions.push(`brewery[contains]${term}[or]brand[contains]${term}[or]name[contains]${term}`);
+      // 検索キーワードの決定（最も短い名称を全文検索に使用）
+      const qKeyword = (Array.from(searchTerms).find(t => t.length > 1 && t.length < 5) || cleanedName).trim();
+
+      // 1. 全文検索 (qパラメータ)
+      // 2. 内部ID検索 (filters)
+      const tasks = [
+        // 銘柄検索
+        getBrands({ q: qKeyword, limit: 50 }).catch(() => ({ contents: [] })),
+        getBrands({ filters: `brewery[equals]${brewery.id}`, limit: 50 }).catch(() => ({ contents: [] })),
+        // 日本酒検索
+        getSakes({ q: qKeyword, limit: 100 }).catch(() => ({ contents: [] })),
+        getSakes({ filters: `brewery[equals]${brewery.id}`, limit: 100 }).catch(() => ({ contents: [] }))
+      ];
+
+      const [qBrands, idBrands, qSakes, idSakes] = await Promise.all(tasks);
+
+      // ブランドの重複排除とマージ
+      const allBrandsMap = new Map();
+      [...qBrands.contents, ...idBrands.contents].forEach(b => allBrandsMap.set(b.id, b));
+      brands = Array.from(allBrandsMap.values());
+
+      // 日本酒の重複排除とマージ
+      const allSakesMap = new Map();
+      [...qSakes.contents, ...idSakes.contents].forEach(s => {
+        // 全文検索の場合は、その酒蔵に無関係なものも混じる可能性があるため、
+        // 名前やbreweryフィールドにキーワードが含まれているか軽くチェック（簡易フィルタ）
+        const nameMatch = s.name.includes(qKeyword);
+        const breweryMatch = s.brewery && s.brewery.includes(qKeyword);
+        if (nameMatch || breweryMatch || idSakes.contents.some(is => is.id === s.id)) {
+          allSakesMap.set(s.id, s);
         }
       });
-      // 内部IDによる検索も追加
-      filterConditions.push(`brewery[equals]${brewery.id}`);
-      
-      const filters = filterConditions.join('[or]');
-      
-      // 銘柄と日本酒を同時に取得
-      const [brandsRes, sakesRes] = await Promise.all([
-        getBrands({ filters, limit: 50 }).catch(() => ({ contents: [] })),
-        getSakes({ filters, limit: 100 }).catch(() => ({ contents: [] }))
-      ]);
-
-      brands = brandsRes.contents;
-      cmsSakes = sakesRes.contents;
+      cmsSakes = Array.from(allSakesMap.values());
 
     } catch (apiErr) {
-      console.error('Related data fetch error (non-fatal):', apiErr);
+      console.error('Related data fetch error (critical):', apiErr);
     }
 
     return (
