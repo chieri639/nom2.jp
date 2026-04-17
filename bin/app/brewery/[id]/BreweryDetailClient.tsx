@@ -256,11 +256,7 @@ const SakeCard = React.memo(({ sake, isRakuten, breweryName }: { sake: any, isRa
                         <Wine size={64} strokeWidth={1} />
                     </div>
                 )}
-                <div className="absolute top-3 left-3">
-                    <span className="bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm tracking-wider">
-                        {isRakuten ? 'RAKUTEN' : 'OFFICIAL'}
-                    </span>
-                </div>
+                {/* 以前あった左上のソースタグは不要とのことで削除しました */}
             </div>
             
             <div className="p-5 flex flex-col flex-1">
