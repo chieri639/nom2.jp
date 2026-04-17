@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { getBreweries } from '@/lib/microcms';
 import BreweryListClient from './BreweryListClient';
+import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
 export const revalidate = 0; // リアルタイム性を重視
 
@@ -35,12 +36,10 @@ export default async function BreweryIndexPage() {
     return (
         <div className="min-h-screen bg-[#F9F8F6]">
             {/* ── イントロセクション ── */}
-            <header className="px-6 pt-20 pb-16 text-center relative">
+            <header className="px-6 pt-12 pb-12 text-center relative">
                 <div className="max-w-4xl mx-auto">
-                    <div className="absolute top-10 left-6 md:left-12">
-                        <Link href="/" className="inline-flex items-center text-xs text-gray-400 hover:text-[#8B7D6B] transition-colors tracking-[0.2em] uppercase font-bold">
-                            ← BACK TO TOP
-                        </Link>
+                    <div className="absolute top-0 left-6 md:left-12">
+                        <DynamicBackButton defaultHref="/" defaultText="BACK TO TOP" />
                     </div>
                     <h1 className="text-4xl md:text-5xl font-serif font-black tracking-[0.1em] text-[#1F1F1F] mb-6">
                         BREWERIES

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Wine } from 'lucide-react';
 import { BREWERY, SAKE, BRAND } from '@/lib/microcms';
 import { fetchRakutenSakes } from '@/lib/rakuten';
+import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
 function unescapeHtml(text: string) {
     if (!text) return '';
@@ -131,9 +132,12 @@ export default function BreweryDetailClient({
 
             {/* ── コンテンツカード ── */}
             <section className="max-w-[1024px] mx-auto -mt-[8vh] relative z-10 bg-white p-8 md:p-16 rounded-xl shadow-sm border border-gray-100/50 mb-12">
-                <Link href={`/${type === 'shop' ? 'shop/search' : type}`} className="text-sm text-[#8B7D6B] mb-12 flex items-center gap-2 hover:opacity-70 transition-opacity duration-200 font-medium">
-                    <span className="text-xs">←</span> {type === 'shop' ? 'ショップ一覧' : '酒蔵一覧'}へ戻る
-                </Link>
+                <div className="mb-12">
+                    <DynamicBackButton 
+                        defaultHref={`/${type === 'shop' ? 'shop' : type}`} 
+                        defaultText={`${type === 'shop' ? 'ショップ一覧' : '酒蔵一覧'}へ戻る`} 
+                    />
+                </div>
 
                 <div className="text-center mb-12">
                     <p className="text-[10px] text-[#8B7D6B] tracking-[0.3em] uppercase mb-3 font-bold">

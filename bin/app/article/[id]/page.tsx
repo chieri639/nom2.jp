@@ -1,92 +1,76 @@
 import React from 'react';
 import Link from 'next/link';
 import { getArticleDetail } from '@/lib/microcms';
+import { ArrowLeft, ArrowRight, Search, Sparkles } from 'lucide-react';
+import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
 export const revalidate = 0;
 
 export default async function ArticleDetailPage(props: any) {
-  // Next.js 14+ App Router: params may need to be awaited
   const params = await props.params;
   const id = params?.id;
 
+  if (!id) return null;
+
   let article: any = null;
-  let errorMsg: string | null = null;
-
-  if (!id) {
-    return (
-      <div style={{ padding: 80, fontFamily: 'monospace' }}>
-        <h1 style={{ color: 'red' }}>Error: No article ID provided</h1>
-        <p>params: {JSON.stringify(params)}</p>
-        <Link href="/article">← 記事一覧に戻る</Link>
-      </div>
-    );
-  }
-
   try {
     article = await getArticleDetail(id);
-  } catch (error: any) {
-    errorMsg = error?.message || JSON.stringify(error);
+  } catch (error) {
+    console.error('Article fetch error:', error);
   }
 
-  if (!article || errorMsg) {
+  if (!article) {
     return (
-      <div style={{ padding: 80, fontFamily: 'monospace', maxWidth: 800, margin: '0 auto' }}>
-        <h1 style={{ color: 'red' }}>記事が見つかりませんでした</h1>
-        <p>ID: {id}</p>
-        {errorMsg && <p style={{ color: '#666' }}>{errorMsg}</p>}
-        <Link href="/article">← 記事一覧に戻る</Link>
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <h1 className="text-2xl font-bold mb-4">記事が見つかりませんでした</h1>
+        <Link href="/article" className="text-[#8B7D6B] hover:underline">← 記事一覧に戻る</Link>
       </div>
     );
   }
 
   return (
-    <div style={{ backgroundColor: '#fdfdfd', minHeight: '100vh', paddingBottom: 80, fontFamily: '"Noto Sans JP", -apple-system, sans-serif' }}>
-      
+    <div className="min-h-screen pb-24">
       {/* Article Header (Hero) */}
-      <header style={{ 
-          background: 'linear-gradient(135deg, #1A1A1D 0%, #2b1A33 100%)', 
-          color: '#fff', 
-          padding: '80px 32px 60px', 
-          textAlign: 'center',
-          marginBottom: 60
-      }}>
-          <div style={{ maxWidth: 800, margin: '0 auto' }}>
-              <span style={{ display: 'inline-block', backgroundColor: '#bfa758', color: '#fff', padding: '6px 16px', borderRadius: 100, fontSize: 13, fontWeight: 700, letterSpacing: 1, marginBottom: 20 }}>
-                  特集記事
+      <header className="px-6 pt-20 pb-16 text-center border-b border-gray-100 bg-white">
+          <div className="max-w-4xl mx-auto">
+              <span className="inline-block bg-[#8B7D6B]/10 text-[#8B7D6B] px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase mb-8">
+                  FEATURED ARTICLE
               </span>
-              <h1 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 800, marginBottom: 24, letterSpacing: '-0.02em', lineHeight: 1.4 }}>
+              <h1 className="text-3xl md:text-5xl font-bold font-serif-jp text-[#1F1F1F] leading-tight mb-12">
                   {article.title}
               </h1>
+              
+              {article.imageUrl && (
+                <div className="aspect-[21/9] w-full max-w-5xl mx-auto rounded-lg overflow-hidden shadow-2xl">
+                    <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
+                </div>
+              )}
           </div>
-          {article.imageUrl && (
-            <div style={{ maxWidth: 900, margin: '40px auto 0', borderRadius: 16, overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.3)', aspectRatio: '16/9' }}>
-                <img src={article.imageUrl} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
-          )}
       </header>
 
       {/* Article Body */}
-      <main style={{ maxWidth: 800, margin: '0 auto', padding: '0 32px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <Link href="/article" style={{ display: 'inline-flex', alignItems: 'center', color: '#6b7280', textDecoration: 'none', fontWeight: 600, fontSize: 14 }}>
-            ← 記事一覧に戻る
-          </Link>
+      <main className="max-w-3xl mx-auto px-6 pt-16">
+        <div className="flex flex-col gap-16">
+          <DynamicBackButton defaultHref="/article" defaultText="BACK TO ARTICLES" />
 
           <article 
-            className="rich-text" 
-            style={{ fontSize: 17, lineHeight: 1.9, color: '#333' }} 
+            className="prose prose-lg max-w-none text-[#333] leading-[2.2] font-medium selection:bg-[#8B7D6B]/20"
             dangerouslySetInnerHTML={{ __html: article.content || '' }} 
           />
 
+          {/* Social / Share Area could go here */}
+
           {/* Read More / Next Actions */}
-          <div style={{ marginTop: 60, paddingTop: 40, borderTop: '1px solid #eee', textAlign: 'center' }}>
-            <h3 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>日本酒を探す</h3>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link href="/nihonshu" style={{ padding: '14px 32px', backgroundColor: '#1A1A1D', color: 'white', borderRadius: 100, fontWeight: 700, textDecoration: 'none' }}>
-                日本酒一覧を見る
+          <div className="mt-20 pt-16 border-t border-gray-100 text-center">
+            <h2 className="text-2xl font-serif-jp font-bold text-[#1F1F1F] mb-12">
+              日本酒の世界をもっと探求する
+            </h2>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link href="/nihonshu" className="group flex items-center gap-3 px-8 py-4 bg-[#1F1F1F] text-white rounded-full text-sm font-bold hover:bg-[#8B7D6B] transition-all shadow-lg hover:-translate-y-1">
+                <Search size={18} /> 日本酒一覧を見る
               </Link>
-              <Link href="/similar" style={{ padding: '14px 32px', backgroundColor: '#bfa758', color: 'white', borderRadius: 100, fontWeight: 700, textDecoration: 'none' }}>
-                AIにおすすめを聞く
+              <Link href="/similar" className="group flex items-center gap-3 px-8 py-4 bg-[#8B7D6B] text-white rounded-full text-sm font-bold hover:brightness-110 transition-all shadow-lg hover:-translate-y-1">
+                <Sparkles size={18} /> AIにおすすめを聞く
               </Link>
             </div>
           </div>

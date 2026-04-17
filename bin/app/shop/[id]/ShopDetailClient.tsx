@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { Wine, MapPin, Phone, Globe, Info } from 'lucide-react';
 import { SHOP } from '@/lib/microcms';
+import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
 type Props = {
     shop: SHOP;
@@ -113,13 +114,9 @@ export default function ShopDetailClient({ shop, serverCleanedData }: Props) {
                 <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
                     {/* Header Area */}
                     <div className="p-8 md:p-12 border-b border-gray-50 bg-white">
-                        <Link href="/shop" className="text-xs text-[#8B7D6B] hover:opacity-70 transition-opacity flex items-center gap-2 mb-8 font-bold tracking-widest uppercase">
-                            ← BACK TO LIST
-                        </Link>
-                        
-                        <h1 className="text-3xl md:text-5xl font-bold font-serif-jp text-[#1F1F1F] leading-tight mb-6">
-                            {shop.name}
-                        </h1>
+                        <div className="mb-8">
+                            <DynamicBackButton defaultHref="/shop" defaultText="BACK TO LIST" />
+                        </div>
                         
                         <div className="flex flex-wrap gap-6 text-[11px] text-[#8B7D6B] font-bold tracking-widest uppercase ornament-list">
                             {shop.prefecture && <span className="flex items-center gap-1.5"><MapPin size={12} /> {shop.prefecture}</span>}

@@ -1,63 +1,118 @@
 import React from 'react';
 import Link from 'next/link';
 import { getShops } from '@/lib/microcms';
+import { MapPin, Phone, ExternalLink, Info, Store } from 'lucide-react';
+import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
 export const revalidate = 0;
 
+function unescapeHtml(text: string) {
+    if (!text) return '';
+    return text
+        .replace(/<br\/?>/gi, '\n')
+        .replace(/<\/p>/gi, '\n')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 export default async function ShopIndexPage() {
-    const { contents: shops } = await getShops({ limit: 100 });
+    let shops: any[] = [];
+    try {
+        const res = await getShops({ limit: 100 });
+        shops = res.contents || [];
+    } catch (error) {
+        console.error('Shop fetch error:', error);
+    }
 
     return (
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 24px', fontFamily: 'system-ui, sans-serif' }}>
-            <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 40, borderBottom: '2px solid #bfa758', paddingBottom: 16, color: '#111827' }}>
-                酒販店・提供店一覧
-            </h1>
+        <div className="min-h-screen bg-[#F9F8F6] pb-24">
+            {/* ── イントロセクション ── */}
+            <header className="px-6 pt-12 pb-12 text-center relative">
+                <div className="max-w-4xl mx-auto">
+                    <div className="absolute top-0 left-6 md:left-12">
+                        <DynamicBackButton defaultHref="/" defaultText="BACK TO TOP" />
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-serif-jp font-bold tracking-[0.1em] text-[#1F1F1F] mb-6">
+                        SHOPS
+                    </h1>
+                    <div className="w-12 h-1 bg-[#8B7D6B] mx-auto mb-6"></div>
+                    <p className="text-sm text-gray-400 tracking-[0.3em] uppercase">
+                        厳選された日本酒と出会える場所
+                    </p>
+                </div>
+            </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-                {shops.map((shop) => (
-                    <Link href={`/shop/${shop.id}`} key={shop.id} style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <div style={{ 
-                            border: '1px solid #e5e7eb', 
-                            borderRadius: '1rem', 
-                            overflow: 'hidden', 
-                            background: '#fff', 
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            height: '100%'
-                        }}>
-                            <div style={{ height: '200px', backgroundColor: '#f3f4f6', position: 'relative' }}>
+            {/* ── メインリスト ── */}
+            <main className="max-w-7xl mx-auto px-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {shops.map((shop) => (
+                        <Link 
+                            href={`/shop/${shop.id}`} 
+                            key={shop.id} 
+                            className="group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden flex flex-col h-full transform-gpu"
+                        >
+                            {/* 16:9 Image Area */}
+                            <div className="aspect-[16/9] relative overflow-hidden bg-gray-50 border-b border-gray-50">
                                 {shop.imageUrl ? (
-                                    <img src={shop.imageUrl} alt={shop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <img 
+                                        src={shop.imageUrl} 
+                                        alt={shop.name} 
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                    />
                                 ) : (
-                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>No Image</div>
+                                    <div className="w-full h-full flex items-center justify-center text-gray-200">
+                                        <Store size={48} strokeWidth={1} />
+                                    </div>
+                                )}
+                                
+                                {shop.prefecture && (
+                                    <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded text-[10px] font-bold text-[#8B7D6B] shadow-sm tracking-wider">
+                                        {shop.prefecture}
+                                    </span>
                                 )}
                             </div>
-                            <div style={{ padding: '1.5rem', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ display: 'inline-block', alignSelf: 'flex-start', padding: '0.25rem 0.75rem', backgroundColor: '#dbeafe', color: '#1e40af', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-                                    酒販店
-                                </span>
-                                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1f2937', marginBottom: '0.75rem', lineHeight: 1.4 }}>{shop.name}</h2>
-                                <div style={{ fontSize: '0.875rem', color: '#4b5563', lineHeight: 1.6, flexGrow: 1, whiteSpace: 'pre-line' }}>
-                                    {(shop.content || '')
-                                        .replace(/<[^>]+>/g, '\n')
-                                        .replace(/&amp;/g, '&')
-                                        .replace(/&lt;/g, '<')
-                                        .replace(/&gt;/g, '>')
-                                        .replace(/\n+/g, '\n')
-                                        .trim()
-                                        .substring(0, 80)}
-                                    {(shop.content || '').length > 80 ? '...' : ''}
+
+                            {/* Content Area */}
+                            <div className="p-6 flex flex-col flex-grow">
+                                <span className="text-[10px] font-bold text-[#8B7D6B] tracking-[0.2em] uppercase mb-2">SHOP</span>
+                                <h2 className="text-lg font-bold text-[#1F1F1F] mb-3 group-hover:text-[#8B7D6B] transition-colors font-serif-jp line-clamp-1">
+                                    {shop.name}
+                                </h2>
+                                <p className="text-xs text-gray-500 leading-relaxed line-clamp-3 mb-6 flex-grow">
+                                    {unescapeHtml(shop.content).substring(0, 100)}...
+                                </p>
+                                
+                                <div className="space-y-2 pt-4 border-t border-gray-50">
+                                    {shop.address && (
+                                        <div className="flex items-start text-[10px] text-gray-400">
+                                            <MapPin size={12} className="mr-2 mt-0.5 shrink-0" />
+                                            <span className="line-clamp-1">{shop.address}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex items-center justify-between mt-2">
+                                        <span className="text-[10px] font-bold text-gray-300">DETAILS VIEW</span>
+                                        <span className="text-[10px] text-[#8B7D6B] font-bold group-hover:translate-x-1 transition-transform">
+                                            詳細を見る →
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </Link>
-                ))}
-            </div>
-            
-            {shops.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '4rem', color: '#6b7280' }}>酒販店データがまだありません。</div>
-            )}
+                        </Link>
+                    ))}
+                </div>
+
+                {shops.length === 0 && (
+                    <div className="py-24 text-center">
+                        <p className="text-gray-400 tracking-[0.2em]">NO SHOPS FOUND</p>
+                    </div>
+                )}
+            </main>
         </div>
     );
 }

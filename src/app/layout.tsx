@@ -2,6 +2,8 @@ import './globals.css'
 import Script from 'next/script'
 import type { Metadata } from 'next'
 import { Noto_Sans_JP, Noto_Serif_JP } from 'next/font/google'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ['latin'],
@@ -67,7 +69,13 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="antialiased font-sans">{children}</body>
+      <body className="antialiased font-sans bg-[#F9F8F6] min-h-screen flex flex-col pt-[60px] md:pt-[68px]">
+        <Header />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer />
+      </body>
     </html>
   )
 }
