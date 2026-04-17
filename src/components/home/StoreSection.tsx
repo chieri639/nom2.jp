@@ -10,15 +10,15 @@ const PRODUCTS = [
         name: '来福酒造「くるにゃん」オリジナルトートバック',
         price: '¥3,500',
         description: '茨城県の来福酒造の公式ロゴ「くるにゃん」のデザインがあしらわれたトートバックです！四合瓶であれば４本程度が余裕で入ります。',
-        image: '/images/store/tote_bag.png'
+        image: 'https://imagedelivery.net/QondspN4HIUvB_R16-ddAQ/69e1e0a46396ba197b092865/b32117c8ff89b0458a32.png/fit=cover,w=920,h=920'
     },
     {
         id: '69e20f9ef3e168ad8db4b02b',
         variation: '69e20f9ef3e168ad8db4b02c',
         name: '来福酒造「くるにゃん」升',
         price: '¥650',
-        description: '茨城県の来福酒造の公式ロゴ「くるにゃん」のデザインがあしらわれました、升です！飾るのでもよし、酒器にするもよし！',
-        image: '/images/store/masu.png'
+        description: '茨城県の来福酒造の公式ロゴ「くるにゃん」のデザインがあしらわれました、升です！飾るのでもよし、何かの入れ物にしてもよし、お酒を入れる酒器もよし！',
+        image: 'https://imagedelivery.net/QondspN4HIUvB_R16-ddAQ/69e1e0a46396ba197b092865/fc72becf998e5bc021ec.jpg/fit=cover,w=920,h=920'
     }
 ];
 
