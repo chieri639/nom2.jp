@@ -29,15 +29,15 @@ export default function ShopDetailClient({ shop, serverCleanedData }: Props) {
             .trim();
         
         const detailKeywords = ['住所', '電話番号', 'TEL', '電話', '営業時間', '定休日', '公式サイト', 'アクセス', '駐車場', '決済方法', '支払い', 'メニュー', '予算'];
+        const sectionHeaders = ['酒蔵について', '銘柄について', 'ショップについて', '商品一覧', '店舗紹介', 'MENU'];
+        
         const tempDetails: { label: string; value: string }[] = [];
-        
-        // 1. 各キーワードの出現位置を特定し、文章を分割
-        let remainingText = text;
-        
-        // キーワードが見つかった位置で文章を切り分ける
         const foundItems: { label: string; start: number; value: string }[] = [];
         
-        detailKeywords.forEach(k => {
+        // 検索対象の単語（詳細項目 + セクション見出し）
+        const allMarkers = [...detailKeywords, ...sectionHeaders];
+        
+        allMarkers.forEach(k => {
             const regex = new RegExp(k + '[:：\\s]', 'g');
             let match;
             while ((match = regex.exec(text)) !== null) {
@@ -51,19 +51,24 @@ export default function ShopDetailClient({ shop, serverCleanedData }: Props) {
         // 各項目の値を切り出す
         for (let i = 0; i < foundItems.length; i++) {
             const current = foundItems[i];
+            
+            // 詳細項目ではない（セクション見出しである）場合はスキップ
+            if (sectionHeaders.includes(current.label)) continue;
+
             const next = foundItems[i + 1];
             const end = next ? next.start : text.length;
             
-            // 「住所 〒...」などの形式からラベル以降を抽出
             let val = text.substring(current.start + current.label.length, end).trim();
-            val = val.replace(/^[:：\s]+/, ''); // 先頭の記号を削除
+            val = val.replace(/^[:：\s]+/, ''); 
             
-            // 商品一覧やHOME以降のノイズを除去（必要に応じて）
-            if (val.includes('商品一覧')) val = val.split('商品一覧')[0].trim();
-            if (val.includes('HOME')) val = val.split('HOME')[0].trim();
+            // 「公式サイト」の場合は、最初の空白で止める
+            if (current.label === '公式サイト') {
+                val = val.split(/\s/)[0];
+            }
 
-            current.value = val;
-            tempDetails.push({ label: current.label, value: val });
+            if (val) {
+                tempDetails.push({ label: current.label, value: val });
+            }
         }
 
         // 2. イントロテキストの抽出（最初のキーワードより前の部分）
