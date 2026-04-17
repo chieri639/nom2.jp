@@ -9,21 +9,37 @@ import { SakeData } from '@/lib/sake-logic';
  */
 export async function fetchAllSakesAction(): Promise<SakeData[]> {
   try {
-    // 320件程度であれば一度に取得可能
-    const response = await getSakes({ limit: 500 }, { next: { revalidate: 0 } });
+    const allSakes: SakeData[] = [];
+    let offset = 0;
+    const limit = 100;
+
+    while (true) {
+      // microCMS APIの上限は100件のため、ループで全件取得
+      const response = await getSakes({ limit, offset }, { next: { revalidate: 0 } });
+      
+      const items = response.contents.map(item => ({
+        id: item.id,
+        name: item.name,
+        brewery: item.brewery,
+        brand: item.brand,
+        price: item.price,
+        description: item.description,
+        imageUrl: item.imageUrl,
+        purchaseUrl: item.purchaseUrl,
+        prefecture: item.prefecture,
+        oldId: item.oldId, 
+      }));
+      
+      allSakes.push(...items);
+
+      if (offset + limit >= response.totalCount || items.length === 0) {
+        break;
+      }
+      
+      offset += limit;
+    }
     
-    return response.contents.map(item => ({
-      id: item.id,
-      name: item.name,
-      brewery: item.brewery,
-      brand: item.brand,
-      price: item.price,
-      description: item.description,
-      imageUrl: item.imageUrl,
-      purchaseUrl: item.purchaseUrl,
-      prefecture: item.prefecture,
-      oldId: item.oldId, 
-    }));
+    return allSakes;
   } catch (error) {
     console.error('Failed to fetch sakes from microCMS:', error);
     return [];

@@ -68,6 +68,10 @@ export default function RootLayout({
             gtag('config', 'G-KRD526KNEV');
           `}
         </Script>
+        {/* STORES.jp Button Script */}
+        <Script id="storesjp-button" strategy="afterInteractive">
+          {`(function(d,s,id){var st=d.getElementsByTagName(s)[0];if(d.getElementById(id)){return;}var nst=d.createElement(s);nst.id=id;nst.src="//btn.stores.jp/button.js";nst.charset="UTF-8";st.parentNode.insertBefore(nst,st);})(document, "script", "storesjp-button");`}
+        </Script>
       </head>
       <body className="antialiased font-sans bg-[#F9F8F6] min-h-screen flex flex-col pt-[60px] md:pt-[68px]">
         <Header />

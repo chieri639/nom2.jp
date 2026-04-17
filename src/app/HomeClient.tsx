@@ -6,6 +6,7 @@ import Pickup from '@/components/home/Pickup';
 import Category from '@/components/home/Category';
 import TasteSearch from '@/components/home/TasteSearch';
 import FeaturedSakes from '@/components/home/FeaturedSakes';
+import StoreSection from '@/components/home/StoreSection';
 
 export default function HomeClient({ articles, sakes }: { articles: any[], sakes: any[] }) {
     return (
@@ -17,6 +18,7 @@ export default function HomeClient({ articles, sakes }: { articles: any[], sakes
                 <TasteSearch />
                 {/* We pass the real sakes data to FeaturedSakes, or it falls back to Mock if empty */}
                 <FeaturedSakes sakes={sakes} />
+                <StoreSection />
             </main>
         </div>
     );
