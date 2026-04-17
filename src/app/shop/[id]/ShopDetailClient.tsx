@@ -149,8 +149,8 @@ export default function ShopDetailClient({ shop, serverCleanedData }: Props) {
                         
                         <div className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
                             <dl className="divide-y divide-gray-50">
-                                {details.length > 0 ? (
-                                    details.map((item, idx) => (
+                                {details.filter(item => item.label !== '公式サイト').length > 0 ? (
+                                    details.filter(item => item.label !== '公式サイト').map((item, idx) => (
                                         <div key={idx} className="flex px-6 py-5 text-sm sm:text-base group hover:bg-gray-50/50 transition-colors">
                                             <dt className="w-24 md:w-32 font-bold text-[#8B7D6B] shrink-0 text-xs tracking-widest uppercase pt-0.5">
                                                 {item.label}
@@ -161,23 +161,33 @@ export default function ShopDetailClient({ shop, serverCleanedData }: Props) {
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="px-6 py-8 text-center text-gray-400 text-sm">
-                                        詳細なスペック情報は現在確認中です。
-                                    </div>
+                                    details.length === 0 && (
+                                        <div className="px-6 py-8 text-center text-gray-400 text-sm">
+                                            詳細なスペック情報は現在確認中です。
+                                        </div>
+                                    )
                                 )}
                                 
-                                {serverCleanedData.website && (
-                                    <div className="flex px-6 py-5 text-sm sm:text-base group hover:bg-gray-50/50 transition-colors">
-                                        <dt className="w-24 md:w-32 font-bold text-[#8B7D6B] shrink-0 text-xs tracking-widest uppercase pt-0.5">
-                                            公式サイト
-                                        </dt>
-                                        <dd className="text-gray-600 leading-relaxed pl-4 border-l border-gray-100 flex-1">
-                                            <a href={serverCleanedData.website} target="_blank" rel="noopener noreferrer" className="text-[#8B7D6B] hover:underline break-all font-medium">
-                                                {serverCleanedData.website}
-                                            </a>
-                                        </dd>
-                                    </div>
-                                )}
+                                {(() => {
+                                    // データベースの値、または解析されたURLを優先的に取得
+                                    const parsedUrl = details.find(d => d.label === '公式サイト')?.value;
+                                    const finalUrl = serverCleanedData.website || parsedUrl;
+                                    
+                                    if (!finalUrl) return null;
+
+                                    return (
+                                        <div className="flex px-6 py-5 text-sm sm:text-base group hover:bg-gray-50/50 transition-colors">
+                                            <dt className="w-24 md:w-32 font-bold text-[#8B7D6B] shrink-0 text-xs tracking-widest uppercase pt-0.5">
+                                                公式サイト
+                                            </dt>
+                                            <dd className="text-gray-600 leading-relaxed pl-4 border-l border-gray-100 flex-1">
+                                                <a href={finalUrl.startsWith('http') ? finalUrl : `https://${finalUrl}`} target="_blank" rel="noopener noreferrer" className="text-[#8B7D6B] hover:underline break-all font-medium">
+                                                    {finalUrl}
+                                                </a>
+                                            </dd>
+                                        </div>
+                                    );
+                                })()}
                             </dl>
                         </div>
                     </div>
