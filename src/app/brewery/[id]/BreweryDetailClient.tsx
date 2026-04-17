@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Wine } from 'lucide-react';
 import { BREWERY, SAKE, BRAND } from '@/lib/microcms';
 import { fetchRakutenSakes } from '@/lib/rakuten';
@@ -113,7 +114,14 @@ export default function BreweryDetailClient({
             {/* ── ヒーロー画像 ── */}
             <section className="w-full h-[40vh] md:h-[50vh] overflow-hidden bg-[#F2F1EF]">
                 {brewery.imageUrl ? (
-                    <img src={brewery.imageUrl} alt={unescapeHtml(brewery.name)} className="w-full h-full object-cover" loading="lazy" />
+                    <Image 
+                        src={brewery.imageUrl} 
+                        alt={unescapeHtml(brewery.name)} 
+                        fill
+                        priority={true}
+                        sizes="100vw"
+                        className="object-cover" 
+                    />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300">
                         <Wine size={64} strokeWidth={1} />
@@ -245,11 +253,12 @@ const SakeCard = React.memo(({ sake, isRakuten, breweryName }: { sake: any, isRa
             {/* 3:4比率の画像エリア */}
             <div className="aspect-[3/4] bg-[#f9f9f9] overflow-hidden relative">
                 {imageUrl ? (
-                    <img 
+                    <Image 
                         src={imageUrl} 
                         alt={name} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                        loading="lazy"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500" 
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-100 bg-gray-50">

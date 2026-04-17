@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { BREWERY } from '@/lib/microcms';
 import { Search, MapPin, Loader2, Wine } from 'lucide-react';
 import { fetchBreweriesAction } from '@/app/actions/brewery';
@@ -174,19 +175,18 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
               >
                 {/* 16:9 Image Area */}
                 <div className="aspect-[16/9] relative overflow-hidden bg-gray-50 border-b border-gray-50">
-                  {/* Typography Placeholder */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] select-none pointer-events-none">
-                     <span className="font-serif text-5xl font-black italic break-all text-center px-4 leading-none">
-                        {brewery.name.replace(/公式|サイト|株式会社|有限会社|合名会社|合資会社|\(.*\)|（.*）/g, '').trim()}
-                     </span>
-                  </div>
+                  {/* Typography Placeholder (Simplified DOM) */}
+                  <span className="absolute inset-0 flex items-center justify-center opacity-[0.03] select-none pointer-events-none font-serif text-5xl font-black italic break-all text-center px-4 leading-none">
+                      {brewery.name.replace(/公式|サイト|株式会社|有限会社|合名会社|合資会社|\(.*\)|（.*）/g, '').trim()}
+                  </span>
 
                   {brewery.imageUrl ? (
-                    <img 
+                    <Image 
                       src={brewery.imageUrl} 
                       alt={brewery.name}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-200">
@@ -204,9 +204,9 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
 
                 {/* Content Area */}
                 <div className="p-5 flex flex-col flex-grow">
-                  <h3 className="font-serif font-bold text-base text-[#1F1F1F] mb-1.5 group-hover:text-[#8B7D6B] transition-colors duration-200 line-clamp-1">
+                  <h2 className="font-serif font-bold text-base text-[#1F1F1F] mb-1.5 group-hover:text-[#8B7D6B] transition-colors duration-200 line-clamp-1">
                     {unescapeHtml(brewery.name)}
-                  </h3>
+                  </h2>
                   {brewery.address && (
                     <div className="flex items-center text-[10px] text-gray-400 font-medium mb-3">
                       <MapPin className="w-3 h-3 mr-1" />

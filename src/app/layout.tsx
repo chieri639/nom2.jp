@@ -1,7 +1,21 @@
 import './globals.css'
 import Script from 'next/script'
 import type { Metadata } from 'next'
+import { Noto_Sans_JP, Noto_Serif_JP } from 'next/font/google'
 
+const notoSansJP = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+  variable: '--font-noto-sans-jp',
+})
+
+const notoSerifJP = Noto_Serif_JP({
+  subsets: ['latin'],
+  weight: ['700'],
+  display: 'swap',
+  variable: '--font-noto-serif-jp',
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://nom2.jp'),
@@ -27,8 +41,7 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  // アクセシビリティのためズーム制限を解除
 }
 
 export default function RootLayout({
@@ -37,14 +50,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja">
+    <html lang="ja" className={`${notoSansJP.variable} ${notoSerifJP.variable}`}>
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+        {/* フォントは next/font で管理されるため link タグは削除 */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-KRD526KNEV"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -53,7 +66,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased font-sans">{children}</body>
     </html>
   )
 }

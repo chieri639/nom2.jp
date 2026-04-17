@@ -46,11 +46,11 @@ body {
   -webkit-overflow-scrolling: touch;
   color: #333;
   background: #F9F8F6; /* 新しいベージュ基調の背景 */
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: var(--font-noto-sans-jp), sans-serif;
 }
 
 .font-serif-jp {
-  font-family: 'Noto Serif JP', serif;
+  font-family: var(--font-noto-serif-jp), serif;
 }
 
 * {
