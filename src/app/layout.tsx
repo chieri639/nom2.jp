@@ -53,7 +53,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="font-sans antialiased bg-slate-50">{children}</body>
+      <body className="antialiased">{children}</body>
     </html>
   )
 }

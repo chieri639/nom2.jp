@@ -24,19 +24,34 @@ export default async function BreweryDetailPage(props: any) {
       }
     }
 
+    // 1. 酒蔵情報の取得... (省略)
     if (!brewery) notFound();
 
-    // 2. 検索キーワードの生成
-    // 「男山株式会社（男山）」→「男山」のように極限までシンプルにする
+    // 2. 検索キーワードの生成（多様な表記揺れに対応）
+    // 「来福酒造株式会社（来福）」から [来福, 来福酒造, 来福酒造株式会社] を抽出
     const originalName = brewery.name.trim();
-    let cleanedName = brewery.name
-      .replace(/[（(].*?[）)]/g, '') // 括弧内を削除
-      .replace(/(株式会社|有限会社|合名会社|合資会社|酒造|醸造|酒造場|（株）|\(株\))/g, '')
-      .trim();
+    const searchTerms = new Set<string>();
+    searchTerms.add(originalName);
     
-    if (!cleanedName || cleanedName.length < 1) {
-      cleanedName = originalName;
+    // 括弧内を抽出（例：来福）
+    const parenMatch = brewery.name.match(/[（(](.*?)[）)]/);
+    if (parenMatch && parenMatch[1]) {
+      searchTerms.add(parenMatch[1].trim());
     }
+    
+    // 会社名・酒造などを除いた純粋な名称
+    let baseName = brewery.name
+      .replace(/[（(].*?[）)]/g, '')
+      .replace(/(株式会社|有限会社|合名会社|合資会社|（株）|\(株\))/g, '')
+      .trim();
+    if (baseName) {
+      searchTerms.add(baseName);
+      // さらに「酒造」「醸造」なども除いたもの
+      const rawName = baseName.replace(/(酒造|醸造|酒造場|分店|本店|蔵)/g, '').trim();
+      if (rawName) searchTerms.add(rawName);
+    }
+    
+    const cleanedName = Array.from(searchTerms)[searchTerms.size - 1] || originalName;
     
     // 3. サーバー側でデータを極限までクリーンアップ
     const cleanedData = cleanBreweryData(brewery.content || '', brewery);
@@ -46,27 +61,27 @@ export default async function BreweryDetailPage(props: any) {
     let cmsSakes: SAKE[] = [];
     
     try {
-      // 酒蔵IDに紐づく銘柄を取得
-      const brandsRes = await getBrands({ 
-        filters: `brewery[equals]${brewery.id}`, 
-        limit: 50 
-      }).catch(() => ({ contents: [] }));
-      brands = brandsRes.contents;
-
-      // 酒蔵IDに紐づく日本酒を取得（IDベース、および名称ベースの両方でカバー）
-      const idFilters = `brewery[equals]${brewery.id}`;
-      const nameFilters = `brewery[contains]${cleanedName}[or]brand[contains]${cleanedName}[or]name[contains]${cleanedName}`;
+      // microCMSのフィルタ文字列を構築（[or]で連結）
+      // searchTerms内の各単語につき brewery, brand, name のいずれかに含まれるかを検索
+      const filterConditions: string[] = [];
+      searchTerms.forEach(term => {
+        if (term.length > 0) {
+          filterConditions.push(`brewery[contains]${term}[or]brand[contains]${term}[or]name[contains]${term}`);
+        }
+      });
+      // 内部IDによる検索も追加
+      filterConditions.push(`brewery[equals]${brewery.id}`);
       
-      const [idSakes, nameSakes] = await Promise.all([
-        getSakes({ filters: idFilters, limit: 100 }).catch(() => ({ contents: [] })),
-        getSakes({ filters: nameFilters, limit: 100 }).catch(() => ({ contents: [] }))
+      const filters = filterConditions.join('[or]');
+      
+      // 銘柄と日本酒を同時に取得
+      const [brandsRes, sakesRes] = await Promise.all([
+        getBrands({ filters, limit: 50 }).catch(() => ({ contents: [] })),
+        getSakes({ filters, limit: 100 }).catch(() => ({ contents: [] }))
       ]);
 
-      // 重複を除去して結合
-      const allSakesMap = new Map();
-      idSakes.contents.forEach(s => allSakesMap.set(s.id, s));
-      nameSakes.contents.forEach(s => allSakesMap.set(s.id, s));
-      cmsSakes = Array.from(allSakesMap.values());
+      brands = brandsRes.contents;
+      cmsSakes = sakesRes.contents;
 
     } catch (apiErr) {
       console.error('Related data fetch error (non-fatal):', apiErr);
