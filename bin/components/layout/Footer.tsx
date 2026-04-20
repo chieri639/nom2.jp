@@ -9,9 +9,9 @@ export default function Footer() {
                 {/* Logo & Brand */}
                 <Link href="/" className="flex flex-col items-center gap-4 group">
                     <img 
-                        src="/images/logo_v4.png" 
+                        src="/images/logo_v2.png" 
                         alt="nom × nom" 
-                        className="h-7 md:h-8 brightness-0 invert-0 grayscale opacity-80 group-hover:opacity-100 transition-opacity" 
+                        className="h-12 md:h-16 brightness-0 invert opacity-90 group-hover:opacity-100 transition-opacity" 
                         style={{ filter: 'brightness(0) invert(1)' }}
                     />
                 </Link>
