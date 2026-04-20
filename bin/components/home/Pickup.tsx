@@ -34,7 +34,7 @@ export default function Pickup({ articles }: { articles?: any[] }) {
         id: a.id,
         tag: a.category || '特集',
         title: a.title,
-        image: a.imageUrl || '/images/sake_and_rice_bowl.png',
+        image: (typeof a.imageUrl === 'string' ? a.imageUrl : a.imageUrl?.url) || '/images/sake_and_rice_bowl.png',
         link: `/article/${a.id}`
     })) : MOCK_PICKUPS;
 

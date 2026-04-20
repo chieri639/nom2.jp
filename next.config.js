@@ -22,6 +22,11 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'imagedelivery.net',
                 pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'nom2.jp',
+                pathname: '/**',
             }
         ],
     },
