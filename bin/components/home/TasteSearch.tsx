@@ -23,7 +23,7 @@ export default function TasteSearch() {
                     <h2 className="font-serif text-3xl md:text-4xl tracking-[0.2em] mb-4 text-white">
                         AI Taste Search
                     </h2>
-                    <p className="text-[#A0A0A0] text-sm tracking-widest mb-16">
+                    <p className="text-[#BABABA] text-sm tracking-widest mb-16">
                         好みの味わいからAIが検索します
                     </p>
                 </motion.div>

@@ -30,14 +30,14 @@ export default function Footer() {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-[#A0A0A0] text-sm tracking-widest">
+                <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-[#BABABA] text-sm tracking-widest">
                     <Link href="#" className="hover:text-white transition-colors">運営情報</Link>
                     <Link href="#" className="hover:text-white transition-colors">利用規約</Link>
                     <Link href="#" className="hover:text-white transition-colors">プライバシーポリシー</Link>
                     <Link href="#" className="hover:text-white transition-colors">お問い合わせ</Link>
                 </nav>
                 
-                <p className="text-[#606060] text-[10px] tracking-[0.2em] uppercase mt-4">
+                <p className="text-[#A0A0A0] text-[10px] tracking-[0.2em] uppercase mt-4">
                     &copy; 2026 nom2.jp All rights reserved.
                 </p>
             </div>

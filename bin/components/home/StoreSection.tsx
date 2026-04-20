@@ -81,10 +81,10 @@ export default function StoreSection() {
                                         {product.name}
                                     </h3>
                                     <p className="text-[#BA9156] font-bold text-lg">
-                                        {product.price} <span className="text-xs font-normal text-gray-400 font-sans tracking-normal">(税込)</span>
+                                        {product.price} <span className="text-xs font-normal text-gray-500 font-sans tracking-normal">(税込)</span>
                                     </p>
                                 </div>
-                                <p className="text-gray-500 text-sm leading-loose mb-8 flex-grow">
+                                <p className="text-gray-600 text-sm leading-loose mb-8 flex-grow">
                                     {product.description}
                                 </p>
                                 

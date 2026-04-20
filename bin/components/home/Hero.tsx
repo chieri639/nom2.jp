@@ -20,6 +20,7 @@ export default function Hero() {
                         alt="nom × nom 公式ロゴ"
                         fill
                         priority
+                        fetchPriority="high"
                         className="object-contain"
                         sizes="(max-width: 768px) 100vw, 60vw"
                     />

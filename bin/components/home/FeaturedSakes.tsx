@@ -78,7 +78,7 @@ export default function FeaturedSakes({ sakes = MOCK_SAKES }: { sakes?: any[] })
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
                                 </div>
                                 <div className="space-y-3">
-                                    <p className="text-[#A0A0A0] text-xs font-bold tracking-widest">
+                                    <p className="text-[#767676] text-xs font-bold tracking-widest">
                                         {sake.brewery}
                                     </p>
                                     <h3 className="text-[#1F1F1F] font-bold text-lg leading-relaxed group-hover:text-[#BA9156] transition-colors">
