@@ -41,6 +41,7 @@ export default function Category() {
                                         src={cat.img} 
                                         alt={cat.title}
                                         fill
+                                        loading="lazy"
                                         sizes="(max-width: 768px) 50vw, 25vw"
                                         className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
                                     />

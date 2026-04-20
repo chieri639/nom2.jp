@@ -72,6 +72,7 @@ export default function FeaturedSakes({ sakes = MOCK_SAKES }: { sakes?: any[] })
                                         src={sake.image} 
                                         alt={sake.name}
                                         fill
+                                        loading="lazy"
                                         sizes="(max-width: 768px) 100vw, 33vw"
                                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                                     />

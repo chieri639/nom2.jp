@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
+        formats: ['image/avif', 'image/webp'],
         // 画像最適化を有効化（unoptimized: true を削除）
         remotePatterns: [
             {
