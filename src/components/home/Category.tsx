@@ -1,6 +1,9 @@
 'use client';
 
 import Image from 'next/image';
+import React from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 const CATEGORIES = [
     { title: '記事を読む', link: '/article', img: '/images/washoku_pairing_hero_1.png' },
