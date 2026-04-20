@@ -16,7 +16,7 @@ export default function Hero() {
             >
                 <div className="relative w-full h-[80%] max-h-[500px]">
                     <Image 
-                        src="/images/hero_main_logo_v2.png"
+                        src="/images/hero_logo_final.png"
                         alt="nom × nom 公式ロゴ"
                         fill
                         priority
