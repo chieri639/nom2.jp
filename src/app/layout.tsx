@@ -1,9 +1,9 @@
 import './globals.css'
-import Script from 'next/script'
 import type { Metadata } from 'next'
 import { Noto_Sans_JP, Noto_Serif_JP } from 'next/font/google'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import DelayedScripts from '@/components/common/DelayedScripts'
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ['latin'],
@@ -64,22 +64,9 @@ export default function RootLayout({
         </main>
         <Footer />
         
-        {/* サードパーティスクリプト（メインスレッドブロックを防ぐため body 末尾へ配置） */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-KRD526KNEV"
-          strategy="lazyOnload"
-        />
-        <Script id="google-analytics" strategy="lazyOnload">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-KRD526KNEV');
-          `}
-        </Script>
-        <Script id="storesjp-button-init" strategy="lazyOnload">
-          {`(function(d,s,id){var st=d.getElementsByTagName(s)[0];if(d.getElementById(id)){return;}var nst=d.createElement(s);nst.id=id;nst.src="//btn.stores.jp/button.js";nst.charset="UTF-8";st.parentNode.insertBefore(nst,st);})(document, "script", "storesjp-button");`}
-        </Script>
+        
+        {/* サードパーティスクリプト（ユーザインタラクション後に遅延ロード） */}
+        <DelayedScripts />
         
       </body>
     </html>
