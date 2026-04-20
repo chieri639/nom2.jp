@@ -1,8 +1,6 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const MOCK_PICKUPS = [
     {
@@ -61,13 +59,12 @@ export default function Pickup({ articles }: { articles?: any[] }) {
                         >
                             <Link href={item.link} className="block">
                                 <div className="aspect-[4/3] bg-gray-100 mb-6 overflow-hidden relative rounded-md">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img 
+                                    <Image 
                                         src={item.image} 
                                         alt={item.title}
-                                        loading="lazy"
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                        onError={(e) => { (e.target as HTMLImageElement).src = '/images/sake_and_rice_bowl.png'; }}
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 33vw"
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                                 </div>

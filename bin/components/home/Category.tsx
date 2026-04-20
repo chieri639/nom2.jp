@@ -1,8 +1,6 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const CATEGORIES = [
     { title: '記事を読む', link: '/article', img: '/images/washoku_pairing_hero_1.png' },
@@ -36,12 +34,12 @@ export default function Category() {
                         >
                             <Link href={cat.link} className="block text-center space-y-4">
                                 <div className="aspect-[3/4] bg-gray-200 overflow-hidden relative shadow-sm group-hover:shadow-lg transition-shadow duration-300 rounded-md">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img 
+                                    <Image 
                                         src={cat.img} 
                                         alt={cat.title}
-                                        loading="lazy"
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
+                                        fill
+                                        sizes="(max-width: 768px) 50vw, 25vw"
+                                        className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
                                     />
                                     <div className="absolute inset-0 bg-[#1F1F1F]/20 group-hover:bg-transparent transition-colors duration-500" />
                                 </div>

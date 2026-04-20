@@ -1,8 +1,6 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const MOCK_SAKES = [
     {
@@ -67,10 +65,12 @@ export default function FeaturedSakes({ sakes = MOCK_SAKES }: { sakes?: any[] })
                         >
                             <Link href={`/nihonshu/${sake.oldId || sake.id}`} className="block flex-grow group">
                                 <div className="aspect-square bg-gray-100 mb-6 overflow-hidden relative shadow-sm rounded-md">
-                                    <img 
+                                    <Image 
                                         src={sake.image} 
                                         alt={sake.name}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 33vw"
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
                                 </div>

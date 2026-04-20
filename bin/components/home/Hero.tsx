@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function Hero() {
     return (
@@ -11,11 +10,17 @@ export default function Hero() {
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
-                className="absolute right-0 md:right-[5%] top-[15vh] w-full md:w-[60%] h-[60vh] md:h-[70vh] bg-gray-200 z-0 bg-cover bg-center"
-                style={{ 
-                    backgroundImage: "url('https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&q=80&w=1200')"
-                }}
-            />
+                className="absolute right-0 md:right-[5%] top-[15vh] w-full md:w-[60%] h-[60vh] md:h-[70vh] z-0"
+            >
+                <Image 
+                    src="https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&q=80&w=1200"
+                    alt="日本酒のヒーローイメージ"
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 60vw"
+                />
+            </motion.div>
 
             {/* Content Container */}
             <div className="container mx-auto px-6 relative z-10 flex">

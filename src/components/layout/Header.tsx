@@ -1,11 +1,17 @@
-import React from 'react';
-import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Header() {
     return (
         <header className="fixed w-full top-0 left-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex items-center justify-between">
             <Link href="/" className="flex items-center">
-                <img src="/images/logo_v4.png" alt="nom × nom" className="h-6 md:h-7" />
+                <Image 
+                    src="/images/logo_v4.png" 
+                    alt="nom × nom" 
+                    width={140}
+                    height={28}
+                    className="h-6 md:h-7 w-auto" 
+                    priority
+                />
             </Link>
             
             <nav className="hidden md:block">
@@ -19,8 +25,8 @@ export default function Header() {
                 </ul>
             </nav>
             
-            {/* Mobile menu button could be added here */}
-            <button className="md:hidden text-[#1F1F1F]">
+            {/* Mobile menu button */}
+            <button className="md:hidden text-[#1F1F1F]" aria-label="メニューを開く">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
         </header>

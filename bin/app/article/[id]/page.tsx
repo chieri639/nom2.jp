@@ -54,7 +54,7 @@ export default async function ArticleDetailPage(props: any) {
           <DynamicBackButton defaultHref="/article" defaultText="BACK TO ARTICLES" />
 
           <article 
-            className="prose prose-lg max-w-none text-[#333] leading-[2.2] font-medium selection:bg-[#8B7D6B]/20"
+            className="rich-text custom-prose max-w-none text-[#333] leading-[2.2] font-medium selection:bg-[#8B7D6B]/20"
             dangerouslySetInnerHTML={{ __html: article.content || '' }} 
           />
 

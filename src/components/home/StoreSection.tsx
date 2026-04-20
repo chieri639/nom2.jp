@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { useEffect } from 'react';
 
 const PRODUCTS = [
     {
@@ -23,6 +23,23 @@ const PRODUCTS = [
 ];
 
 export default function StoreSection() {
+    useEffect(() => {
+        // STORES.jpのボタンはスクリプトでiframeを生成するため、マウント後にアクセシビリティ用のタイトルを付与
+        const timer = setInterval(() => {
+            const iframes = document.querySelectorAll('iframe.storesjp-button-cart');
+            if (iframes.length > 0) {
+                iframes.forEach((iframe, idx) => {
+                    if (!iframe.getAttribute('title')) {
+                        iframe.setAttribute('title', `STORES 決済ボタン ${idx + 1}`);
+                    }
+                });
+                // タイトル付与完了したらインターバルをクリア
+                clearInterval(timer);
+            }
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
+
     return (
         <section className="py-24 bg-[#F9F8F6]">
             <div className="container mx-auto px-6 max-w-5xl">
@@ -48,11 +65,13 @@ export default function StoreSection() {
                             transition={{ delay: index * 0.1, duration: 0.6 }}
                             className="bg-white rounded-lg border border-[#F3F4F6] overflow-hidden shadow-sm hover:shadow-md transition-shadow group h-full flex flex-col"
                         >
-                            <div className="aspect-[4/3] overflow-hidden bg-gray-50">
-                                <img
+                            <div className="aspect-[4/3] overflow-hidden bg-gray-50 relative">
+                                <Image
                                     src={product.image}
                                     alt={product.name}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
                             </div>
                             <div className="p-8 flex flex-col flex-grow">

@@ -69,7 +69,7 @@ export default function RootLayout({
           `}
         </Script>
         {/* STORES.jp Button Script */}
-        <Script id="storesjp-button" strategy="afterInteractive">
+        <Script id="storesjp-button-init" strategy="afterInteractive">
           {`(function(d,s,id){var st=d.getElementsByTagName(s)[0];if(d.getElementById(id)){return;}var nst=d.createElement(s);nst.id=id;nst.src="//btn.stores.jp/button.js";nst.charset="UTF-8";st.parentNode.insertBefore(nst,st);})(document, "script", "storesjp-button");`}
         </Script>
       </head>
