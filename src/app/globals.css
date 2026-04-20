@@ -86,6 +86,25 @@ canvas {
   animation: fade-in 0.8s ease-out forwards;
 }
 
+@keyframes hero-bg-scale {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.anim-hero-bg {
+  animation: hero-bg-scale 1.2s ease-out forwards;
+}
+
+@keyframes hero-text-slide {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.anim-hero-text {
+  animation: hero-text-slide 1s ease-out 0.5s forwards;
+  opacity: 0;
+}
+
 .sake-reco-main-container {
   width: 100%;
   max-width: 100%;
