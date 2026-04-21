@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { getArticles } from '@/lib/microcms';
-import { staticArticles } from '@/data/staticArticles';
 import { BookOpen, ArrowRight, Languages } from 'lucide-react';
 import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
@@ -15,9 +14,6 @@ export default async function ArticleIndexPage() {
     } catch (e) {
         console.error('Article fetch error:', e);
     }
-
-    // 静的記事データをMicroCMSのデータより優先して先頭に結合
-    articles = [...staticArticles, ...articles];
 
     return (
         <div className="min-h-screen pb-24">
