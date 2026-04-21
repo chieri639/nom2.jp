@@ -2,8 +2,9 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Wine, Star, ThumbsUp, MapPin, ExternalLink } from 'lucide-react';
+import { Loader2, Wine } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 type SakeCMS = {
     id: string;
@@ -12,13 +13,13 @@ type SakeCMS = {
     description?: string;
     price?: number;
     imageUrl?: string;
-    tags?: string;
+    tags?: string | string[];
     reason?: string;
 };
 
 function SearchPageContent() {
     const searchParams = useSearchParams();
-    const query = searchParams.get('q');
+    const query = searchParams.get('q') || '';
     const [loading, setLoading] = useState(true);
     const [results, setResults] = useState<SakeCMS[]>([]);
 
@@ -26,13 +27,13 @@ function SearchPageContent() {
         const fetchSakes = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`/api/sakes?q=${encodeURIComponent(query || '')}`);
+                const res = await fetch(`/api/sakes?q=${encodeURIComponent(query)}`);
                 const data = await res.json();
                 
                 setTimeout(() => {
                     setResults(data);
                     setLoading(false);
-                }, 1500);
+                }, 800); // Shorter loading time to improve perceived performance
 
             } catch (err) {
                 console.error('Failed to fetch from microCMS:', err);
@@ -49,121 +50,128 @@ function SearchPageContent() {
     }, [query]);
 
     return (
-        <main className="pt-32 pb-16 px-4">
-            <div className="container mx-auto max-w-4xl">
-
-                <div className="flex items-center justify-between mb-8">
-                    <Link href="/" className="inline-flex items-center text-sm text-slate-500 hover:text-indigo-600 transition-colors">
-                        <ArrowLeft size={16} className="mr-1" />
-                        検索に戻る
-                    </Link>
-                    {!loading && <span className="text-sm text-slate-500">{results.length}件の提案</span>}
-                </div>
-
-                <h1 className="text-3xl font-bold mb-2">
-                    「{query || ''}」への提案
-                </h1>
-                <p className="text-slate-500 mb-8">
-                    AIがあなたのリクエストに合わせて厳選しました。
-                </p>
-
-                {loading ? (
-                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-24 text-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 mb-6">
-                            <Loader2 size={32} className="animate-spin" />
+        <div className="bg-[#F9F8F6] min-h-screen text-[#333]">
+            <header className="max-w-7xl mx-auto pt-8 md:pt-12 px-6 pb-8">
+                <div className="border-b border-gray-200 pb-8 md:pb-10">
+                    <p className="text-[10px] text-gray-400 font-bold tracking-[0.3em] uppercase mb-4">Search Results</p>
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div>
+                            <h1 className="text-2xl md:text-3xl font-serif font-bold tracking-wider text-[#1F1F1F]">
+                                {query ? `「${query}」への提案` : 'すべての日本酒'}
+                            </h1>
+                            <p className="text-xs text-gray-500 mt-2 font-sans">
+                                AIがあなたの好みに基づいて、最適な銘柄を選出しました。
+                            </p>
                         </div>
-                        <h2 className="text-xl font-bold mb-2 animate-pulse">AIが最適な一本を選定中...</h2>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">
-                            全国の日本酒と最新データと照合しています<br />
-                            少々お待ちください
-                        </p>
+                        <div className="flex flex-wrap gap-2">
+                            {query && (
+                                <span className="bg-[#8B7D6B] text-white text-[10px] px-3 py-1 rounded-full shadow-sm font-sans">
+                                    {query}
+                                </span>
+                            )}
+                            <Link href="/search" className="bg-white border border-gray-200 text-gray-400 text-[10px] px-3 py-1 rounded-full hover:border-[#8B7D6B] hover:text-[#8B7D6B] cursor-pointer transition flex items-center font-sans">
+                                すべて解除
+                            </Link>
+                        </div>
                     </div>
-                ) : (
-                    <div className="space-y-6">
-                        {results.map((sake) => (
-                            <Link href={`/nihonshu/${sake.id}`} key={sake.id} className="block bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                                <div className="md:flex">
-                                    <div className="md:w-48 bg-slate-200 dark:bg-slate-800 h-48 md:h-auto flex items-center justify-center text-slate-400 relative overflow-hidden">
-                                        {sake.imageUrl ? (
-                                            <img src={sake.imageUrl} alt={sake.name} className="absolute inset-0 w-full h-full object-cover" />
-                                        ) : (
-                                            <Wine size={48} opacity={0.5} />
-                                        )}
-                                    </div>
+                </div>
+            </header>
 
-                                    <div className="p-6 md:p-8 flex-1">
-                                        <div className="flex items-start justify-between mb-2">
-                                            <div>
-                                                <div className="flex items-center text-sm text-slate-500 mb-1">
-                                                    <MapPin size={14} className="mr-1" />
-                                                    {sake.brewery}
-                                                </div>
-                                                <h2 className="text-2xl font-bold text-indigo-900 dark:text-indigo-100 mb-2">{sake.name}</h2>
+            <main className="max-w-7xl mx-auto pb-20 px-6 font-sans">
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-32">
+                        <Loader2 size={32} className="animate-spin text-[#8B7D6B] mb-4" />
+                        <p className="text-sm text-gray-500 animate-pulse">AIが最適な一本を選定中...</p>
+                    </div>
+                ) : results.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {results.map((sake) => (
+                            <Link href={`/nihonshu/${sake.id}`} key={sake.id}>
+                                <div className="h-full group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-500 overflow-hidden cursor-pointer flex flex-col">
+                                    <div className="aspect-square bg-[#fdfdfd] overflow-hidden relative">
+                                        {sake.imageUrl ? (
+                                            <Image 
+                                                src={sake.imageUrl} 
+                                                alt={sake.name}
+                                                fill
+                                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                                className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+                                                <Wine size={48} opacity={0.5} />
                                             </div>
-                                            <div className="flex flex-col items-end">
-                                                <span className="text-2xl font-bold text-slate-900 dark:text-white">
-                                                    {sake.price ? `¥${sake.price}` : '価格未定'}
-                                                </span>
-                                                <div className="flex items-center text-indigo-600 text-sm font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded mt-1">
-                                                    <Star size={14} className="mr-1 fill-indigo-600" />
-                                                    マッチ度 {Math.floor(Math.random() * 15) + 85}%
-                                                </div>
-                                            </div>
+                                        )}
+                                        <div className="absolute top-4 right-4 z-10">
+                                            <span className="bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-[#8B7D6B] shadow-sm">
+                                                マッチ度 {Math.floor(Math.random() * 15) + 85}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="p-6 flex-1 flex flex-col">
+                                        <div className="space-y-1 mb-4">
+                                            <p className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">{sake.brewery || '不明な酒蔵'}</p>
+                                            <h2 className="text-lg font-bold leading-tight text-[#1F1F1F] group-hover:text-[#8B7D6B] transition-colors line-clamp-2">{sake.name}</h2>
+                                        </div>
+                                        
+                                        <div className="flex items-baseline gap-2 mb-4 mt-auto">
+                                            <span className="text-xl font-bold text-[#333]">
+                                                {sake.price ? `¥${Number(sake.price).toLocaleString()}` : '-'}
+                                            </span>
+                                            <span className="text-[10px] text-gray-400">税込</span>
                                         </div>
 
-                                        <div className="text-slate-600 dark:text-slate-300 mb-4 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: (sake.description || '').substring(0, 150) + '...' }} />
+                                        {sake.reason ? (
+                                            <p className="text-[11px] text-gray-500 leading-relaxed line-clamp-3 bg-gray-50 p-3 rounded-md italic mb-4">
+                                                {sake.reason}
+                                            </p>
+                                        ) : sake.description ? (
+                                            <p className="text-[11px] text-gray-500 leading-relaxed line-clamp-3 bg-gray-50 p-3 rounded-md mb-4" 
+                                               dangerouslySetInnerHTML={{ __html: sake.description.replace(/<[^>]*>?/gm, '') }} />
+                                        ) : (
+                                            <p className="text-[11px] text-gray-400 leading-relaxed line-clamp-3 bg-gray-50 p-3 rounded-md italic mb-4">
+                                                AIによる特徴の分析結果がありません。
+                                            </p>
+                                        )}
 
-                                        <div className="bg-indigo-50 dark:bg-indigo-950/30 rounded-lg p-4 border border-indigo-100 dark:border-indigo-900/50 mb-4">
-                                            <div className="flex items-start gap-3">
-                                                <div className="mt-1 bg-indigo-600 rounded-full p-1 text-white">
-                                                    <ThumbsUp size={12} />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs font-bold text-indigo-800 dark:text-indigo-300 mb-1">AIのおすすめポイント</p>
-                                                    <p className="text-sm text-indigo-900 dark:text-indigo-200">
-                                                        {sake.reason || 'この日本酒は、あなたのリクエストの特徴と高い親和性があります。詳細ページでペアリング情報をご確認ください。'}
-                                                    </p>
-                                                </div>
+                                        <div className="pt-2 flex items-center justify-between border-t border-gray-50 mt-2">
+                                            <div className="flex flex-wrap gap-1">
+                                                {sake.tags && (
+                                                    (Array.isArray(sake.tags) ? sake.tags : sake.tags.split(','))
+                                                    .slice(0, 2)
+                                                    .map(tag => (
+                                                        <span key={tag} className="text-[9px] border border-gray-200 px-2 py-0.5 rounded text-gray-400 whitespace-nowrap">
+                                                            {typeof tag === 'string' ? tag.trim() : tag}
+                                                        </span>
+                                                    ))
+                                                )}
                                             </div>
+                                            <span className="text-[10px] font-bold text-[#8B7D6B] whitespace-nowrap ml-2">詳細を見る →</span>
                                         </div>
                                     </div>
                                 </div>
                             </Link>
                         ))}
                     </div>
-                )}
-                
-                {!loading && results.length === 0 && (
-                    <div className="text-center p-12 bg-white rounded-xl border border-slate-200 mt-8">
-                        <p className="text-slate-500 font-bold mb-4">一致する日本酒が見つかりませんでした。</p>
-                        <Link href="/nihonshu" className="text-indigo-600 underline">一覧から探す</Link>
+                ) : (
+                    <div className="text-center py-24 bg-white rounded-lg border border-gray-100 shadow-sm">
+                        <Wine size={48} className="mx-auto text-gray-300 mb-4" />
+                        <p className="text-gray-500 font-medium mb-4">一致する日本酒が見つかりませんでした。</p>
+                        <Link href="/nihonshu" className="text-[#8B7D6B] font-bold hover:underline text-sm">
+                            すべての日本酒を見る
+                        </Link>
                     </div>
                 )}
-
-            </div>
-        </main >
+            </main>
+        </div>
     );
 }
 
 export default function SearchPage() {
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-50">
-            {/* Navigation */}
-            <nav className="fixed w-full z-50 bg-white/50 dark:bg-slate-950/50 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight hover:opacity-80 transition-opacity">
-                        <img src="/images/logo_v4.png" alt="nom × nom" className="h-[28px] w-auto object-contain" />
-                    </Link>
-                    <div className="flex items-center gap-4">
-                        <Link href="/login" className="text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                            ログイン
-                        </Link>
-                    </div>
-                </div>
-            </nav>
-            <React.Suspense fallback={<div className="pt-32 text-center">読み込み中...</div>}>
-                <SearchPageContent />
-            </React.Suspense>
-        </div>
+        <React.Suspense fallback={<div className="pt-32 text-center text-gray-400 h-screen bg-[#F9F8F6]">読み込み中...</div>}>
+            <SearchPageContent />
+        </React.Suspense>
     );
 }
