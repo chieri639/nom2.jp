@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { getArticleDetail } from '@/lib/microcms';
+import { staticArticles } from '@/data/staticArticles';
 import { ArrowLeft, ArrowRight, Search, Sparkles } from 'lucide-react';
 import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
@@ -12,11 +13,15 @@ export default async function ArticleDetailPage(props: any) {
 
   if (!id) return null;
 
-  let article: any = null;
-  try {
-    article = await getArticleDetail(id);
-  } catch (error) {
-    console.error('Article fetch error:', error);
+  // 静的記事データに存在するかバイパスチェック
+  let article: any = staticArticles.find((a) => a.id === id);
+
+  if (!article) {
+    try {
+      article = await getArticleDetail(id);
+    } catch (error) {
+      console.error('Article fetch error:', error);
+    }
   }
 
   if (!article) {
