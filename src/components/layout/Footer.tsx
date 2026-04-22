@@ -24,7 +24,7 @@ export default function Footer() {
                 {/* Social Links */}
                 <div className="flex items-center gap-6">
                     <a 
-                        href="https://www.instagram.com/nom2_jp/" 
+                        href="https://www.instagram.com/nihonshu.nom_nom/" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-[#C0C0C0] hover:text-[#BA9156] transition-all duration-300 transform hover:scale-110"
