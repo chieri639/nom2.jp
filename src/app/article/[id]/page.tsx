@@ -44,20 +44,28 @@ export default async function ArticleDetailPage(props: any) {
     <div className="min-h-screen pb-24">
       {/* Article Header (Hero) */}
       <header className="px-6 pt-20 pb-16 text-center border-b border-gray-100 bg-white">
-          <div className="max-w-4xl mx-auto">
-              <span className="inline-block bg-[#8B7D6B]/10 text-[#8B7D6B] px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase mb-8">
-                  FEATURED ARTICLE
-              </span>
-              <h1 className="text-3xl md:text-5xl font-bold font-serif-jp text-[#1F1F1F] leading-tight mb-12">
-                  {article.title}
-              </h1>
-              
-              {article.imageUrl && (
-                <div className="aspect-[21/9] w-full max-w-5xl mx-auto rounded-lg overflow-hidden shadow-2xl">
-                    <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
-                </div>
-              )}
-          </div>
+        <div className="max-w-4xl mx-auto">
+          <span className="inline-block bg-[#8B7D6B]/10 text-[#8B7D6B] px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase mb-8">
+            FEATURED ARTICLE
+          </span>
+          <h1 className="text-3xl md:text-5xl font-bold font-serif-jp text-[#1F1F1F] leading-tight mb-12">
+            {article.title}
+          </h1>
+
+          {article.imageUrl && (
+            <div className="relative aspect-[4/3] md:aspect-[21/9] w-full max-w-5xl mx-auto rounded-lg overflow-hidden shadow-2xl bg-[#1A1A1A]">
+              <div 
+                className="absolute inset-0 bg-cover bg-center opacity-40 blur-2xl scale-110"
+                style={{ backgroundImage: `url(${article.imageUrl})` }}
+              />
+              <img 
+                src={article.imageUrl} 
+                alt={article.title} 
+                className="relative z-10 w-full h-full object-contain" 
+              />
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Article Body */}
@@ -65,9 +73,9 @@ export default async function ArticleDetailPage(props: any) {
         <div className="flex flex-col gap-16">
           <DynamicBackButton defaultHref="/article" defaultText="BACK TO ARTICLES" />
 
-          <article 
+          <article
             className="rich-text custom-prose max-w-none text-[#333] leading-[2.2] font-medium selection:bg-[#8B7D6B]/20"
-            dangerouslySetInnerHTML={{ __html: article.content || '' }} 
+            dangerouslySetInnerHTML={{ __html: article.content || '' }}
           />
 
           {/* Social / Share Area could go here */}
