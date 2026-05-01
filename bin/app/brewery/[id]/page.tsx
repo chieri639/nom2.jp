@@ -9,7 +9,7 @@ export const revalidate = 3600;
 export default async function BreweryDetailPage(props: any) {
   const params = await props.params;
   const idOrSlug = params.id;
-  
+
   try {
     // 1. 酒蔵情報の取得
     let brewery: BREWERY | null = null;
@@ -32,13 +32,13 @@ export default async function BreweryDetailPage(props: any) {
     const originalName = brewery.name.trim();
     const searchTerms = new Set<string>();
     searchTerms.add(originalName);
-    
+
     // 括弧内を抽出（例：来福）
     const parenMatch = brewery.name.match(/[（(](.*?)[）)]/);
     if (parenMatch && parenMatch[1]) {
       searchTerms.add(parenMatch[1].trim());
     }
-    
+
     // 会社名・酒造などを除いた純粋な名称
     let baseName = brewery.name
       .replace(/[（(].*?[）)]/g, '')
@@ -50,16 +50,16 @@ export default async function BreweryDetailPage(props: any) {
       const rawName = baseName.replace(/(酒造|醸造|酒造場|分店|本店|蔵)/g, '').trim();
       if (rawName) searchTerms.add(rawName);
     }
-    
+
     const cleanedName = Array.from(searchTerms)[searchTerms.size - 1] || originalName;
-    
+
     // 3. サーバー側でデータを極限までクリーンアップ
     const cleanedData = cleanBreweryData(brewery.content || '', brewery);
 
     // 4. 関連データの取得（全文検索 q と ID検索 のハイブリッド戦略）
     let brands: BREWERY[] = [];
     let cmsSakes: SAKE[] = [];
-    
+
     try {
       // 検索キーワードの決定（最も短い名称を全文検索に使用）
       const qKeyword = (Array.from(searchTerms).find(t => t.length > 1 && t.length < 5) || cleanedName).trim();
@@ -100,10 +100,10 @@ export default async function BreweryDetailPage(props: any) {
     }
 
     return (
-      <BreweryDetailClient 
-        brewery={brewery} 
-        initialCmsSakes={cmsSakes} 
-        brands={brands} 
+      <BreweryDetailClient
+        brewery={brewery}
+        initialCmsSakes={cmsSakes}
+        brands={brands}
         serverCleanedData={cleanedData}
       />
     );

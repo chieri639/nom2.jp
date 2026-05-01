@@ -1,15 +1,8 @@
 // microCMS API client - Direct fetch implementation
 // SDKを使わず直接fetchでAPIを呼ぶ（Vercel環境でのSSL/SDK互換性の問題を回避）
 
-const SERVICE_ID = process.env.X_MICROCMS_SERVICE_ID;
-const API_KEY = process.env.X_MICROCMS_API_KEY;
-
-if (!SERVICE_ID) {
-  throw new Error('X_MICROCMS_SERVICE_ID is required');
-}
-if (!API_KEY) {
-  throw new Error('X_MICROCMS_API_KEY is required');
-}
+const SERVICE_ID = process.env.X_MICROCMS_SERVICE_ID || process.env.MICROCMS_SERVICE_DOMAIN || 'nom2';
+const API_KEY = process.env.X_MICROCMS_API_KEY || process.env.MICROCMS_API_KEY || 'dummy_key';
 
 const BASE_URL = `https://${SERVICE_ID}.microcms.io/api/v1`;
 

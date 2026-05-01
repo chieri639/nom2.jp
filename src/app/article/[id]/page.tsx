@@ -37,7 +37,12 @@ export default async function ArticleDetailPage(props: any) {
       }
     }
 
-    permanentRedirect('/');
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <h1 className="text-2xl font-bold mb-4">記事が見つかりませんでした</h1>
+        <Link href="/article" className="text-[#8B7D6B] hover:underline">← 記事一覧に戻る</Link>
+      </div>
+    );
   }
 
   return (
@@ -53,16 +58,8 @@ export default async function ArticleDetailPage(props: any) {
           </h1>
 
           {article.imageUrl && (
-            <div className="relative aspect-[4/3] md:aspect-[21/9] w-full max-w-5xl mx-auto rounded-lg overflow-hidden shadow-2xl bg-[#1A1A1A]">
-              <div 
-                className="absolute inset-0 bg-cover bg-center opacity-40 blur-2xl scale-110"
-                style={{ backgroundImage: `url(${article.imageUrl})` }}
-              />
-              <img 
-                src={article.imageUrl} 
-                alt={article.title} 
-                className="relative z-10 w-full h-full object-contain" 
-              />
+            <div className="aspect-[21/9] w-full max-w-5xl mx-auto rounded-lg overflow-hidden shadow-2xl">
+              <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
             </div>
           )}
         </div>
