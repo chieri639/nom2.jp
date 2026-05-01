@@ -12,7 +12,7 @@ export default async function NihonshuDetailPage(props: any) {
   try {
     // 1. まず直接IDで取得を試みる
     let sake: SAKE | null = null;
-    
+
     try {
       sake = await getSakeDetail(idOrSlug);
     } catch {
