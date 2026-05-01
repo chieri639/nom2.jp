@@ -23,14 +23,17 @@ export default async function ArticleDetailPage(props: any) {
   if (!article) {
     // もし大文字が含まれるIDで記事が見つからなかった場合、小文字のIDで再検索する（SEO救済用301リダイレクト）
     if (id !== id.toLowerCase()) {
+      let lowerArticle = null;
       try {
-        const lowerArticle = await getArticleDetail(id.toLowerCase());
-        if (lowerArticle) {
-          // 小文字の記事が存在すれば、SEO評価を引き継ぐ「301 Permanent Redirect」を実行
-          permanentRedirect(`/article/${id.toLowerCase()}`);
-        }
+        lowerArticle = await getArticleDetail(id.toLowerCase());
       } catch (e) {
-        // 小文字でも見つからなかった場合はそのまま404へ
+        // 小文字でも見つからなかった場合は無視
+      }
+
+      if (lowerArticle) {
+        // 小文字の記事が存在すれば、SEO評価を引き継ぐ「301 Permanent Redirect」を実行
+        // 注: permanentRedirectはエラーをスローしてルーティングを中断するため、try-catchの外で呼ぶ必要がある
+        permanentRedirect(`/article/${id.toLowerCase()}`);
       }
     }
 
