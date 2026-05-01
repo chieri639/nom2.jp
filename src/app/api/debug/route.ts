@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const SERVICE_ID = process.env.X_MICROCMS_SERVICE_ID;
   const API_KEY = process.env.X_MICROCMS_API_KEY;
