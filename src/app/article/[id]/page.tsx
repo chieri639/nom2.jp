@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { permanentRedirect } from 'next/navigation';
 import { getArticleDetail } from '@/lib/microcms';
 import { ArrowLeft, ArrowRight, Search, Sparkles } from 'lucide-react';
 import DynamicBackButton from '@/components/layout/DynamicBackButton';
@@ -20,6 +21,19 @@ export default async function ArticleDetailPage(props: any) {
   }
 
   if (!article) {
+    // もし大文字が含まれるIDで記事が見つからなかった場合、小文字のIDで再検索する（SEO救済用301リダイレクト）
+    if (id !== id.toLowerCase()) {
+      try {
+        const lowerArticle = await getArticleDetail(id.toLowerCase());
+        if (lowerArticle) {
+          // 小文字の記事が存在すれば、SEO評価を引き継ぐ「301 Permanent Redirect」を実行
+          permanentRedirect(`/article/${id.toLowerCase()}`);
+        }
+      } catch (e) {
+        // 小文字でも見つからなかった場合はそのまま404へ
+      }
+    }
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
         <h1 className="text-2xl font-bold mb-4">記事が見つかりませんでした</h1>
