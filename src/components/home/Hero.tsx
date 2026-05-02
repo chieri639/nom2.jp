@@ -34,9 +34,9 @@ export default function Hero() {
                             lineHeight: 1.6,
                         }}
                     >
-                        <span className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-[0.3em] sm:tracking-[0.5em] md:tracking-[0.8em] whitespace-nowrap">新しい</span>
-                        <span className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-[0.3em] sm:tracking-[0.5em] md:tracking-[0.8em] whitespace-nowrap">日本酒との</span>
-                        <span className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-[0.3em] sm:tracking-[0.5em] md:tracking-[0.8em] whitespace-nowrap">出会い。</span>
+                        <span className="text-2xl sm:text-3xl md:text-5xl lg:text-[45px] tracking-[0.3em] sm:tracking-[0.5em] md:tracking-[0.8em] whitespace-nowrap">新しい</span>
+                        <span className="text-2xl sm:text-3xl md:text-5xl lg:text-[45px] tracking-[0.3em] sm:tracking-[0.5em] md:tracking-[0.8em] whitespace-nowrap">日本酒との</span>
+                        <span className="text-2xl sm:text-3xl md:text-5xl lg:text-[45px] tracking-[0.3em] sm:tracking-[0.5em] md:tracking-[0.8em] whitespace-nowrap">出会い。</span>
                     </h1>
                 </div>
             </div>
