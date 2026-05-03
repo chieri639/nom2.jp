@@ -15,7 +15,7 @@ const sakeData = [
   { id: 7, name: "貴醸酒\nMELLOW オーク樽熟成", short: "MELLOW", x: 20, y: 22, emoji: "🍯", desc: "デザート感覚で楽しむ濃厚な甘み。ウイスキー好きにも" },
   // 右下: 辛口・しっかり（x>50, y<50）
   { id: 8, name: "純米吟醸生原酒\n愛山", short: "愛山", x: 68, y: 38, emoji: "⛰️", desc: "幻の酒米「愛山」。旨みと力強さが共存", affiliateHtml: '<a href="https://hb.afl.rakuten.co.jp/ichiba/3e8d5ce7.ece59876.3e8d5ce8.34c8adb5/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fjizake-watanabe%2F10008559%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hgb/3e8d5ce7.ece59876.3e8d5ce8.34c8adb5/?me_id=1214778&item_id=10008559&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fjizake-watanabe%2Fcabinet%2F06300917%2F07074642%2Fimgrc0106105406.jpg%3F_ex%3D300x300&s=300x300&t=pict" border="0" style="margin:2px" alt="" title=""></a>' },
-  { id: 9, name: "純米酒\n安康", short: "安康", x: 60, y: 25, emoji: "🌾", desc: "縁起の良い鮟鱇にちなんだ冬限定酒。スッキリとした飲み口に柑橘系の香りとジューシーさが広がる。" },
+  { id: 9, name: "純米酒\n安康", short: "安康", x: 35, y: 65, emoji: "🌾", desc: "縁起の良い鮟鱇にちなんだ冬限定酒。スッキリとした飲み口に柑橘系の香りとジューシーさが広がる。" },
   { id: 10, name: "純米大吟醸\n別誂", short: "別誂", x: 78, y: 32, emoji: "🎌", desc: "日本酒通をうならせる本格派。余韻が長い", affiliateHtml: '<a href="https://hb.afl.rakuten.co.jp/ichiba/3f6c8ad9.08e087e0.3f6c8ada.7a802074/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshidukuya%2Fraihuku035%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hgb/3f6c8ad9.08e087e0.3f6c8ada.7a802074/?me_id=1282651&item_id=10001089&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fshidukuya%2Fcabinet%2F03078492%2F03079637%2Fimgrc0070938901.jpg%3F_ex%3D300x300&s=300x300&t=pict" border="0" style="margin:2px" alt="" title=""></a>' },
   { id: 11, name: "真向勝負\n純米大吟醸", short: "真向勝負", x: 85, y: 18, emoji: "⚔️", desc: "その名の通り正面勝負。辛口でコクが深い", affiliateHtml: '<a href="https://hb.afl.rakuten.co.jp/ichiba/40a48afe.0cfaf26f.40a48aff.35c6f521/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fkuranosuke%2Frai1200%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hgb/40a48afe.0cfaf26f.40a48aff.35c6f521/?me_id=1204944&item_id=10001247&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fkuranosuke%2Fcabinet%2F00%2Frai1200_1.jpg%3F_ex%3D300x300&s=300x300&t=pict" border="0" style="margin:2px" alt="" title=""></a>' },
   { id: 12, name: "純米吟醸生原酒\nX 黒", short: "X 黒", x: 72, y: 15, emoji: "⬛", desc: "生原酒ならではのパワフルな旨み。上級者向け", affiliateHtml: '<a href="https://hb.afl.rakuten.co.jp/ichiba/4b051cd8.d75aacc6.4b051cd9.805a7e55/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fsake-akiyama%2Fraifuku_jg_x_jika_nude_720%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MSwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hgb/4b051cd8.d75aacc6.4b051cd9.805a7e55/?me_id=1340633&item_id=10003152&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fsake-akiyama%2Fcabinet%2Fshohin%2Fraifuku%2Fimgrc0119704140.jpg%3F_ex%3D300x300&s=300x300&t=pict" border="0" style="margin:2px" alt="" title=""></a>' },
@@ -114,7 +114,7 @@ export default function RaifuSakeChartClient() {
               alignItems: "center",
               gap: 4,
             }}>
-              <span style={{ fontSize: "0.7rem", color: "#c09060", letterSpacing: "0.2em" }}>軽快・スッキリ ▲</span>
+              <span style={{ fontSize: "0.65rem", color: "#c09060", letterSpacing: "0.15em" }}>◀ 濃厚・しっかり　　軽快・スッキリ ▶</span>
             </div>
 
             <div style={{ position: "relative", width: 520, height: 520 }}>
@@ -259,8 +259,8 @@ export default function RaifuSakeChartClient() {
               <span style={{ fontSize: "0.65rem", color: "#c09060", letterSpacing: "0.15em" }}>◀ 甘口・フルーティー</span>
               <span style={{ fontSize: "0.65rem", color: "#c09060", letterSpacing: "0.15em" }}>辛口・キレ ▶</span>
             </div>
-            <div style={{ textAlign: "center", fontSize: "0.6rem", color: "#8b7355", marginTop: 2, letterSpacing: "0.1em" }}>
-              ↕ 味わいの濃淡（縦軸） ｜ ↔ 味わいの方向性（横軸）
+            <div style={{ textAlign: "center", fontSize: "0.6rem", color: "#8b7355", marginTop: 6, letterSpacing: "0.1em" }}>
+              ↕ 縦軸：スッキリ ⇔ しっかり ｜ ↔ 横軸：甘口 ⇔ 辛口
             </div>
           </div>
 
