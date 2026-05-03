@@ -4,21 +4,21 @@ import { useState } from "react";
 
 const sakeData = [
   // 左上: 甘口・スッキリ（x<50, y>50）
-  { id: 1, name: "純米吟醸\nなでしこの花酵母", short: "なでしこ", x: 22, y: 78, emoji: "🌸", desc: "花のような上品な甘み。初心者にも大人気" },
+  { id: 1, name: "純米吟醸\nなでしこの花酵母", short: "なでしこ", x: 22, y: 78, emoji: "🌸", desc: "花のような上品な甘み。初心者にも大人気", affiliateHtml: '<a href="https://hb.afl.rakuten.co.jp/ichiba/52dd99d1.d2f48cd6.52dd99d2.3ce57010/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fkikusui-sake-shop%2F4935707015896%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hgb/52dd99d1.d2f48cd6.52dd99d2.3ce57010/?me_id=1434713&item_id=10000063&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fkikusui-sake-shop%2Fcabinet%2Fshohin%2Fimgrc0101260939.jpg%3F_ex%3D300x300&s=300x300&t=pict" border="0" style="margin:2px" alt="" title=""></a>' },
   { id: 2, name: "純米大吟醸\n超精米8%", short: "超精米8%", x: 30, y: 85, emoji: "✨", desc: "雑味ゼロの究極の透明感。フルーティーで軽快" },
   { id: 3, name: "大吟醸\n蔵元限定醸造 機械栓", short: "蔵元限定", x: 18, y: 70, emoji: "🏷️", desc: "蔵元こだわりの華やか系大吟醸" },
   { id: 4, name: "大吟醸\n雫", short: "雫", x: 28, y: 90, emoji: "💧", desc: "雫取りの最高峰。エレガントで繊細" },
   // 右上: 辛口・スッキリ（x>50, y>50）
-  { id: 5, name: "純米吟醸\nいちごの花酵母", short: "いちご花酵母", x: 62, y: 75, emoji: "🍓", desc: "名前は甘そうだが実はキレ系。ギャップが面白い！" },
+  { id: 5, name: "純米吟醸\nいちごの花酵母", short: "いちご花酵母", x: 62, y: 75, emoji: "🍓", desc: "名前は甘そうだが実はキレ系。ギャップが面白い！", affiliateHtml: '<a href="https://hb.afl.rakuten.co.jp/ichiba/40a48afe.0cfaf26f.40a48aff.35c6f521/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fkuranosuke%2F1283%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hgb/40a48afe.0cfaf26f.40a48aff.35c6f521/?me_id=1204944&item_id=10010839&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fkuranosuke%2Fcabinet%2F83%2F1283_1.jpg%3F_ex%3D300x300&s=300x300&t=pict" border="0" style="margin:2px" alt="" title=""></a>' },
   { id: 6, name: "純米吟醸\n亀の尾", short: "亀の尾", x: 75, y: 68, emoji: "🐢", desc: "古代米「亀の尾」使用。キレがあり食中酒として最適" },
   // 左下: 甘口・しっかり（x<50, y<50）
   { id: 7, name: "貴醸酒\nMELLOW オーク樽熟成", short: "MELLOW", x: 20, y: 22, emoji: "🍯", desc: "デザート感覚で楽しむ濃厚な甘み。ウイスキー好きにも" },
   // 右下: 辛口・しっかり（x>50, y<50）
-  { id: 8, name: "純米吟醸生原酒\n愛山", short: "愛山", x: 68, y: 38, emoji: "⛰️", desc: "幻の酒米「愛山」。旨みと力強さが共存" },
+  { id: 8, name: "純米吟醸生原酒\n愛山", short: "愛山", x: 68, y: 38, emoji: "⛰️", desc: "幻の酒米「愛山」。旨みと力強さが共存", affiliateHtml: '<a href="https://hb.afl.rakuten.co.jp/ichiba/3e8d5ce7.ece59876.3e8d5ce8.34c8adb5/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fjizake-watanabe%2F10008559%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hgb/3e8d5ce7.ece59876.3e8d5ce8.34c8adb5/?me_id=1214778&item_id=10008559&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fjizake-watanabe%2Fcabinet%2F06300917%2F07074642%2Fimgrc0106105406.jpg%3F_ex%3D300x300&s=300x300&t=pict" border="0" style="margin:2px" alt="" title=""></a>' },
   { id: 9, name: "純米酒\n安康", short: "安康", x: 60, y: 25, emoji: "🌾", desc: "米の旨みをしっかり感じる定番の食中酒" },
-  { id: 10, name: "純米大吟醸\n別誂", short: "別誂", x: 78, y: 32, emoji: "🎌", desc: "日本酒通をうならせる本格派。余韻が長い" },
+  { id: 10, name: "純米大吟醸\n別誂", short: "別誂", x: 78, y: 32, emoji: "🎌", desc: "日本酒通をうならせる本格派。余韻が長い", affiliateHtml: '<a href="https://hb.afl.rakuten.co.jp/ichiba/3f6c8ad9.08e087e0.3f6c8ada.7a802074/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshidukuya%2Fraihuku035%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MCwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hgb/3f6c8ad9.08e087e0.3f6c8ada.7a802074/?me_id=1282651&item_id=10001089&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fshidukuya%2Fcabinet%2F03078492%2F03079637%2Fimgrc0070938901.jpg%3F_ex%3D300x300&s=300x300&t=pict" border="0" style="margin:2px" alt="" title=""></a>' },
   { id: 11, name: "真向勝負\n純米大吟醸", short: "真向勝負", x: 85, y: 18, emoji: "⚔️", desc: "その名の通り正面勝負。辛口でコクが深い" },
-  { id: 12, name: "純米吟醸生原酒\nX 黒", short: "X 黒", x: 72, y: 15, emoji: "⬛", desc: "生原酒ならではのパワフルな旨み。上級者向け" },
+  { id: 12, name: "純米吟醸生原酒\nX 黒", short: "X 黒", x: 72, y: 15, emoji: "⬛", desc: "生原酒ならではのパワフルな旨み。上級者向け", affiliateHtml: '<a href="https://hb.afl.rakuten.co.jp/ichiba/4b051cd8.d75aacc6.4b051cd9.805a7e55/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fsake-akiyama%2Fraifuku_jg_x_jika_nude_720%2F&link_type=pict&ut=eyJwYWdlIjoiaXRlbSIsInR5cGUiOiJwaWN0Iiwic2l6ZSI6IjMwMHgzMDAiLCJuYW0iOjEsIm5hbXAiOiJyaWdodCIsImNvbSI6MSwiY29tcCI6ImRvd24iLCJwcmljZSI6MSwiYm9yIjoxLCJjb2wiOjEsImJidG4iOjEsInByb2QiOjAsImFtcCI6ZmFsc2V9" target="_blank" rel="nofollow sponsored noopener" style="word-wrap:break-word;"><img src="https://hbb.afl.rakuten.co.jp/hgb/4b051cd8.d75aacc6.4b051cd9.805a7e55/?me_id=1340633&item_id=10003152&pc=https%3A%2F%2Fthumbnail.image.rakuten.co.jp%2F%400_mall%2Fsake-akiyama%2Fcabinet%2Fshohin%2Fraifuku%2Fimgrc0119704140.jpg%3F_ex%3D300x300&s=300x300&t=pict" border="0" style="margin:2px" alt="" title=""></a>' },
 ];
 
 const quadrants = [
@@ -336,35 +336,39 @@ export default function RaifuSakeChartClient() {
                 </div>
                 
                 {/* Affiliate Link */}
-                <a 
-                  href={`https://search.rakuten.co.jp/search/mall/来福+${encodeURIComponent(displaySake.short)}/`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    background: "#bf0000",
-                    color: "white",
-                    padding: "0.8rem 2rem",
-                    borderRadius: "4px",
-                    fontSize: "0.9rem",
-                    fontWeight: "bold",
-                    textDecoration: "none",
-                    letterSpacing: "0.05em",
-                    boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
-                    transition: "opacity 0.2s"
-                  }}
-                  onMouseOver={(e) => e.currentTarget.style.opacity = "0.8"}
-                  onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="9" cy="21" r="1"></circle>
-                    <circle cx="20" cy="21" r="1"></circle>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                  </svg>
-                  楽天市場で購入する
-                </a>
+                {'affiliateHtml' in displaySake && displaySake.affiliateHtml ? (
+                  <div dangerouslySetInnerHTML={{ __html: displaySake.affiliateHtml }} />
+                ) : (
+                  <a 
+                    href={`https://search.rakuten.co.jp/search/mall/来福+${encodeURIComponent(displaySake.short)}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      background: "#bf0000",
+                      color: "white",
+                      padding: "0.8rem 2rem",
+                      borderRadius: "4px",
+                      fontSize: "0.9rem",
+                      fontWeight: "bold",
+                      textDecoration: "none",
+                      letterSpacing: "0.05em",
+                      boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+                      transition: "opacity 0.2s"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.opacity = "0.8"}
+                    onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="9" cy="21" r="1"></circle>
+                      <circle cx="20" cy="21" r="1"></circle>
+                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    楽天市場で探す
+                  </a>
+                )}
               </>
             ) : (
               <div style={{ color: "#6b5540", fontSize: "0.9rem", lineHeight: 1.8, letterSpacing: "0.1em" }}>
