@@ -16,6 +16,7 @@ export default function Header() {
     };
 
     return (
+        <>
         <header className="fixed w-full top-0 left-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex items-center justify-between">
             <Link href="/" className="flex items-center" onClick={closeMenu}>
                 <Image 
@@ -52,21 +53,23 @@ export default function Header() {
                 )}
             </button>
 
-            {/* Mobile Menu Overlay */}
-            {isMenuOpen && (
-                <div className="fixed inset-0 bg-white z-50 flex flex-col pt-24 px-8 md:hidden">
-                    <nav>
-                        <ul className="flex flex-col gap-6 text-[#1F1F1F] text-lg tracking-widest font-medium uppercase">
-                            <li><Link href="/article" onClick={closeMenu}>Articles</Link></li>
-                            <li><Link href="/brewery" onClick={closeMenu}>Breweries</Link></li>
-                            <li><Link href="/shop" onClick={closeMenu}>Shop</Link></li>
-                            <li><Link href="/brand" onClick={closeMenu}>Brand</Link></li>
-                            <li><Link href="/similar" onClick={closeMenu} className="text-[#BA9156] font-bold flex items-center gap-2"><span className="text-xl">✨</span> AI Search</Link></li>
-                            <li className="pt-4 border-t border-gray-200 mt-2"><Link href="/en" onClick={closeMenu}>EN</Link></li>
-                        </ul>
-                    </nav>
-                </div>
-            )}
         </header>
+
+        {/* Mobile Menu Overlay */}
+        {isMenuOpen && (
+            <div className="fixed inset-0 bg-white z-[45] flex flex-col pt-24 px-8 md:hidden">
+                <nav>
+                    <ul className="flex flex-col gap-6 text-[#1F1F1F] text-lg tracking-widest font-medium uppercase">
+                        <li><Link href="/article" onClick={closeMenu}>Articles</Link></li>
+                        <li><Link href="/brewery" onClick={closeMenu}>Breweries</Link></li>
+                        <li><Link href="/shop" onClick={closeMenu}>Shop</Link></li>
+                        <li><Link href="/brand" onClick={closeMenu}>Brand</Link></li>
+                        <li><Link href="/similar" onClick={closeMenu} className="text-[#BA9156] font-bold flex items-center gap-2"><span className="text-xl">✨</span> AI Search</Link></li>
+                        <li className="pt-4 border-t border-gray-200 mt-2"><Link href="/en" onClick={closeMenu}>EN</Link></li>
+                    </ul>
+                </nav>
+            </div>
+        )}
+        </>
     );
 }
