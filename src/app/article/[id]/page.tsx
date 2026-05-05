@@ -66,12 +66,12 @@ export default async function ArticleDetailPage(props: any) {
       </header>
 
       {/* Article Body */}
-      <main className="max-w-3xl mx-auto px-6 pt-16">
-        <div className="flex flex-col gap-16">
+      <main className="max-w-3xl mx-auto px-6 pt-8">
+        <div className="flex flex-col gap-6">
           <DynamicBackButton defaultHref="/article" defaultText="BACK TO ARTICLES" />
 
           <article
-            className="rich-text custom-prose max-w-none text-[#333] leading-[2.2] font-medium selection:bg-[#8B7D6B]/20"
+            className="rich-text custom-prose max-w-none text-[#333] leading-[2.2] font-medium selection:bg-[#8B7D6B]/20 [&>div:first-child]:!pt-4 [&>div:first-child]:!px-0 md:[&>div:first-child]:!pt-8"
             dangerouslySetInnerHTML={{ __html: article.content || '' }}
           />
 
