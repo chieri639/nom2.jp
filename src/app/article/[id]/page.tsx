@@ -6,7 +6,8 @@ import { getArticleDetail } from '@/lib/microcms';
 import { Search, Sparkles } from 'lucide-react';
 import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
-export const revalidate = 86400;
+export const revalidate = 0;
+
 
 async function fetchArticle(id: string) {
   try {
