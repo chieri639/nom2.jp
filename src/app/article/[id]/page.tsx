@@ -44,17 +44,13 @@ export default async function ArticleDetailPage(props: any) {
   // 1. まず直接IDで取得
   let article: any = await fetchArticle(id);
 
-  // 2. 見つからない場合、大文字→小文字で再試行
+  // 2. 見つからない場合のみ、大文字→小文字で再試行してリダイレクト
+  //    ※ article.id !== id のリダイレクトはループの原因になるため行わない
   if (!article && id !== id.toLowerCase()) {
     article = await fetchArticle(id.toLowerCase());
     if (article) {
       permanentRedirect(`/article/${id.toLowerCase()}`);
     }
-  }
-
-  // 3. 記事が見つかったが、アクセスIDと正規IDが異なる場合はリダイレクト
-  if (article && article.id !== id) {
-    permanentRedirect(`/article/${article.id}`);
   }
 
   if (!article) {
@@ -65,6 +61,7 @@ export default async function ArticleDetailPage(props: any) {
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen pb-24">

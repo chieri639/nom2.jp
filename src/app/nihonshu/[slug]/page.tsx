@@ -54,12 +54,8 @@ export default async function NihonshuDetailPage(props: any) {
       notFound();
     }
 
-    // 正規IDと異なるURLでアクセスされた場合は正規IDへリダイレクト
-    if (sake.id !== idOrSlug) {
-      permanentRedirect(`/nihonshu/${sake.id}`);
-    }
-
     return <SakeDetailClient sake={sake} />;
+
   } catch (err) {
     console.error("日本酒詳細取得エラー:", err);
     notFound();
