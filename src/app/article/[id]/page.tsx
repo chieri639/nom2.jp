@@ -1,11 +1,39 @@
 import React from 'react';
 import Link from 'next/link';
 import { permanentRedirect } from 'next/navigation';
+import { Metadata } from 'next';
 import { getArticleDetail } from '@/lib/microcms';
-import { ArrowLeft, ArrowRight, Search, Sparkles } from 'lucide-react';
+import { Search, Sparkles } from 'lucide-react';
 import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
-export const revalidate = 0;
+export const revalidate = 86400;
+
+async function fetchArticle(id: string) {
+  try {
+    return await getArticleDetail(id);
+  } catch {
+    return null;
+  }
+}
+
+export async function generateMetadata(props: any): Promise<Metadata> {
+  const params = await props.params;
+  const id = params?.id;
+  if (!id) return {};
+
+  // 大文字IDの場合は小文字IDで取得を試みる
+  const article = await fetchArticle(id) || await fetchArticle(id.toLowerCase());
+  if (!article) return {};
+
+  const canonicalId = article.id;
+  return {
+    title: `${article.title} | nom × nom`,
+    description: article.content?.replace(/<[^>]+>/g, '').slice(0, 120) || article.title,
+    alternates: {
+      canonical: `https://nom2.jp/article/${canonicalId}`,
+    },
+  };
+}
 
 export default async function ArticleDetailPage(props: any) {
   const params = await props.params;
@@ -13,30 +41,23 @@ export default async function ArticleDetailPage(props: any) {
 
   if (!id) return null;
 
-  let article: any = null;
-  try {
-    article = await getArticleDetail(id);
-  } catch (error) {
-    console.error('Article fetch error:', error);
+  // 1. まず直接IDで取得
+  let article: any = await fetchArticle(id);
+
+  // 2. 見つからない場合、大文字→小文字で再試行
+  if (!article && id !== id.toLowerCase()) {
+    article = await fetchArticle(id.toLowerCase());
+    if (article) {
+      permanentRedirect(`/article/${id.toLowerCase()}`);
+    }
+  }
+
+  // 3. 記事が見つかったが、アクセスIDと正規IDが異なる場合はリダイレクト
+  if (article && article.id !== id) {
+    permanentRedirect(`/article/${article.id}`);
   }
 
   if (!article) {
-    // もし大文字が含まれるIDで記事が見つからなかった場合、小文字のIDで再検索する（SEO救済用301リダイレクト）
-    if (id !== id.toLowerCase()) {
-      let lowerArticle = null;
-      try {
-        lowerArticle = await getArticleDetail(id.toLowerCase());
-      } catch (e) {
-        // 小文字でも見つからなかった場合は無視
-      }
-
-      if (lowerArticle) {
-        // 小文字の記事が存在すれば、SEO評価を引き継ぐ「301 Permanent Redirect」を実行
-        // 注: permanentRedirectはエラーをスローしてルーティングを中断するため、try-catchの外で呼ぶ必要がある
-        permanentRedirect(`/article/${id.toLowerCase()}`);
-      }
-    }
-
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
         <h1 className="text-2xl font-bold mb-4">記事が見つかりませんでした</h1>
@@ -74,8 +95,6 @@ export default async function ArticleDetailPage(props: any) {
             className="rich-text custom-prose max-w-none text-[#333] leading-[2.2] font-medium selection:bg-[#8B7D6B]/20 [&>div:first-child]:!pt-4 [&>div:first-child]:!px-0 md:[&>div:first-child]:!pt-8"
             dangerouslySetInnerHTML={{ __html: article.content || '' }}
           />
-
-          {/* Social / Share Area could go here */}
 
           {/* Read More / Next Actions */}
           <div className="mt-20 pt-16 border-t border-gray-100 text-center">

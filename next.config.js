@@ -56,8 +56,65 @@ const nextConfig = {
     },
     // STUDIOからの移行時にSEO資産（旧URLからの評価）を引き継ぐための301リダイレクト設定
     async redirects() {
-        return [];
+        return [
+            // 旧 /posts/* → /article/*
+            {
+                source: '/posts/:id',
+                destination: '/article/:id',
+                permanent: true,
+            },
+            // 旧 /brewery/brand/* → /brand/*
+            {
+                source: '/brewery/brand/:id',
+                destination: '/brand/:id',
+                permanent: true,
+            },
+            // 旧 /sake-reco → /similar（AIおすすめページ）
+            {
+                source: '/sake-reco',
+                destination: '/similar',
+                permanent: true,
+            },
+            // 旧 /recommend/* → /similar
+            {
+                source: '/recommend/:path*',
+                destination: '/similar',
+                permanent: true,
+            },
+            // 旧 /news/* → トップ
+            {
+                source: '/news/:path*',
+                destination: '/',
+                permanent: true,
+            },
+            // 旧 /event/* → トップ
+            {
+                source: '/event/:path*',
+                destination: '/',
+                permanent: true,
+            },
+            // 旧 /en → トップ（英語版なし）
+            {
+                source: '/en',
+                destination: '/',
+                permanent: true,
+            },
+            // 旧 /brewery/（空ID） → 酒蔵一覧
+            {
+                source: '/brewery/',
+                destination: '/brewery',
+                permanent: true,
+            },
+            // /brewery/(公式サイトなし) → 酒蔵一覧
+            {
+                source: '/brewery/:id',
+                has: [{ type: 'query', key: 'id', value: '公式サイトなし' }],
+                destination: '/brewery',
+                permanent: true,
+            },
+        ];
     },
 };
 
 module.exports = nextConfig;
+
