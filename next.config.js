@@ -112,23 +112,6 @@ const nextConfig = {
                 destination: '/brewery',
                 permanent: true,
             },
-            // リダイレクト.csv: 大文字IDの記事URL → 小文字の正規URL へ301
-            { source: '/article/2R6bfvfo', destination: '/article/2r6bfvfo', permanent: true },
-            { source: '/article/OuHuVCuy', destination: '/article/ouhuvcuy', permanent: true },
-            { source: '/article/m-Dw1h1K', destination: '/article/m-dw1h1k', permanent: true },
-            { source: '/article/l2IY5GPA', destination: '/article/l2iy5gpa', permanent: true },
-            { source: '/article/NsmnVo9L', destination: '/article/nsmnvo9l', permanent: true },
-            { source: '/article/zOVwGA55', destination: '/article/zovwga55', permanent: true },
-            { source: '/article/tjXZfmhg', destination: '/article/tjxzfmhg', permanent: true },
-            { source: '/article/Xqtesql-', destination: '/article/xqtesql-', permanent: true },
-            { source: '/article/zBn9CcDu', destination: '/article/zbn9ccdu', permanent: true },
-            { source: '/article/hVjhiFIg', destination: '/article/hvjhifig', permanent: true },
-            { source: '/article/J8FDQjWc', destination: '/article/j8fdqjwc', permanent: true },
-            { source: '/article/4nKbI2B6', destination: '/article/4nkbi2b6', permanent: true },
-            { source: '/article/eG9e1cjp', destination: '/article/eg9e1cjp', permanent: true },
-            { source: '/article/nByqilzM', destination: '/article/nbyqilzm', permanent: true },
-            { source: '/article/zHscWODV', destination: '/article/zhscwodv', permanent: true },
-            { source: '/article/hhpBxrJO', destination: '/article/hhpbxrjo', permanent: true },
         ];
     },
 };
