@@ -36,7 +36,7 @@ export default function Header() {
                     <li><Link href="/shop" className="hover:text-black transition-colors">Shop</Link></li>
                     <li><Link href="/brand" className="hover:text-black transition-colors">Brand</Link></li>
                     <li><Link href="/similar" className="hover:text-[#BA9156] transition-colors font-bold flex items-center gap-1"><span className="text-lg leading-none">✨</span> AI Search</Link></li>
-                    <li><Link href="/en" className="hover:text-black transition-colors">EN</Link></li>
+                    <li><Link href="/about" className="hover:text-black transition-colors">About</Link></li>
                 </ul>
             </nav>
             
@@ -65,7 +65,7 @@ export default function Header() {
                         <li><Link href="/shop" onClick={closeMenu}>Shop</Link></li>
                         <li><Link href="/brand" onClick={closeMenu}>Brand</Link></li>
                         <li><Link href="/similar" onClick={closeMenu} className="text-[#BA9156] font-bold flex items-center gap-2"><span className="text-xl">✨</span> AI Search</Link></li>
-                        <li className="pt-4 border-t border-gray-200 mt-2"><Link href="/en" onClick={closeMenu}>EN</Link></li>
+                        <li className="pt-4 border-t border-gray-200 mt-2"><Link href="/about" onClick={closeMenu}>About</Link></li>
                     </ul>
                 </nav>
             </div>

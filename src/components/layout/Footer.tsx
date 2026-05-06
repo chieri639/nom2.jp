@@ -36,7 +36,7 @@ export default function Footer() {
 
                 {/* Navigation */}
                 <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-[#BABABA] text-sm tracking-widest">
-                    <Link href="#" className="hover:text-white transition-colors">運営情報</Link>
+                    <Link href="/about" className="hover:text-white transition-colors">のむのむとは？</Link>
                     <Link href="#" className="hover:text-white transition-colors">利用規約</Link>
                     <Link href="#" className="hover:text-white transition-colors">プライバシーポリシー</Link>
                     <Link href="#" className="hover:text-white transition-colors">お問い合わせ</Link>
