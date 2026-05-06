@@ -1,14 +1,44 @@
 import React from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
+import { Metadata } from 'next';
 import { getBreweryDetail, getBreweries, getSakes, getBrands, BREWERY, SAKE, cleanBreweryData } from '@/lib/microcms';
 import BreweryDetailClient from './BreweryDetailClient';
 
-// キャッシュ有効化：1時間（3600秒）
-export const revalidate = 3600;
+export const revalidate = 86400;
+
+export async function generateMetadata(props: any): Promise<Metadata> {
+  const params = await props.params;
+  const idOrSlug = params.id;
+  try {
+    const brewery = await getBreweryDetail(idOrSlug).catch(async () => {
+      const res = await getBreweries({ filters: `oldId[equals]${idOrSlug}`, limit: 1 });
+      return res.contents[0] || null;
+    });
+    if (!brewery) return {};
+    return {
+      title: `${brewery.name} | nom × nom`,
+      description: `${brewery.name}の日本酒情報・銘柄一覧`.slice(0, 120),
+      alternates: {
+        canonical: `https://nom2.jp/brewery/${brewery.id}`,
+      },
+    };
+  } catch {
+    return {};
+  }
+}
 
 export default async function BreweryDetailPage(props: any) {
   const params = await props.params;
   const idOrSlug = params.id;
+
+  // 大文字のIDが来た場合は小文字へ301リダイレクト
+  if (idOrSlug !== idOrSlug.toLowerCase()) {
+    const lowerSlug = idOrSlug.toLowerCase();
+    try {
+      const lowerBrewery = await getBreweryDetail(lowerSlug).catch(() => null);
+      if (lowerBrewery) permanentRedirect(`/brewery/${lowerSlug}`);
+    } catch {}
+  }
 
   try {
     // 1. 酒蔵情報の取得
