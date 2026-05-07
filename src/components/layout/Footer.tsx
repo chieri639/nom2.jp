@@ -10,13 +10,13 @@ export default function Footer() {
                 {/* Logo & Brand */}
                 <Link href="/" className="flex flex-col items-center gap-4 group">
                     <Image 
-                        src="/images/logo_v2.png" 
+                        src="/images/icon.png" 
                         alt="nom × nom" 
-                        width={200}
+                        width={80}
                         height={80}
                         loading="lazy"
-                        className="h-12 md:h-16 w-auto brightness-0 invert opacity-90 group-hover:opacity-100 transition-opacity" 
-                        style={{ filter: 'brightness(0) invert(1)' }}
+                        className="h-16 w-16 object-contain opacity-90 group-hover:opacity-100 transition-opacity" 
+                        style={{ filter: 'invert(1)', mixBlendMode: 'screen' }}
                     />
                 </Link>
                 
