@@ -36,6 +36,7 @@ export default function Footer() {
                 {/* Navigation */}
                 <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-[#BABABA] text-sm tracking-widest">
                     <Link href="/about" className="hover:text-white transition-colors">のむのむとは？</Link>
+                    <Link href="/tokusho" className="hover:text-white transition-colors">特定商取引法に基づく表記</Link>
                     <Link href="/privacy" className="hover:text-white transition-colors">プライバシーポリシー・免責事項</Link>
                     <Link href="/contact" className="hover:text-white transition-colors">お問い合わせ</Link>
                 </nav>
