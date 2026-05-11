@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { BREWERY } from '@/lib/microcms';
 import { Search, MapPin, Loader2, Wine } from 'lucide-react';
 import { fetchBreweriesAction } from '@/app/actions/brewery';
+import BreweryMapUI from '@/components/brewery/BreweryMapUI';
 
 type Props = {
   initialBreweries: BREWERY[];
@@ -118,8 +119,16 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
     return () => observer.disconnect();
   }, [hasMore, isLoading, offset, searchQuery, selectedRegion, loadMore]);
 
+  const handleMapSearch = (query: string) => {
+    setSearchQuery(query);
+    handleFilterChange(query, selectedRegion);
+  };
+
   return (
     <div className="min-h-screen bg-[#F9F8F6]">
+      {/* ── マップ検索UI ── */}
+      <BreweryMapUI onSearch={handleMapSearch} />
+
       {/* ── Sticky Header ── */}
       <div className="sticky top-0 z-40 bg-[#F9F8F6]/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-shadow duration-300">
         <div className="max-w-7xl mx-auto px-6 py-4 space-y-4">

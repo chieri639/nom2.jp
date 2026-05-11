@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import { getBreweries } from '@/lib/microcms';
 import BreweryListClient from './BreweryListClient';
-import BreweryMapUI from '@/components/brewery/BreweryMapUI';
 import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
 export const revalidate = 0; // リアルタイム性を重視
@@ -51,9 +50,6 @@ export default async function BreweryIndexPage() {
                     </p>
                 </div>
             </header>
-
-            {/* ── マップ検索UI ── */}
-            <BreweryMapUI />
 
             {/* ── メインリスト（Client Side） ── */}
             <BreweryListClient 

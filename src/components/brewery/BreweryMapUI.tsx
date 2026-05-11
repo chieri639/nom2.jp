@@ -42,15 +42,20 @@ const REGIONS = [
   }
 ];
 
-export default function BreweryMapUI() {
+type Props = {
+  onSearch?: (query: string) => void;
+};
+
+export default function BreweryMapUI({ onSearch }: Props) {
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-    // 検索実行処理は後のフェーズで実装
-    console.log('Search:', searchQuery);
+    if (onSearch) {
+      onSearch(searchQuery);
+    }
   };
 
   return (
@@ -218,7 +223,9 @@ export default function BreweryMapUI() {
                     key={pref} 
                     onClick={() => {
                       setSearchQuery(pref);
-                      console.log(`Filter by: ${pref}`);
+                      if (onSearch) {
+                        onSearch(pref);
+                      }
                     }}
                     className={`text-[11px] text-left px-3 py-2 rounded transition-colors duration-200
                       ${hoveredRegion === region.id 
