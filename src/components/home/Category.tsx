@@ -42,7 +42,8 @@ export default function Category() {
                                         alt={cat.title}
                                         fill
                                         loading="lazy"
-                                        sizes="(max-width: 768px) 50vw, 25vw"
+                                        sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 288px"
+                                        quality={60}
                                         className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
                                     />
                                     <div className="absolute inset-0 bg-[#1F1F1F]/20 group-hover:bg-transparent transition-colors duration-500" />
