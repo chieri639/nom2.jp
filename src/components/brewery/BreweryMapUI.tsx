@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 
@@ -42,42 +42,45 @@ const REGIONS = [
   }
 ];
 
+function getTabRegion(pref: string): string {
+  const chugoku = ['鳥取県', '島根県', '岡山県', '広島県', '山口県'];
+  const shikoku = ['徳島県', '香川県', '愛媛県', '高知県'];
+  if (chugoku.includes(pref)) return '中国';
+  if (shikoku.includes(pref)) return '四国';
+  
+  const kinki = ['三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県'];
+  if (kinki.includes(pref)) return '近畿';
+  
+  const r = REGIONS.find(r => r.prefectures.includes(pref));
+  return r ? r.name : 'すべて';
+}
+
 type Props = {
-  onSearch?: (query: string) => void;
+  onSelectPrefecture?: (pref: string, regionName: string) => void;
 };
 
-export default function BreweryMapUI({ onSearch }: Props) {
+export default function BreweryMapUI({ onSelectPrefecture }: Props) {
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [hoverSource, setHoverSource] = useState<'map' | 'list' | null>(null);
+  const regionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    if (onSearch) {
-      onSearch(searchQuery);
+  useEffect(() => {
+    // 地図からのホバー時のみ、該当のリストパネルへ自動スクロールする
+    if (hoverSource === 'map' && hoveredRegion) {
+      const el = regionRefs.current[hoveredRegion];
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
-  };
+  }, [hoveredRegion, hoverSource]);
 
   return (
     <section className="max-w-6xl mx-auto py-12 px-6 font-sans">
       
       {/* 検索ヘッダー */}
-      <div className="text-center mb-12">
-        <h2 className="text-xs font-bold text-[#8B7D6B] tracking-[0.4em] uppercase mb-4">Find your Brewery</h2>
-        <h3 className="text-2xl md:text-3xl font-serif font-bold mb-8 text-[#1F1F1F]">全国の蔵から探す</h3>
-        
-        <form onSubmit={handleSearch} className="max-w-xl mx-auto relative group">
-          <input 
-            type="text" 
-            placeholder="蔵名、銘柄、エリアを入力してください" 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-lg py-4 px-6 text-sm focus:outline-none focus:border-[#8B7D6B] focus:ring-1 focus:ring-[#8B7D6B] transition-all shadow-sm group-hover:shadow-md text-[#1F1F1F]"
-          />
-          <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#8B7D6B] transition-colors p-2">
-            <Search size={20} />
-          </button>
-        </form>
+      <div className="text-center mb-8">
+        <h2 className="text-xs font-bold text-[#8B7D6B] tracking-[0.4em] uppercase mb-4">Search by Map</h2>
+        <h3 className="text-2xl md:text-3xl font-serif font-bold text-[#1F1F1F]">地図から探す</h3>
       </div>
 
       {/* マップUIコンテナ */}
@@ -93,7 +96,10 @@ export default function BreweryMapUI({ onSearch }: Props) {
             <svg 
               viewBox="0 0 400 400" 
               className="w-full h-full drop-shadow-sm"
-              onMouseLeave={() => setHoveredRegion(null)}
+              onMouseLeave={() => {
+                setHoveredRegion(null);
+                setHoverSource(null);
+              }}
             >
               <defs>
                 <filter id="glow">
@@ -107,7 +113,7 @@ export default function BreweryMapUI({ onSearch }: Props) {
 
               {/* 北海道 */}
               <g 
-                onMouseEnter={() => setHoveredRegion('hokkaido')}
+                onMouseEnter={() => { setHoveredRegion('hokkaido'); setHoverSource('map'); }}
                 className="cursor-pointer transition-all duration-300"
               >
                 <rect x="270" y="30" width="80" height="70" rx="8" 
@@ -119,7 +125,7 @@ export default function BreweryMapUI({ onSearch }: Props) {
 
               {/* 東北 */}
               <g 
-                onMouseEnter={() => setHoveredRegion('tohoku')}
+                onMouseEnter={() => { setHoveredRegion('tohoku'); setHoverSource('map'); }}
                 className="cursor-pointer transition-all duration-300"
               >
                 <rect x="270" y="110" width="50" height="90" rx="8" 
@@ -131,7 +137,7 @@ export default function BreweryMapUI({ onSearch }: Props) {
 
               {/* 関東 */}
               <g 
-                onMouseEnter={() => setHoveredRegion('kanto')}
+                onMouseEnter={() => { setHoveredRegion('kanto'); setHoverSource('map'); }}
                 className="cursor-pointer transition-all duration-300"
               >
                 <rect x="270" y="210" width="60" height="60" rx="8" 
@@ -143,7 +149,7 @@ export default function BreweryMapUI({ onSearch }: Props) {
 
               {/* 中部 */}
               <g 
-                onMouseEnter={() => setHoveredRegion('chubu')}
+                onMouseEnter={() => { setHoveredRegion('chubu'); setHoverSource('map'); }}
                 className="cursor-pointer transition-all duration-300"
               >
                 <rect x="210" y="150" width="50" height="90" rx="8" 
@@ -155,7 +161,7 @@ export default function BreweryMapUI({ onSearch }: Props) {
 
               {/* 関西 */}
               <g 
-                onMouseEnter={() => setHoveredRegion('kansai')}
+                onMouseEnter={() => { setHoveredRegion('kansai'); setHoverSource('map'); }}
                 className="cursor-pointer transition-all duration-300"
               >
                 <rect x="150" y="190" width="50" height="60" rx="8" 
@@ -167,7 +173,7 @@ export default function BreweryMapUI({ onSearch }: Props) {
 
               {/* 中国・四国 */}
               <g 
-                onMouseEnter={() => setHoveredRegion('chugoku_shikoku')}
+                onMouseEnter={() => { setHoveredRegion('chugoku_shikoku'); setHoverSource('map'); }}
                 className="cursor-pointer transition-all duration-300"
               >
                 <rect x="70" y="180" width="70" height="40" rx="8" 
@@ -184,7 +190,7 @@ export default function BreweryMapUI({ onSearch }: Props) {
 
               {/* 九州・沖縄 */}
               <g 
-                onMouseEnter={() => setHoveredRegion('kyushu_okinawa')}
+                onMouseEnter={() => { setHoveredRegion('kyushu_okinawa'); setHoverSource('map'); }}
                 className="cursor-pointer transition-all duration-300"
               >
                 <rect x="20" y="220" width="40" height="70" rx="8" 
@@ -206,12 +212,13 @@ export default function BreweryMapUI({ onSearch }: Props) {
         {/* 県名リストパネル */}
         <div 
           className="space-y-6 overflow-y-auto max-h-[500px] pr-2 custom-scrollbar"
-          onMouseLeave={() => setHoveredRegion(null)}
+          onMouseLeave={() => { setHoveredRegion(null); setHoverSource(null); }}
         >
           {REGIONS.map((region) => (
             <div 
               key={region.id}
-              onMouseEnter={() => setHoveredRegion(region.id)}
+              ref={(el) => { regionRefs.current[region.id] = el; }}
+              onMouseEnter={() => { setHoveredRegion(region.id); setHoverSource('list'); }}
               className={`transition-opacity duration-300 ${hoveredRegion && hoveredRegion !== region.id ? 'opacity-40' : 'opacity-100'}`}
             >
               <h4 className="text-sm font-serif font-bold text-[#8B7D6B] border-b border-gray-100 pb-2 mb-3">
@@ -222,9 +229,8 @@ export default function BreweryMapUI({ onSearch }: Props) {
                   <button 
                     key={pref} 
                     onClick={() => {
-                      setSearchQuery(pref);
-                      if (onSearch) {
-                        onSearch(pref);
+                      if (onSelectPrefecture) {
+                        onSelectPrefecture(pref, getTabRegion(pref));
                       }
                     }}
                     className={`text-[11px] text-left px-3 py-2 rounded transition-colors duration-200
