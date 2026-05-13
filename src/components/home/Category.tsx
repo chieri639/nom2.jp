@@ -16,7 +16,7 @@ export default function Category() {
     return (
         <section className="py-24 bg-[#F0EEEB]">
             <div className="container mx-auto px-6 max-w-6xl">
-                <motion.h2 
+                <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
@@ -27,7 +27,7 @@ export default function Category() {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                     {CATEGORIES.map((cat, index) => (
-                        <motion.div 
+                        <motion.div
                             key={index}
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -37,8 +37,8 @@ export default function Category() {
                         >
                             <Link href={cat.link} className="block text-center space-y-4">
                                 <div className="aspect-[3/4] bg-gray-200 overflow-hidden relative shadow-sm group-hover:shadow-lg transition-shadow duration-300 rounded-md">
-                                    <Image 
-                                        src={cat.img} 
+                                    <Image
+                                        src={cat.img}
                                         alt={cat.title}
                                         fill
                                         loading="lazy"
