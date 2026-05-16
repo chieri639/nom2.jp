@@ -1,9 +1,0 @@
-> 1%
-not dead
-not IE 11
-chrome >= 95
-safari >= 15
-edge >= 95
-firefox >= 95
-ios >= 15
-# モダンブラウザをターゲットに設定し、不要なポリフィルを削減します

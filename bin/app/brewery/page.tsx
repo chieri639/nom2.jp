@@ -12,7 +12,7 @@ export default async function BreweryIndexPage() {
 
     try {
         // 初期表示用に12件取得（モック表示時もバランスよく表示するため）
-        const res = await getBreweries({ 
+        const res = await getBreweries({
             limit: 12,
             orders: '-createdAt'
         });
@@ -52,9 +52,9 @@ export default async function BreweryIndexPage() {
             </header>
 
             {/* ── メインリスト（Client Side） ── */}
-            <BreweryListClient 
-                initialBreweries={initialBreweries} 
-                totalCount={totalCount} 
+            <BreweryListClient
+                initialBreweries={initialBreweries}
+                totalCount={totalCount}
             />
         </div>
     );

@@ -43,7 +43,7 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialBreweries.length < totalCount);
   const [offset, setOffset] = useState(initialBreweries.length);
-  
+
   const sentinelRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -86,7 +86,7 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearchQuery(val);
-    
+
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     searchTimeoutRef.current = setTimeout(() => {
       handleFilterChange(val, selectedRegion);
@@ -160,29 +160,29 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {breweries.map((brewery) => {
-             const plainContent = unescapeHtml(
-                (brewery.content || '')
-                    .replace(/<[^>]+>/g, ' ')
-                    .replace(/\s+/g, ' ')
-                    .trim()
+            const plainContent = unescapeHtml(
+              (brewery.content || '')
+                .replace(/<[^>]+>/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
             );
 
             return (
-              <Link 
-                href={`/brewery/${brewery.oldId || brewery.id}`} 
-                key={brewery.id} 
+              <Link
+                href={`/brewery/${brewery.oldId || brewery.id}`}
+                key={brewery.id}
                 className="brewery-card group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl transition-[box-shadow,transform] duration-500 flex flex-col h-full overflow-hidden"
               >
                 {/* 16:9 Image Area */}
                 <div className="aspect-[16/9] relative overflow-hidden bg-gray-50 border-b border-gray-50">
                   {/* Typography Placeholder (Simplified DOM) */}
                   <span className="absolute inset-0 flex items-center justify-center opacity-[0.03] select-none pointer-events-none font-serif text-5xl font-black italic break-all text-center px-4 leading-none">
-                      {brewery.name.replace(/公式|サイト|株式会社|有限会社|合名会社|合資会社|\(.*\)|（.*）/g, '').trim()}
+                    {brewery.name.replace(/公式|サイト|株式会社|有限会社|合名会社|合資会社|\(.*\)|（.*）/g, '').trim()}
                   </span>
 
                   {brewery.imageUrl ? (
-                    <Image 
-                      src={brewery.imageUrl} 
+                    <Image
+                      src={brewery.imageUrl}
                       alt={brewery.name}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -216,7 +216,7 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
                   <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed mb-4">
                     {plainContent}
                   </p>
-                  
+
                   <div className="mt-auto pt-3 border-t border-gray-50 flex justify-end">
                     <span className="text-[10px] font-bold text-[#8B7D6B] flex items-center group-hover:translate-x-1 transition-transform duration-300">
                       VIEW DETAIL <span className="ml-1">→</span>
@@ -241,8 +241,8 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
         )}
 
         {/* ── Infinite Scroll Sentinel / Loading ── */}
-        <div 
-          ref={sentinelRef} 
+        <div
+          ref={sentinelRef}
           className="h-40 flex flex-col items-center justify-center mt-12 transition-opacity duration-300"
         >
           {isLoading && (

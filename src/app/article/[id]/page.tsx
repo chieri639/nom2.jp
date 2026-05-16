@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { getArticleDetail } from '@/lib/microcms';
 import { Search, Sparkles } from 'lucide-react';
@@ -41,11 +42,18 @@ export default async function ArticleDetailPage(props: any) {
 
   if (!id) return null;
 
-  // IDで直接取得（大文字・小文字どちらでも対応）
-  // next.config.js の redirects() が大文字→小文字の正規化を担当するためリダイレクト不要
+  // 大文字のIDが来た場合は小文字へ301リダイレクト
+  if (id !== id.toLowerCase()) {
+    const lowerId = id.toLowerCase();
+    const lowerArticle = await fetchArticle(lowerId).catch(() => null);
+    if (lowerArticle) {
+      permanentRedirect(`/article/${lowerId}`);
+    }
+  }
+
   let article: any = await fetchArticle(id);
 
-  // 直接取得できない場合は小文字で再試行（リダイレクトはしない）
+  // 直接取得できない場合は小文字で再試行
   if (!article) {
     article = await fetchArticle(id.toLowerCase());
   }

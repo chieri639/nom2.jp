@@ -22,13 +22,16 @@ const notoSerifJP = Noto_Serif_JP({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://nom2.jp'),
-  title: 'nom × nom - 日本酒メディアポータル',
+  title: {
+    default: 'nomnom（のむのむ） | 日本酒メディアポータル',
+    template: '%s | nomnom（のむのむ）',
+  },
   description: 'AIによる診断や和食とのペアリングなど、日本酒の新しい楽しみ方を提案するメディアポータルです。',
   openGraph: {
-    title: 'nom × nom - 日本酒メディアポータル',
+    title: 'nomnom（のむのむ） | 日本酒メディアポータル',
     description: 'AIによる診断や和食とのペアリングなど、日本酒の新しい楽しみ方を提案するメディアポータルです。',
     url: 'https://nom2.jp',
-    siteName: 'nom × nom',
+    siteName: 'nomnom（のむのむ）',
     images: [
       {
         url: '/images/logo_v2.png',

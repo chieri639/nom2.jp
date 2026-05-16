@@ -10,7 +10,7 @@ export default function DelayedScripts() {
         // Fallback timeout just in case user does nothing but wait
         const timeoutId = setTimeout(() => {
             setShouldLoad(true);
-        }, 3500);
+        }, 10000);
 
         const handleInteraction = () => {
             setShouldLoad(true);

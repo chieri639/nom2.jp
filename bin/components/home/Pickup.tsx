@@ -66,7 +66,8 @@ export default function Pickup({ articles }: { articles?: any[] }) {
                                         src={item.image} 
                                         alt={item.title}
                                         fill
-                                        sizes="(max-width: 768px) 100vw, 33vw"
+                                        sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 384px"
+                                        quality={60}
                                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />

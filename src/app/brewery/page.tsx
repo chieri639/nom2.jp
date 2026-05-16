@@ -12,7 +12,7 @@ export default async function BreweryIndexPage() {
 
     try {
         // 初期表示用に12件取得（モック表示時もバランスよく表示するため）
-        const res = await getBreweries({ 
+        const res = await getBreweries({
             limit: 12,
             orders: '-createdAt'
         });
@@ -36,7 +36,7 @@ export default async function BreweryIndexPage() {
     return (
         <div className="min-h-screen bg-[#F9F8F6]">
             {/* ── イントロセクション ── */}
-            <header className="px-6 pt-12 pb-4 text-center relative">
+            <header className="px-6 pt-12 pb-12 text-center relative">
                 <div className="max-w-4xl mx-auto">
                     <div className="absolute top-0 left-6 md:left-12">
                         <DynamicBackButton defaultHref="/" defaultText="BACK TO TOP" />
@@ -52,9 +52,9 @@ export default async function BreweryIndexPage() {
             </header>
 
             {/* ── メインリスト（Client Side） ── */}
-            <BreweryListClient 
-                initialBreweries={initialBreweries} 
-                totalCount={totalCount} 
+            <BreweryListClient
+                initialBreweries={initialBreweries}
+                totalCount={totalCount}
             />
         </div>
     );

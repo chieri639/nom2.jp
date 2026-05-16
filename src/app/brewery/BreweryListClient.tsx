@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { BREWERY } from '@/lib/microcms';
 import { Search, MapPin, Loader2, Wine } from 'lucide-react';
 import { fetchBreweriesAction } from '@/app/actions/brewery';
-import BreweryMapUI from '@/components/brewery/BreweryMapUI';
 
 type Props = {
   initialBreweries: BREWERY[];
@@ -44,7 +43,6 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialBreweries.length < totalCount);
   const [offset, setOffset] = useState(initialBreweries.length);
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
@@ -102,18 +100,8 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
     handleFilterChange(searchQuery, region);
   };
 
-  // マップから県名が選択された時の処理
-  const handleSelectPrefecture = (pref: string, region: string) => {
-    setSearchQuery(pref);
-    setSelectedRegion(region);
-    setViewMode('list');
-    handleFilterChange(pref, region);
-  };
-
   // 無限スクロールの監視
   useEffect(() => {
-    if (viewMode !== 'list') return; // リスト表示時のみ監視
-
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !isLoading) {
@@ -128,178 +116,149 @@ export default function BreweryListClient({ initialBreweries, totalCount }: Prop
     }
 
     return () => observer.disconnect();
-  }, [hasMore, isLoading, offset, searchQuery, selectedRegion, loadMore, viewMode]);
+  }, [hasMore, isLoading, offset, searchQuery, selectedRegion, loadMore]);
 
   return (
     <div className="min-h-screen bg-[#F9F8F6]">
-      
-      {/* ── View Mode Toggle ── */}
-      <div className="bg-[#F9F8F6] pt-2 pb-6">
-        <div className="max-w-xs md:max-w-md mx-auto px-4 flex bg-white rounded-full shadow-sm p-1 border border-gray-100">
-          <button 
-            onClick={() => setViewMode('list')}
-            className={`flex-1 py-2 text-sm font-bold rounded-full transition-all ${viewMode === 'list' ? 'bg-[#8B7D6B] text-white shadow' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            リストから探す
-          </button>
-          <button 
-            onClick={() => setViewMode('map')}
-            className={`flex-1 py-2 text-sm font-bold rounded-full transition-all ${viewMode === 'map' ? 'bg-[#8B7D6B] text-white shadow' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            地図から探す
-          </button>
+      {/* ── Sticky Header ── */}
+      <div className="sticky top-0 z-40 bg-[#F9F8F6]/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-shadow duration-300">
+        <div className="max-w-7xl mx-auto px-6 py-4 space-y-4">
+          {/* Search Input */}
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#8B7D6B] transition-colors" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={onSearchChange}
+              placeholder="蔵名、銘柄、地域で検索..."
+              className="w-full bg-white border border-gray-200 rounded-full py-3.5 pl-12 pr-6 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B7D6B]/20 focus:border-[#8B7D6B] transition-all shadow-sm placeholder:text-gray-300"
+            />
+          </div>
+
+          {/* Region Tabs */}
+          <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar pb-1 -mx-2 px-2">
+            {REGIONS.map((region) => (
+              <button
+                key={region}
+                onClick={() => onRegionChange(region)}
+                className={`
+                  flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all
+                  ${selectedRegion === region
+                    ? 'bg-[#8B7D6B] text-white shadow-md'
+                    : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'
+                  }
+                `}
+              >
+                {region}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {viewMode === 'map' && (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <BreweryMapUI onSelectPrefecture={handleSelectPrefecture} />
-        </div>
-      )}
+      {/* ── Brewery Grid ── */}
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {breweries.map((brewery) => {
+            const plainContent = unescapeHtml(
+              (brewery.content || '')
+                .replace(/<[^>]+>/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+            );
 
-      {viewMode === 'list' && (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* ── Sticky Header ── */}
-          <div className="sticky top-0 z-40 bg-[#F9F8F6]/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-shadow duration-300">
-            <div className="max-w-7xl mx-auto px-6 py-4 space-y-4">
-              {/* Search Input */}
-              <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#8B7D6B] transition-colors" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={onSearchChange}
-                  placeholder="蔵名、銘柄、地域で検索..."
-                  className="w-full bg-white border border-gray-200 rounded-full py-3.5 pl-12 pr-6 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B7D6B]/20 focus:border-[#8B7D6B] transition-all shadow-sm placeholder:text-gray-300"
-                />
-              </div>
+            return (
+              <Link
+                href={`/brewery/${brewery.oldId || brewery.id}`}
+                key={brewery.id}
+                className="brewery-card group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl transition-[box-shadow,transform] duration-500 flex flex-col h-full overflow-hidden"
+              >
+                {/* 16:9 Image Area */}
+                <div className="aspect-[16/9] relative overflow-hidden bg-gray-50 border-b border-gray-50">
+                  {/* Typography Placeholder (Simplified DOM) */}
+                  <span className="absolute inset-0 flex items-center justify-center opacity-[0.03] select-none pointer-events-none font-serif text-5xl font-black italic break-all text-center px-4 leading-none">
+                    {brewery.name.replace(/公式|サイト|株式会社|有限会社|合名会社|合資会社|\(.*\)|（.*）/g, '').trim()}
+                  </span>
 
-              {/* Region Tabs */}
-              <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar pb-1 -mx-2 px-2">
-                {REGIONS.map((region) => (
-                  <button
-                    key={region}
-                    onClick={() => onRegionChange(region)}
-                    className={`
-                      flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all
-                      ${selectedRegion === region
-                        ? 'bg-[#8B7D6B] text-white shadow-md'
-                        : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100'
-                      }
-                    `}
-                  >
-                    {region}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* ── Brewery Grid ── */}
-          <div className="max-w-7xl mx-auto px-6 py-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {breweries.map((brewery) => {
-                const plainContent = unescapeHtml(
-                  (brewery.content || '')
-                    .replace(/<[^>]+>/g, ' ')
-                    .replace(/\s+/g, ' ')
-                    .trim()
-                );
-
-                return (
-                  <Link
-                    href={`/brewery/${brewery.oldId || brewery.id}`}
-                    key={brewery.id}
-                    className="brewery-card group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl transition-[box-shadow,transform] duration-500 flex flex-col h-full overflow-hidden"
-                  >
-                    {/* 16:9 Image Area */}
-                    <div className="aspect-[16/9] relative overflow-hidden bg-gray-50 border-b border-gray-50">
-                      {/* Typography Placeholder (Simplified DOM) */}
-                      <span className="absolute inset-0 flex items-center justify-center opacity-[0.03] select-none pointer-events-none font-serif text-5xl font-black italic break-all text-center px-4 leading-none">
-                        {brewery.name.replace(/公式|サイト|株式会社|有限会社|合名会社|合資会社|\(.*\)|（.*）/g, '').trim()}
-                      </span>
-
-                      {brewery.imageUrl ? (
-                        <Image
-                          src={brewery.imageUrl}
-                          alt={brewery.name}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-200">
-                          <Wine size={48} strokeWidth={1} />
-                        </div>
-                      )}
-
-                      {/* Prefecture Badge */}
-                      {brewery.prefecture && (
-                        <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded text-[10px] font-bold text-[#8B7D6B] shadow-sm tracking-wider">
-                          {brewery.prefecture}
-                        </span>
-                      )}
+                  {brewery.imageUrl ? (
+                    <Image
+                      src={brewery.imageUrl}
+                      alt={brewery.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-200">
+                      <Wine size={48} strokeWidth={1} />
                     </div>
+                  )}
 
-                    {/* Content Area */}
-                    <div className="p-5 flex flex-col flex-grow">
-                      <h2 className="font-serif font-bold text-base text-[#1F1F1F] mb-1.5 group-hover:text-[#8B7D6B] transition-colors duration-200 line-clamp-1">
-                        {unescapeHtml(brewery.name)}
-                      </h2>
-                      {brewery.address && (
-                        <div className="flex items-center text-[10px] text-gray-400 font-medium mb-3">
-                          <MapPin className="w-3 h-3 mr-1" />
-                          <span className="truncate">{brewery.address.replace(/^〒?\d{3}-\d{4}\s*/, '')}</span>
-                        </div>
-                      )}
-                      <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed mb-4">
-                        {plainContent}
-                      </p>
+                  {/* Prefecture Badge */}
+                  {brewery.prefecture && (
+                    <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded text-[10px] font-bold text-[#8B7D6B] shadow-sm tracking-wider">
+                      {brewery.prefecture}
+                    </span>
+                  )}
+                </div>
 
-                      <div className="mt-auto pt-3 border-t border-gray-50 flex justify-end">
-                        <span className="text-[10px] font-bold text-[#8B7D6B] flex items-center group-hover:translate-x-1 transition-transform duration-300">
-                          VIEW DETAIL <span className="ml-1">→</span>
-                        </span>
-                      </div>
+                {/* Content Area */}
+                <div className="p-5 flex flex-col flex-grow">
+                  <h2 className="font-serif font-bold text-base text-[#1F1F1F] mb-1.5 group-hover:text-[#8B7D6B] transition-colors duration-200 line-clamp-1">
+                    {unescapeHtml(brewery.name)}
+                  </h2>
+                  {brewery.address && (
+                    <div className="flex items-center text-[10px] text-gray-400 font-medium mb-3">
+                      <MapPin className="w-3 h-3 mr-1" />
+                      <span className="truncate">{brewery.address.replace(/^〒?\d{3}-\d{4}\s*/, '')}</span>
                     </div>
-                  </Link>
-                );
-              })}
-            </div>
+                  )}
+                  <p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed mb-4">
+                    {plainContent}
+                  </p>
 
-            {/* ── Empty State ── */}
-            {!isLoading && breweries.length === 0 && (
-              <div className="text-center py-40">
-                <div className="bg-white/50 inline-block p-8 rounded-full mb-6">
-                  <Search className="w-12 h-12 text-gray-200 mx-auto" />
+                  <div className="mt-auto pt-3 border-t border-gray-50 flex justify-end">
+                    <span className="text-[10px] font-bold text-[#8B7D6B] flex items-center group-hover:translate-x-1 transition-transform duration-300">
+                      VIEW DETAIL <span className="ml-1">→</span>
+                    </span>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-400 tracking-widest uppercase">
-                  該当する酒蔵が見つかりません
-                </p>
-              </div>
-            )}
-
-            {/* ── Infinite Scroll Sentinel / Loading ── */}
-            <div
-              ref={sentinelRef}
-              className="h-40 flex flex-col items-center justify-center mt-12 transition-opacity duration-300"
-            >
-              {isLoading && (
-                <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-2">
-                  <Loader2 className="w-8 h-8 text-[#8B7D6B] animate-spin mb-3" />
-                  <p className="text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase">Loading Archives</p>
-                </div>
-              )}
-              {!hasMore && breweries.length > 0 && (
-                <div className="flex flex-col items-center opacity-40">
-                  <div className="w-12 h-px bg-gray-300 mb-6"></div>
-                  <p className="text-[10px] font-bold text-gray-400 tracking-[0.4em] uppercase">End of Database</p>
-                </div>
-              )}
-            </div>
-          </div>
+              </Link>
+            );
+          })}
         </div>
-      )}
+
+        {/* ── Empty State ── */}
+        {!isLoading && breweries.length === 0 && (
+          <div className="text-center py-40">
+            <div className="bg-white/50 inline-block p-8 rounded-full mb-6">
+              <Search className="w-12 h-12 text-gray-200 mx-auto" />
+            </div>
+            <p className="text-sm text-gray-400 tracking-widest uppercase">
+              該当する酒蔵が見つかりません
+            </p>
+          </div>
+        )}
+
+        {/* ── Infinite Scroll Sentinel / Loading ── */}
+        <div
+          ref={sentinelRef}
+          className="h-40 flex flex-col items-center justify-center mt-12 transition-opacity duration-300"
+        >
+          {isLoading && (
+            <div className="flex flex-col items-center animate-in fade-in slide-in-from-bottom-2">
+              <Loader2 className="w-8 h-8 text-[#8B7D6B] animate-spin mb-3" />
+              <p className="text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase">Loading Archives</p>
+            </div>
+          )}
+          {!hasMore && breweries.length > 0 && (
+            <div className="flex flex-col items-center opacity-40">
+              <div className="w-12 h-px bg-gray-300 mb-6"></div>
+              <p className="text-[10px] font-bold text-gray-400 tracking-[0.4em] uppercase">End of Database</p>
+            </div>
+          )}
+        </div>
+      </div>
 
     </div>
   );
