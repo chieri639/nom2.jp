@@ -7,14 +7,23 @@ import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
 export const revalidate = 0;
 
-export default async function ArticleIndexPage() {
+export default async function ArticleIndexPage(props: any) {
+    const searchParams = await props.searchParams;
+    const page = parseInt(searchParams?.page || '1', 10);
+    const limit = 24;
+    const offset = (page - 1) * limit;
+
     let articles: any[] = [];
+    let totalCount = 0;
     try {
-        const res = await getArticles({ limit: 100 });
+        const res = await getArticles({ limit, offset });
         articles = res.contents || [];
+        totalCount = res.totalCount || 0;
     } catch (e) {
         console.error('Article fetch error:', e);
     }
+
+    const totalPages = Math.ceil(totalCount / limit);
 
     return (
         <div className="min-h-screen pb-24">
@@ -90,6 +99,25 @@ export default async function ArticleIndexPage() {
                 {articles.length === 0 && (
                     <div className="py-24 text-center">
                         <p className="text-gray-400 tracking-[0.2em]">NO ARTICLES FOUND</p>
+                    </div>
+                )}
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex justify-center gap-3 mt-16">
+                        {Array.from({ length: totalPages }).map((_, i) => (
+                            <Link
+                                key={i}
+                                href={`/article?page=${i + 1}`}
+                                className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-bold transition-all ${
+                                    page === i + 1 
+                                        ? 'bg-[#8B7D6B] text-white shadow-md' 
+                                        : 'bg-white border border-gray-200 text-gray-500 hover:border-[#8B7D6B] hover:text-[#8B7D6B]'
+                                }`}
+                            >
+                                {i + 1}
+                            </Link>
+                        ))}
                     </div>
                 )}
             </main>
