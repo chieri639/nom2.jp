@@ -68,6 +68,7 @@ export default async function ArticleIndexPage(props: any) {
                                             fill
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                             priority={index < 4}
+                                            fetchPriority={index < 4 ? 'high' : 'auto'}
                                             className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110" 
                                         />
                                     ) : (
