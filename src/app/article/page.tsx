@@ -5,7 +5,7 @@ import { getArticles } from '@/lib/microcms';
 import { BookOpen, ArrowRight, Languages } from 'lucide-react';
 import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export default async function ArticleIndexPage(props: any) {
     const searchParams = await props.searchParams;
@@ -56,7 +56,7 @@ export default async function ArticleIndexPage(props: any) {
 
             {/* Grid Container */}
             <main className="max-w-7xl mx-auto px-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10">
                     {articles.map((article, index) => (
                         <Link href={`/article/${article.id}`} key={article.id} className="group flex flex-col h-full">
                             <article className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 h-full flex flex-col transform-gpu">
@@ -81,17 +81,16 @@ export default async function ArticleIndexPage(props: any) {
                                     )}
                                 </div>
 
-                                <div className="p-8 flex flex-col flex-grow">
-                                    <h2 className="text-xl font-bold text-[#1F1F1F] leading-snug mb-4 group-hover:text-[#8B7D6B] transition-colors font-serif-jp line-clamp-2 min-h-[2.8em]">
+                                <div className="p-4 md:p-8 flex flex-col flex-grow">
+                                    <h2 className="text-sm md:text-xl font-bold text-[#1F1F1F] leading-snug mb-2 md:mb-4 group-hover:text-[#8B7D6B] transition-colors font-serif-jp line-clamp-2">
                                         {article.title}
                                     </h2>
-                                    <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-8 flex-grow">
+                                    <p className="hidden md:block text-sm text-gray-500 leading-relaxed line-clamp-3 mb-8 flex-grow">
                                         {(article.content || '').replace(/<[^>]+>/g, '').replace(/\n+/g, ' ')}
                                     </p>
-                                    <div className="flex items-center justify-between pt-6 border-t border-gray-50 mt-auto">
-                                        <span className="text-[10px] font-bold text-gray-300 tracking-[0.2em] uppercase">FEATURED ARTICLE</span>
+                                    <div className="flex items-center justify-end pt-3 md:pt-6 border-t border-gray-50 mt-auto">
                                         <span className="text-[10px] text-[#8B7D6B] font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                                            READ MORE <ArrowRight size={12} />
+                                            READ <ArrowRight size={10} />
                                         </span>
                                     </div>
                                 </div>
