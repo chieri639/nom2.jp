@@ -10,13 +10,16 @@ export const revalidate = 0;
 export default async function ArticleIndexPage(props: any) {
     const searchParams = await props.searchParams;
     const page = parseInt(searchParams?.page || '1', 10);
-    const limit = 24;
+    const limit = 12;
     const offset = (page - 1) * limit;
 
     let articles: any[] = [];
     let totalCount = 0;
     try {
-        const res = await getArticles({ limit, offset });
+        const res = await getArticles(
+            { limit, offset }, 
+            { next: { revalidate: 3600 } } as RequestInit
+        );
         articles = res.contents || [];
         totalCount = res.totalCount || 0;
     } catch (e) {
