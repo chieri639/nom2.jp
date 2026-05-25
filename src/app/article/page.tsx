@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getArticles } from '@/lib/microcms';
 import { BookOpen, ArrowRight, Languages } from 'lucide-react';
 import DynamicBackButton from '@/components/layout/DynamicBackButton';
@@ -44,7 +45,7 @@ export default async function ArticleIndexPage() {
             {/* Grid Container */}
             <main className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    {articles.map((article) => (
+                    {articles.map((article, index) => (
                         <Link href={`/article/${article.id}`} key={article.id} className="group flex flex-col h-full">
                             <article className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 h-full flex flex-col transform-gpu">
                                 <div className="aspect-[16/10] relative overflow-hidden bg-gray-50">
@@ -52,13 +53,16 @@ export default async function ArticleIndexPage() {
                                         特集記事
                                     </span>
                                     {article.imageUrl ? (
-                                        <img 
+                                        <Image 
                                             src={article.imageUrl} 
                                             alt={article.title} 
-                                            className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110" 
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            priority={index < 4}
+                                            className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110" 
                                         />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-200">
+                                        <div className="w-full h-full flex items-center justify-center text-gray-200 relative z-0">
                                             <BookOpen size={48} strokeWidth={1} />
                                         </div>
                                     )}

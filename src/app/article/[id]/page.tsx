@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { getArticleDetail } from '@/lib/microcms';
@@ -82,8 +83,15 @@ export default async function ArticleDetailPage(props: any) {
           </h1>
 
           {article.imageUrl && (
-            <div className="aspect-[21/9] w-full max-w-5xl mx-auto rounded-lg overflow-hidden shadow-2xl">
-              <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
+            <div className="aspect-[21/9] w-full max-w-5xl mx-auto rounded-lg overflow-hidden shadow-2xl relative">
+              <Image 
+                src={article.imageUrl} 
+                alt={article.title} 
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 1024px"
+                className="object-cover" 
+              />
             </div>
           )}
         </div>
