@@ -27,6 +27,10 @@ export const metadata: Metadata = {
     template: '%s | nomnom（のむのむ）',
   },
   description: 'AIによる診断や和食とのペアリングなど、日本酒の新しい楽しみ方を提案するメディアポータルです。',
+  icons: {
+    icon: '/icon.png',
+    apple: '/icon.png',
+  },
   openGraph: {
     title: 'nomnom（のむのむ） | 日本酒メディアポータル',
     description: 'AIによる診断や和食とのペアリングなど、日本酒の新しい楽しみ方を提案するメディアポータルです。',
