@@ -1,10 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        formats: ['image/avif', 'image/webp'],
-        deviceSizes: [420, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-        imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-        // 画像最適化を有効化（unoptimized: true を削除）
+        // avifは生成コストが高くVercelの変換数を大量消費するためwebpのみに限定
+        formats: ['image/webp'],
+        // ブレイクポイントを4つに絞る（以前の9→4で変換数を約55%削減）
+        deviceSizes: [640, 828, 1200, 1920],
+        // fillプロパティ使用時はimageSizesは不要なので削除
+        // imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+        // 変換済み画像を1年間CDNにキャッシュ → 同じ画像は二度変換されない
+        minimumCacheTTL: 60 * 60 * 24 * 365,
         remotePatterns: [
             {
                 protocol: 'https',
