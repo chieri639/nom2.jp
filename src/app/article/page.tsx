@@ -5,7 +5,7 @@ import { getArticles } from '@/lib/microcms';
 import { BookOpen, ArrowRight, Languages } from 'lucide-react';
 import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 export default async function ArticleIndexPage(props: any) {
     const searchParams = await props.searchParams;
@@ -18,7 +18,7 @@ export default async function ArticleIndexPage(props: any) {
     try {
         const res = await getArticles(
             { limit, offset }, 
-            { next: { revalidate: 3600 } } as RequestInit
+            { next: { revalidate: 60 } } as RequestInit
         );
         articles = res.contents || [];
         totalCount = res.totalCount || 0;
