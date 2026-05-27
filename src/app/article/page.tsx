@@ -85,7 +85,7 @@ export default async function ArticleIndexPage(props: any) {
                                     <h2 className="text-sm md:text-xl font-bold text-[#1F1F1F] leading-snug mb-2 md:mb-4 group-hover:text-[#8B7D6B] transition-colors font-serif-jp line-clamp-2">
                                         {article.title}
                                     </h2>
-                                    <p className="hidden md:block text-sm text-gray-500 leading-relaxed line-clamp-3 mb-8 flex-grow">
+                                    <p className="hidden md:[-webkit-box] text-sm text-gray-500 leading-relaxed line-clamp-3 mb-8 flex-grow">
                                         {(article.content || '').replace(/<[^>]+>/g, '').replace(/\n+/g, ' ')}
                                     </p>
                                     <div className="flex items-center justify-end pt-3 md:pt-6 border-t border-gray-50 mt-auto">

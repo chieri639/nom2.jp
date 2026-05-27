@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        // avifは生成コストが高くVercelの変換数を大量消費するためwebpのみに限定
+        // Vercelの無料枠上限に達したため、今月は最適化を完全に無効化して元の画像を直接配信する
+        unoptimized: true,
         formats: ['image/webp'],
-        // ブレイクポイントを4つに絞る（以前の9→4で変換数を約55%削減）
         deviceSizes: [640, 828, 1200, 1920],
         // fillプロパティ使用時はimageSizesは不要なので削除
         // imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
