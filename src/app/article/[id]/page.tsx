@@ -58,7 +58,8 @@ export default async function ArticleDetailPage(props: any) {
   }
 
   let article: any = await fetchArticle(id);
-const otherArticles = await getArticles({ limit: 6, offset: 0 }) as any[];
+const otherArticlesResponse = await getArticles({ limit: 6, offset: 0 });
+const otherArticles = otherArticlesResponse.contents as any[];
 
   // 直接取得できない場合は小文字で再試行
   if (!article) {
