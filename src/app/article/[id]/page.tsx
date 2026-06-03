@@ -3,7 +3,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
-import { getArticleDetail } from '@/lib/microcms';
+import { getArticles, getArticleDetail } from '@/lib/microcms';
+
+// other imports remain
+
+// otherArticles will be fetched inside the component
+
 import { Search, Sparkles } from 'lucide-react';
 import DynamicBackButton from '@/components/layout/DynamicBackButton';
 
@@ -53,6 +58,7 @@ export default async function ArticleDetailPage(props: any) {
   }
 
   let article: any = await fetchArticle(id);
+const otherArticles = await getArticles({ limit: 6, offset: 0 }) as any[];
 
   // 直接取得できない場合は小文字で再試行
   if (!article) {
@@ -119,6 +125,24 @@ export default async function ArticleDetailPage(props: any) {
               <Link href="/similar" className="group flex items-center gap-3 px-8 py-4 bg-[#8B7D6B] text-white rounded-full text-sm font-bold hover:brightness-110 transition-all shadow-lg hover:-translate-y-1">
                 <Sparkles size={18} /> AIにおすすめを聞く
               </Link>
+            </div>
+          </div>
+          {/* Related Articles */}
+          <div className="mt-16 pt-8 border-t border-gray-100">
+            <h3 className="text-xl font-bold text-[#1F1F1F] mb-6 text-center">関連記事</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {otherArticles.filter(a => a.id !== article.id).map((rel) => (
+                <Link key={rel.id} href={`/article/${rel.id}`} className="group block border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
+                  {rel.imageUrl && (
+                    <div className="aspect-[16/9] relative">
+                      <Image src={rel.imageUrl} alt={rel.title} fill className="object-cover transition-transform group-hover:scale-105" />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <h4 className="font-semibold text-[#1F1F1F] group-hover:text-[#8B7D6B] transition-colors line-clamp-2">{rel.title}</h4>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
