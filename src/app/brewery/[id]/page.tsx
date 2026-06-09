@@ -19,7 +19,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
       title: `${brewery.name} | nom × nom`,
       description: `${brewery.name}の日本酒情報・銘柄一覧`.slice(0, 120),
       alternates: {
-        canonical: `https://nom2.jp/brewery/${brewery.id}`,
+        canonical: `https://nom2.jp/brewery/${brewery.id.toLowerCase()}`,
       },
     };
   } catch {

@@ -216,3 +216,63 @@ export function cleanBreweryData(html: string, entity: BREWERY) {
     website: website || ''
   };
 }
+
+/**
+ * 関連記事を取得する
+ * 1. 同じカテゴリの記事をフィルターで取得（現在の記事を除外）
+ * 2. カテゴリで十分な件数が取れない場合は、最新記事でフォールバック
+ * @param currentId 現在の記事ID（除外用）
+ * @param category 現在の記事のカテゴリ
+ * @param limit 取得件数（デフォルト: 5）
+ * @returns 関連記事の配列
+ */
+export async function getRelatedArticles(
+  currentId: string,
+  category: string | undefined,
+  limit: number = 5
+): Promise<ARTICLE[]> {
+  const fetchLimit = limit + 1; // 現在の記事が含まれる可能性があるため+1
+
+  try {
+    let related: ARTICLE[] = [];
+
+    // カテゴリが指定されている場合、同カテゴリの記事を取得
+    if (category) {
+      const res = await getArticles({
+        filters: `category[equals]${category}`,
+        limit: fetchLimit,
+        orders: '-publishedAt',
+      });
+      related = (res.contents || []).filter((a) => a.id !== currentId);
+    }
+
+    // カテゴリで十分な件数が取れない場合、最新記事でフォールバック
+    if (related.length < 3) {
+      const fallbackRes = await getArticles({
+        limit: fetchLimit + 3, // 十分な件数を確保
+        orders: '-publishedAt',
+      });
+      const fallbackArticles = (fallbackRes.contents || []).filter(
+        (a) => a.id !== currentId && !related.some((r) => r.id === a.id)
+      );
+      related = [...related, ...fallbackArticles];
+    }
+
+    return related.slice(0, limit);
+  } catch (error) {
+    console.error('Failed to fetch related articles:', error);
+
+    // エラー時も最新記事でフォールバック
+    try {
+      const fallback = await getArticles({
+        limit: fetchLimit,
+        orders: '-publishedAt',
+      });
+      return (fallback.contents || [])
+        .filter((a) => a.id !== currentId)
+        .slice(0, limit);
+    } catch {
+      return [];
+    }
+  }
+}

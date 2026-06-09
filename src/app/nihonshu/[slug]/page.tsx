@@ -29,7 +29,7 @@ export async function generateMetadata(props: any): Promise<Metadata> {
     title: `${sake.name} | nom × nom`,
     description: sake.description?.slice(0, 120) || `${sake.name}の詳細情報`,
     alternates: {
-      canonical: `https://nom2.jp/nihonshu/${canonicalId}`,
+      canonical: `https://nom2.jp/nihonshu/${canonicalId.toLowerCase()}`,
     },
   };
 }

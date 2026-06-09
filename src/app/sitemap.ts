@@ -78,7 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   articles.forEach((item) => {
     sitemapUrls.push({
-      url: `${siteUrl}/article/${item.id}`,
+      url: `${siteUrl}/article/${item.id.toLowerCase()}`,
       lastModified: new Date(item.updatedAt),
       changeFrequency: 'weekly',
       priority: 0.7,
@@ -87,7 +87,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   breweries.forEach((item) => {
     sitemapUrls.push({
-      url: `${siteUrl}/brewery/${item.id}`,
+      url: `${siteUrl}/brewery/${item.id.toLowerCase()}`,
       lastModified: new Date(item.updatedAt),
       changeFrequency: 'weekly',
       priority: 0.6,
@@ -96,7 +96,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   brands.forEach((item) => {
     sitemapUrls.push({
-      url: `${siteUrl}/brand/${item.id}`,
+      url: `${siteUrl}/brand/${item.id.toLowerCase()}`,
       lastModified: new Date(item.updatedAt),
       changeFrequency: 'weekly',
       priority: 0.6,
@@ -105,7 +105,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   sakes.forEach((item) => {
     sitemapUrls.push({
-      url: `${siteUrl}/nihonshu/${item.id}`,
+      url: `${siteUrl}/nihonshu/${item.id.toLowerCase()}`,
       lastModified: new Date(item.updatedAt),
       changeFrequency: 'weekly',
       priority: 0.6,

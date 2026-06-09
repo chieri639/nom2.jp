@@ -3,7 +3,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
-import { getArticles, getArticleDetail } from '@/lib/microcms';
+import { draftMode } from 'next/headers';
+import { getArticleDetail } from '@/lib/microcms';
+import RelatedArticles from '@/components/common/RelatedArticles';
 
 // other imports remain
 
@@ -15,9 +17,10 @@ import DynamicBackButton from '@/components/layout/DynamicBackButton';
 export const revalidate = 0;
 
 
-async function fetchArticle(id: string) {
+async function fetchArticle(id: string, draftKey?: string) {
   try {
-    return await getArticleDetail(id);
+    const queries = draftKey ? { draftKey } : undefined;
+    return await getArticleDetail(id, queries);
   } catch {
     return null;
   }
@@ -37,33 +40,44 @@ export async function generateMetadata(props: any): Promise<Metadata> {
     title: `${article.title} | nom × nom`,
     description: article.content?.replace(/<[^>]+>/g, '').slice(0, 120) || article.title,
     alternates: {
-      canonical: `https://nom2.jp/article/${canonicalId}`,
+      canonical: `https://nom2.jp/article/${canonicalId.toLowerCase()}`,
     },
   };
 }
 
 export default async function ArticleDetailPage(props: any) {
   const params = await props.params;
+  const searchParams = await props.searchParams;
   const id = params?.id;
+  const draftKey = searchParams?.draftKey as string | undefined;
+
+  // Draft Mode の状態を取得
+  const { isEnabled: isDraftMode } = await draftMode();
 
   if (!id) return null;
 
-  // 大文字のIDが来た場合は小文字へ301リダイレクト
-  if (id !== id.toLowerCase()) {
-    const lowerId = id.toLowerCase();
-    const lowerArticle = await fetchArticle(lowerId).catch(() => null);
-    if (lowerArticle) {
-      permanentRedirect(`/article/${lowerId}`);
+  // Draft Mode でない場合のみリダイレクト処理を行う
+  if (!isDraftMode) {
+    // 大文字のIDが来た場合は小文字へ301リダイレクト
+    if (id !== id.toLowerCase()) {
+      const lowerId = id.toLowerCase();
+      const lowerArticle = await fetchArticle(lowerId).catch(() => null);
+      if (lowerArticle) {
+        permanentRedirect(`/article/${lowerId}`);
+      }
     }
   }
 
-  let article: any = await fetchArticle(id);
-const otherArticlesResponse = await getArticles({ limit: 6, offset: 0 });
-const otherArticles = otherArticlesResponse.contents as any[];
+  // Draft Mode 時は draftKey を渡して下書きデータを取得
+  let article: any = isDraftMode && draftKey
+    ? await fetchArticle(id, draftKey)
+    : await fetchArticle(id);
 
   // 直接取得できない場合は小文字で再試行
   if (!article) {
-    article = await fetchArticle(id.toLowerCase());
+    article = isDraftMode && draftKey
+      ? await fetchArticle(id.toLowerCase(), draftKey)
+      : await fetchArticle(id.toLowerCase());
   }
 
   if (!article) {
@@ -79,8 +93,20 @@ const otherArticles = otherArticlesResponse.contents as any[];
 
   return (
     <div className="min-h-screen pb-24">
+      {/* Draft Mode バナー */}
+      {isDraftMode && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-black text-center py-2 px-4 text-sm font-bold shadow-lg">
+          🔍 プレビューモード — 下書きコンテンツを表示中（ID: {article.id}）
+          <a
+            href="/api/disable-draft"
+            className="ml-4 inline-block bg-black text-white px-3 py-1 rounded text-xs hover:bg-gray-800 transition-colors"
+          >
+            プレビューを終了
+          </a>
+        </div>
+      )}
       {/* Article Header (Hero) */}
-      <header className="px-6 pt-20 pb-16 text-center border-b border-gray-100 bg-white">
+      <header className={`px-6 ${isDraftMode ? 'pt-28' : 'pt-20'} pb-16 text-center border-b border-gray-100 bg-white`}>
         <div className="max-w-4xl mx-auto">
           <span className="inline-block bg-[#8B7D6B]/10 text-[#8B7D6B] px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase mb-8">
             FEATURED ARTICLE
@@ -125,24 +151,11 @@ const otherArticles = otherArticlesResponse.contents as any[];
               </Link>
             </div>
           </div>
-          {/* Related Articles */}
-          <div className="mt-16 pt-8 border-t border-gray-100">
-            <h3 className="text-xl font-bold text-[#1F1F1F] mb-6 text-center">関連記事</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {otherArticles.filter(a => a.id !== article.id).map((rel) => (
-                <Link key={rel.id} href={`/article/${rel.id}`} className="group block border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
-                  {rel.imageUrl && (
-                    <div className="aspect-[16/9] relative">
-                      <Image src={rel.imageUrl} alt={rel.title} fill className="object-cover transition-transform group-hover:scale-105" />
-                    </div>
-                  )}
-                  <div className="p-4">
-                    <h4 className="font-semibold text-[#1F1F1F] group-hover:text-[#8B7D6B] transition-colors line-clamp-2">{rel.title}</h4>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
+          {/* Related Articles - カテゴリベースの関連記事 */}
+          <RelatedArticles
+            currentArticleId={article.id}
+            category={article.category}
+          />
         </div>
       </main>
     </div>

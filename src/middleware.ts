@@ -5,12 +5,11 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const path = url.pathname;
 
-  // 確実にトップページへ転送したい旧URLのプレフィックス群
-  const redirectPrefixes = ['/news', '/event', '/posts', '/brewery/brand'];
-
-  if (redirectPrefixes.some(prefix => path.startsWith(prefix))) {
-    url.pathname = '/';
-    return NextResponse.redirect(url, 301); // 301 Permanent Redirect
+  // パスに大文字が含まれている場合、小文字に変換して301リダイレクト
+  // クエリパラメータはそのまま維持される（nextUrl.cloneにより自動的に保持）
+  if (path !== path.toLowerCase()) {
+    url.pathname = path.toLowerCase();
+    return NextResponse.redirect(url, 301);
   }
 
   return NextResponse.next();
@@ -18,9 +17,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/news/:path*', 
-    '/event/:path*', 
-    '/posts/:path*', 
-    '/brewery/brand/:path*'
+    // 静的アセット・Next.js内部パス・APIルートを除外した全パスにマッチ
+    '/((?!_next/static|_next/image|favicon\\.ico|icon\\.png|images|fonts|api).*)',
   ],
 };
