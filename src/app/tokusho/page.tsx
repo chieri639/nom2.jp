@@ -12,11 +12,11 @@ export const metadata: Metadata = {
 export default function TokushoPage() {
   // 特定商取引法に基づく表記のデータ
   const items = [
-    { label: '販売業者', value: '（会社名または屋号を記入）' },
-    { label: '代表責任者', value: '（代表者または責任者の氏名を記入）' },
-    { label: '所在地', value: '〒000-0000 （住所を記入）' },
-    { label: '電話番号', value: '（電話番号を記入）' },
-    { label: 'メールアドレス', value: '（メールアドレスを記入）' },
+    { label: '販売業者', value: '石﨑　智絵理' },
+    { label: '代表責任者', value: '石﨑　智絵理' },
+    { label: '所在地', value: '〒150-0001　東京都渋谷区神宮前2丁目19番地3号' },
+    { label: '電話番号', value: '090-2327-6078' },
+    { label: 'メールアドレス', value: 'st.pika2.916@gmail.com' },
     { label: '販売価格', value: '各商品紹介ページに表示している価格に基づきます。' },
     { label: '商品代金以外の必要料金', value: '消費税、配送料、各種決済の手数料（振込手数料、コンビニ決済手数料等）。' },
     { label: '支払方法', value: 'クレジットカード決済 / 銀行振込 / コンビニ決済' },
@@ -62,23 +62,23 @@ export default function TokushoPage() {
           <div className="border-t border-b border-gray-100 divide-y divide-gray-100 mb-6">
             <div className="flex flex-col sm:flex-row sm:justify-between py-4 text-sm">
               <span className="text-[#8B7D6B] sm:text-gray-400 font-bold mb-1 sm:mb-0">販売場の名称及び所在地</span>
-              <span className="text-gray-700 sm:text-right font-medium">（店舗名・住所を記入）</span>
+              <span className="text-gray-700 sm:text-right font-medium">nom2.jpオンラインショップ　東京都渋谷区神宮前2丁目19番地3号</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:justify-between py-4 text-sm">
               <span className="text-[#8B7D6B] sm:text-gray-400 font-bold mb-1 sm:mb-0">酒類販売管理者の氏名</span>
-              <span className="text-gray-700 sm:text-right font-medium">（氏名を記入）</span>
+              <span className="text-gray-700 sm:text-right font-medium">石﨑　智絵理</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:justify-between py-4 text-sm">
               <span className="text-[#8B7D6B] sm:text-gray-400 font-bold mb-1 sm:mb-0">酒類販売管理研修受講年月日</span>
-              <span className="text-gray-700 sm:text-right font-medium">202X年X月X日</span>
+              <span className="text-gray-700 sm:text-right font-medium">令和8年4月17日</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:justify-between py-4 text-sm">
               <span className="text-[#8B7D6B] sm:text-gray-400 font-bold mb-1 sm:mb-0">次回研修受講期限</span>
-              <span className="text-gray-700 sm:text-right font-medium">202X年X月X日</span>
+              <span className="text-gray-700 sm:text-right font-medium">令和11年4月16日</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:justify-between py-4 text-sm">
               <span className="text-[#8B7D6B] sm:text-gray-400 font-bold mb-1 sm:mb-0">研修実施団体名</span>
-              <span className="text-gray-700 sm:text-right font-medium">（研修実施団体名を記入）</span>
+              <span className="text-gray-700 sm:text-right font-medium">全国小売酒販組合中央会</span>
             </div>
           </div>
           <div className="pt-2 text-center">
