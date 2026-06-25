@@ -32,6 +32,7 @@ export default function Header() {
             <nav className="hidden md:block">
                 <ul className="flex items-center gap-8 text-[#5D5D5D] text-sm tracking-widest font-medium uppercase">
                     <li><Link href="/article" className="hover:text-black transition-colors">Articles</Link></li>
+                    <li><Link href="/event" className="hover:text-black transition-colors">Events</Link></li>
                     <li><Link href="/brewery" className="hover:text-black transition-colors">Breweries</Link></li>
                     <li><Link href="/shop" className="hover:text-black transition-colors">Shop</Link></li>
                     <li><Link href="/brand" className="hover:text-black transition-colors">Brand</Link></li>
@@ -61,6 +62,7 @@ export default function Header() {
                 <nav>
                     <ul className="flex flex-col gap-6 text-[#1F1F1F] text-lg tracking-widest font-medium uppercase">
                         <li><Link href="/article" onClick={closeMenu}>Articles</Link></li>
+                        <li><Link href="/event" onClick={closeMenu}>Events</Link></li>
                         <li><Link href="/brewery" onClick={closeMenu}>Breweries</Link></li>
                         <li><Link href="/shop" onClick={closeMenu}>Shop</Link></li>
                         <li><Link href="/brand" onClick={closeMenu}>Brand</Link></li>

@@ -93,12 +93,7 @@ const nextConfig = {
                 destination: '/',
                 permanent: true,
             },
-            // 旧 /event/* → トップ
-            {
-                source: '/event/:path*',
-                destination: '/',
-                permanent: true,
-            },
+            // 旧 /event/* リダイレクトは削除（/event ページが新規追加されたため）
             // 旧 /en → トップ（英語版なし）
             {
                 source: '/en',
