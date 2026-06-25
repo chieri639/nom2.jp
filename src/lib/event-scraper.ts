@@ -7,7 +7,7 @@
 
 // ========== 型定義 ==========
 
-export type EventSource = 'peatix' | 'prtimes';
+export type EventSource = 'peatix' | 'prtimes' | 'saketimes' | 'nihonshucalendar';
 
 export type SakeEvent = {
   id: string;
@@ -58,11 +58,33 @@ async function scrapeRssFeed(url: string, sourceName: EventSource, defaultOrgani
     while ((itemMatch = itemPattern.exec(xml)) !== null) {
       const item = itemMatch[1];
 
-      const title = extractTag(item, 'title');
+      const title = extractTag(item, 'title') || '';
       const link = extractTag(item, 'link');
       let description = extractTag(item, 'description') || extractTag(item, 'content:encoded');
       const pubDate = extractTag(item, 'dc:date') || extractTag(item, 'pubDate');
-      const creator = extractTag(item, 'dc:creator') || defaultOrganizer;
+
+      // 主催者が配信元や記事著者になっている場合はクリアする
+      let creator = extractTag(item, 'dc:creator');
+      let organizer = '';
+      if (creator) {
+        const lowerCreator = creator.toLowerCase();
+        if (
+          !lowerCreator.includes('sake times') &&
+          !lowerCreator.includes('saketimes') &&
+          !lowerCreator.includes('日本酒カレンダー') &&
+          !lowerCreator.includes('nihonshucalendar') &&
+          !lowerCreator.includes('pr times') &&
+          !lowerCreator.includes('prtimes') &&
+          !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(creator) // メールアドレス等の著者
+        ) {
+          organizer = creator;
+        }
+      }
+
+      // PR TIMESの場合はプレスリリースの発信企業がdc:creatorに入ることが多いため、そのまま利用
+      if (sourceName === 'prtimes' && !organizer && creator) {
+        organizer = creator;
+      }
 
       const combined = `${title} ${description}`.toLowerCase();
       
@@ -75,7 +97,7 @@ async function scrapeRssFeed(url: string, sourceName: EventSource, defaultOrgani
         // イベント関連キーワードも必須
         const hasEventKw = EVENT_KEYWORDS.some(kw => combined.includes(kw.toLowerCase()));
         if (!hasEventKw) continue;
-      } else if (sourceName === 'peatix') {
+      } else if (sourceName === 'nihonshucalendar') {
         // 日本酒カレンダーはそもそも日本酒特化なのでOK
       } else {
         // SAKE TIMES などは日本酒特化だが、イベント情報だけを拾いたい
@@ -91,17 +113,21 @@ async function scrapeRssFeed(url: string, sourceName: EventSource, defaultOrgani
          imageUrl = extractImageFromDescription(content);
       }
 
+      // 記事タイトルや本文から「本当の開催日」を抽出する
+      const cleanDesc = stripHtml(description || '');
+      const parsedDate = extractEventDate(title, cleanDesc, pubDate);
+
       events.push({
         id: `${sourceName}-${link?.replace(/\D/g, '').slice(0, 12) || Date.now()}-${Math.floor(Math.random()*1000)}`,
         title: title || '',
-        date: pubDate || '',
-        dateLabel: pubDate ? formatDateLabel(pubDate) : '',
+        date: parsedDate.date,
+        dateLabel: parsedDate.dateLabel,
         location: '', // RSSからは場所の特定が困難なため空
         imageUrl: imageUrl,
         eventUrl: link || '',
         source: sourceName,
-        description: stripHtml(description || '').slice(0, 120) + '...',
-        organizer: creator,
+        description: cleanDesc.slice(0, 120) + '...',
+        organizer: organizer,
       });
 
       if (events.length >= 15) break; // 各ソース最大15件
@@ -153,17 +179,111 @@ function stripHtml(html: string): string {
 }
 
 /**
- * 日付文字列を「2026年7月5日(土)」形式に変換
+ * テキストからイベント開催日を抽出する
  */
-function formatDateLabel(dateStr: string): string {
-  try {
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
-    const days = ['日', '月', '火', '水', '木', '金', '土'];
-    return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日(${days[d.getDay()]})`;
-  } catch {
-    return dateStr;
+function extractEventDate(title: string, description: string, pubDate: string): { date: string; dateLabel: string } {
+  const text = `${title} ${description}`;
+
+  // 1. 「◯月◯日」または「◯/◯」のパターンを探す
+  // YYYY年M月D日 または M月D日
+  const datePattern1 = /(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日/;
+  const datePattern2 = /(\d{1,2})月\s*(\d{1,2})日/;
+  const datePattern3 = /(\d{4})[-/](\d{1,2})[-/](\d{1,2})/;
+  const datePattern4 = /(\d{1,2})\/(\d{1,2})/;
+
+  let year = new Date().getFullYear();
+  let month = 0;
+  let day = 0;
+  let hasMatch = false;
+
+  let m = text.match(datePattern1);
+  if (m) {
+    year = parseInt(m[1], 10);
+    month = parseInt(m[2], 10);
+    day = parseInt(m[3], 10);
+    hasMatch = true;
+  } else {
+    m = text.match(datePattern3);
+    if (m) {
+      year = parseInt(m[1], 10);
+      month = parseInt(m[2], 10);
+      day = parseInt(m[3], 10);
+      hasMatch = true;
+    } else {
+      m = text.match(datePattern2);
+      if (m) {
+        month = parseInt(m[1], 10);
+        day = parseInt(m[2], 10);
+        hasMatch = true;
+        // pubDate から年を推定（pubDateが存在すればその年、なければ今年）
+        if (pubDate) {
+          try {
+            year = new Date(pubDate).getFullYear();
+          } catch {}
+        }
+      } else {
+        m = text.match(datePattern4);
+        if (m) {
+          const tempMonth = parseInt(m[1], 10);
+          const tempDay = parseInt(m[2], 10);
+          // 妥当な日付範囲か簡易チェック (1〜12月, 1〜31日)
+          if (tempMonth >= 1 && tempMonth <= 12 && tempDay >= 1 && tempDay <= 31) {
+            month = tempMonth;
+            day = tempDay;
+            hasMatch = true;
+            if (pubDate) {
+              try {
+                year = new Date(pubDate).getFullYear();
+              } catch {}
+            }
+          }
+        }
+      }
+    }
   }
+
+  if (hasMatch && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+    const formattedMonth = String(month).padStart(2, '0');
+    const formattedDay = String(day).padStart(2, '0');
+    const dateStr = `${year}-${formattedMonth}-${formattedDay}`;
+    
+    // 曜日を求める
+    try {
+      const d = new Date(year, month - 1, day);
+      const days = ['日', '月', '火', '水', '木', '金', '土'];
+      return {
+        date: dateStr,
+        dateLabel: `${year}年${month}月${day}日(${days[d.getDay()]})`,
+      };
+    } catch {
+      return {
+        date: dateStr,
+        dateLabel: `${year}年${month}月${day}日`,
+      };
+    }
+  }
+
+  // 日付が検出できない場合は、pubDateをフォールバックとして使う
+  if (pubDate) {
+    try {
+      const d = new Date(pubDate);
+      if (!isNaN(d.getTime())) {
+        const formattedMonth = String(d.getMonth() + 1).padStart(2, '0');
+        const formattedDay = String(d.getDate()).padStart(2, '0');
+        const dateStr = `${d.getFullYear()}-${formattedMonth}-${formattedDay}`;
+        const days = ['日', '月', '火', '水', '木', '金', '土'];
+        return {
+          date: dateStr,
+          dateLabel: `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日(${days[d.getDay()]})`,
+        };
+      }
+    } catch {}
+  }
+
+  return {
+    date: '',
+    dateLabel: '開催日未定',
+  };
 }
 
 /**
@@ -185,8 +305,8 @@ function deduplicateEvents(events: SakeEvent[]): SakeEvent[] {
  */
 export async function scrapeAllEvents(): Promise<SakeEvent[]> {
   const [sakeTimesEvents, nihonshuCalendarEvents, prtimesEvents] = await Promise.allSettled([
-    scrapeRssFeed('https://jp.sake-times.com/feed', 'prtimes', 'SAKE TIMES'), // SAKE TIMES (using prtimes badge color for news)
-    scrapeRssFeed('https://nihonshucalendar.com/index.xml', 'peatix', '日本酒カレンダー'), // 日本酒カレンダー (using peatix badge color for events)
+    scrapeRssFeed('https://jp.sake-times.com/feed', 'saketimes', 'SAKE TIMES'),
+    scrapeRssFeed('https://nihonshucalendar.com/index.xml', 'nihonshucalendar', '日本酒カレンダー'),
     scrapeRssFeed('https://prtimes.jp/index.rdf', 'prtimes', 'PR TIMES'),
   ]);
 

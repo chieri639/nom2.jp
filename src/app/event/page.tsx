@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { scrapeAllEvents, type SakeEvent } from '@/lib/event-scraper';
-import EventCard from '@/components/event/EventCard';
+import EventList from '@/components/event/EventList';
 import { CalendarDays, Sparkles, Search } from 'lucide-react';
 
 // 1時間ごとに再取得（ISR）
@@ -10,7 +10,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: '日本酒イベント・フェア情報 | nom × nom',
-  description: '全国の日本酒イベント、試飲会、蔵開き、酒フェスなどの最新情報をまとめてお届け。Peatix・PR TIMESから自動収集した日本酒関連イベント情報をチェック。',
+  description: '全国の日本酒イベント、試飲会、蔵開き、酒フェスなどの最新情報をまとめてお届け。日本酒カレンダー・SAKE TIMES・PR TIMESから自動収集した日本酒関連イベント情報をチェック。',
   alternates: {
     canonical: 'https://nom2.jp/event',
   },
@@ -51,7 +51,7 @@ export default async function EventPage() {
           <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
             全国の日本酒イベント、試飲会、蔵開き、酒フェスなどの最新情報を
             <br className="hidden md:block" />
-            PeatixやPR TIMESから自動収集してお届けします。
+            日本酒カレンダー、SAKE TIMES、PR TIMESから自動収集してお届けします。
           </p>
         </div>
       </header>
@@ -60,14 +60,14 @@ export default async function EventPage() {
       {events.length > 0 && (
         <div className="max-w-6xl mx-auto px-6 mb-8">
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-            <span className="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
+            <span className="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 font-medium">
               📊 {events.length}件のイベント情報
             </span>
-            <span className="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
+            <span className="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 font-medium">
               🔄 1時間ごとに自動更新
             </span>
-            <span className="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-              📡 Peatix · PR TIMES から収集
+            <span className="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 font-medium">
+              📡 日本酒カレンダー · SAKE TIMES · PR TIMES から収集
             </span>
           </div>
         </div>
@@ -76,11 +76,7 @@ export default async function EventPage() {
       {/* Event Grid */}
       <main className="max-w-6xl mx-auto px-6">
         {events.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
+          <EventList initialEvents={events} />
         ) : (
           /* Empty State */
           <div className="text-center py-20">
@@ -100,7 +96,8 @@ export default async function EventPage() {
         {/* Disclaimer & Source Attribution */}
         <div className="mt-16 pt-8 border-t border-gray-200">
           <p className="text-xs text-gray-400 text-center leading-relaxed">
-            ※ イベント情報は <a href="https://peatix.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Peatix</a> および{' '}
+            ※ イベント情報は <a href="https://nihonshucalendar.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">日本酒カレンダー</a>、{' '}
+            <a href="https://jp.sake-times.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">SAKE TIMES</a>、および{' '}
             <a href="https://prtimes.jp" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">PR TIMES</a> から自動収集しています。
             <br />
             最新の開催情報・詳細は各イベントの公式ページをご確認ください。
