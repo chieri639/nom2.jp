@@ -22,155 +22,37 @@ export type SakeEvent = {
   organizer: string;     // 主催者 / 企業名
 };
 
-// ========== Peatix スクレイパー ==========
+// ========== RSS スクレイパー ==========
 
-const PEATIX_SEARCH_KEYWORDS = ['日本酒', '酒蔵', '蔵開き', '地酒', '純米酒', 'SAKE'];
+const SAKE_KEYWORDS = ['日本酒', '酒蔵', '蔵開き', '地酒', 'SAKE', '純米', '利き酒', '角打ち'];
+const EVENT_KEYWORDS = ['イベント', 'フェス', '試飲', 'フェア', '開催', 'ペアリング', 'セミナー', 'ツアー', '祭'];
 
 /**
- * Peatix の検索ページ HTML をパースしてイベント情報を抽出する
+ * 各種メディアのRSSフィードから日本酒関連イベント・ニュースを取得
  */
-async function scrapePeatixKeyword(keyword: string): Promise<SakeEvent[]> {
+async function scrapeRssFeed(url: string, sourceName: EventSource, defaultOrganizer: string): Promise<SakeEvent[]> {
   const events: SakeEvent[] = [];
 
   try {
-    const url = `https://peatix.com/search?q=${encodeURIComponent(keyword)}&country=JP&p=1&s=date`;
-
     const res = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; nom2-bot/1.0; +https://nom2.jp)',
-        'Accept': 'text/html,application/xhtml+xml',
-        'Accept-Language': 'ja,en;q=0.5',
-      },
-      signal: AbortSignal.timeout(15000),
-    });
-
-    if (!res.ok) {
-      console.warn(`Peatix search failed for "${keyword}": ${res.status}`);
-      return [];
-    }
-
-    const html = await res.text();
-
-    // Peatix の検索結果から JSON-LD (Event schema) を抽出
-    const jsonLdMatches = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g);
-    if (jsonLdMatches) {
-      for (const match of jsonLdMatches) {
-        try {
-          const jsonStr = match.replace(/<script type="application\/ld\+json">/, '').replace(/<\/script>/, '');
-          const data = JSON.parse(jsonStr);
-          if (data['@type'] === 'Event' || (Array.isArray(data) && data[0]?.['@type'] === 'Event')) {
-            const items = Array.isArray(data) ? data : [data];
-            for (const item of items) {
-              events.push(jsonLdToSakeEvent(item, 'peatix'));
-            }
-          }
-        } catch {
-          // JSON parse error — skip
-        }
-      }
-    }
-
-    // JSON-LD が無い場合は HTML からリンクとタイトルを抽出
-    if (events.length === 0) {
-      // パターン: <a href="/event/XXXXXX" ...>タイトル</a>
-      const linkPattern = /<a[^>]*href="(\/event\/\d+[^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
-      let linkMatch;
-      const seen = new Set<string>();
-      while ((linkMatch = linkPattern.exec(html)) !== null) {
-        const path = linkMatch[1];
-        const text = linkMatch[2].replace(/<[^>]+>/g, '').trim();
-        if (!text || text.length < 5 || seen.has(path)) continue;
-        seen.add(path);
-
-        // 日本酒関連のタイトルかチェック
-        const isRelevant = PEATIX_SEARCH_KEYWORDS.some(kw =>
-          text.includes(kw) || text.toLowerCase().includes(kw.toLowerCase())
-        );
-        if (!isRelevant && keyword === '日本酒') continue; // メインキーワードなら全件OK
-
-        events.push({
-          id: `peatix-${path.replace(/\D/g, '')}`,
-          title: text,
-          date: '',
-          dateLabel: '',
-          location: '',
-          imageUrl: '',
-          eventUrl: `https://peatix.com${path}`,
-          source: 'peatix',
-          description: '',
-          organizer: '',
-        });
-      }
-    }
-
-    // 取得間隔を守る (5秒)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-  } catch (err) {
-    console.error(`Peatix scrape error for "${keyword}":`, err);
-  }
-
-  return events;
-}
-
-/**
- * JSON-LD (Schema.org Event) を SakeEvent に変換
- */
-function jsonLdToSakeEvent(data: any, source: EventSource): SakeEvent {
-  const startDate = data.startDate || '';
-  return {
-    id: `${source}-${(data.url || '').replace(/\D/g, '').slice(0, 12) || Date.now()}`,
-    title: data.name || '',
-    date: startDate,
-    dateLabel: startDate ? formatDateLabel(startDate) : '',
-    location: typeof data.location === 'string'
-      ? data.location
-      : data.location?.name || data.location?.address?.addressLocality || '',
-    imageUrl: typeof data.image === 'string' ? data.image : (data.image?.[0] || ''),
-    eventUrl: data.url || '',
-    source,
-    description: (data.description || '').slice(0, 200),
-    organizer: data.organizer?.name || '',
-  };
-}
-
-/**
- * Peatix から日本酒イベントを取得（全キーワード統合）
- */
-export async function scrapePeatix(): Promise<SakeEvent[]> {
-  // メインキーワードだけで取得（負荷を抑える）
-  const events = await scrapePeatixKeyword('日本酒');
-  return deduplicateEvents(events);
-}
-
-// ========== PR TIMES RSS スクレイパー ==========
-
-const PRTIMES_KEYWORDS = ['日本酒', '酒蔵', '蔵開き', '地酒', 'SAKE', '純米', '酒フェス', '酒イベント', '利き酒', '角打ち'];
-
-/**
- * PR TIMES の RSS フィードから日本酒関連プレスリリースを取得
- */
-export async function scrapePRTimes(): Promise<SakeEvent[]> {
-  const events: SakeEvent[] = [];
-
-  try {
-    const res = await fetch('https://prtimes.jp/index.rdf', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; nom2-bot/1.0; +https://nom2.jp)',
         'Accept': 'application/rss+xml, application/xml, text/xml',
       },
       signal: AbortSignal.timeout(15000),
+      next: { revalidate: 3600 }, // 1時間キャッシュ
     });
 
     if (!res.ok) {
-      console.warn(`PR TIMES RSS fetch failed: ${res.status}`);
+      console.warn(`${sourceName} RSS fetch failed: ${res.status}`);
       return [];
     }
 
     const xml = await res.text();
 
-    // RSS の <item> を抽出
-    const itemPattern = /<item>([\s\S]*?)<\/item>/gi;
+    // RSS 1.0 / 2.0 の <item> を抽出
+    // <items> タグと区別するため <item> または <item rdf:about="..."> のみをマッチさせる
+    const itemPattern = /<item(?:\s+[^>]+)?>([\s\S]*?)<\/item>/gi;
     let itemMatch;
 
     while ((itemMatch = itemPattern.exec(xml)) !== null) {
@@ -178,37 +60,54 @@ export async function scrapePRTimes(): Promise<SakeEvent[]> {
 
       const title = extractTag(item, 'title');
       const link = extractTag(item, 'link');
-      const description = extractTag(item, 'description');
+      let description = extractTag(item, 'description') || extractTag(item, 'content:encoded');
       const pubDate = extractTag(item, 'dc:date') || extractTag(item, 'pubDate');
-      const creator = extractTag(item, 'dc:creator');
+      const creator = extractTag(item, 'dc:creator') || defaultOrganizer;
 
-      // 日本酒関連かフィルター
       const combined = `${title} ${description}`.toLowerCase();
-      const isRelevant = PRTIMES_KEYWORDS.some(kw => combined.includes(kw.toLowerCase()));
-      if (!isRelevant) continue;
+      
+      // ソースごとのフィルターロジック
+      if (sourceName === 'prtimes') {
+        // 日本酒関連キーワードが必須
+        const hasSakeKw = SAKE_KEYWORDS.some(kw => combined.includes(kw.toLowerCase()));
+        if (!hasSakeKw) continue;
+        
+        // イベント関連キーワードも必須
+        const hasEventKw = EVENT_KEYWORDS.some(kw => combined.includes(kw.toLowerCase()));
+        if (!hasEventKw) continue;
+      } else if (sourceName === 'peatix') {
+        // 日本酒カレンダーはそもそも日本酒特化なのでOK
+      } else {
+        // SAKE TIMES などは日本酒特化だが、イベント情報だけを拾いたい
+        const hasEventKw = EVENT_KEYWORDS.some(kw => combined.includes(kw.toLowerCase()));
+        if (!hasEventKw) continue;
+      }
 
-      // イベント/フェア関連のキーワードがあればより高優先度
-      const eventKeywords = ['イベント', 'フェア', 'フェス', '開催', '試飲', '蔵開き', '限定', 'POP UP', '角打ち'];
-      const isEventRelated = eventKeywords.some(kw => combined.includes(kw.toLowerCase()));
+      let imageUrl = extractImageFromDescription(description || '');
+      
+      // SAKE TIMES の場合、コンテンツ内の一番最初の画像を抽出
+      if (!imageUrl && xml.includes('sake-times.com')) {
+         const content = extractTag(item, 'content:encoded');
+         imageUrl = extractImageFromDescription(content);
+      }
 
       events.push({
-        id: `prtimes-${link?.replace(/\D/g, '').slice(0, 12) || Date.now()}`,
+        id: `${sourceName}-${link?.replace(/\D/g, '').slice(0, 12) || Date.now()}-${Math.floor(Math.random()*1000)}`,
         title: title || '',
         date: pubDate || '',
         dateLabel: pubDate ? formatDateLabel(pubDate) : '',
-        location: '',
-        imageUrl: extractImageFromDescription(description || ''),
+        location: '', // RSSからは場所の特定が困難なため空
+        imageUrl: imageUrl,
         eventUrl: link || '',
-        source: 'prtimes',
-        description: stripHtml(description || '').slice(0, 200),
-        organizer: creator || '',
+        source: sourceName,
+        description: stripHtml(description || '').slice(0, 120) + '...',
+        organizer: creator,
       });
 
-      // 最大20件まで
-      if (events.length >= 20) break;
+      if (events.length >= 15) break; // 各ソース最大15件
     }
   } catch (err) {
-    console.error('PR TIMES RSS scrape error:', err);
+    console.error(`${sourceName} RSS scrape error:`, err);
   }
 
   return events;
@@ -285,13 +184,15 @@ function deduplicateEvents(events: SakeEvent[]): SakeEvent[] {
  * 全ソースからイベントを取得して統合
  */
 export async function scrapeAllEvents(): Promise<SakeEvent[]> {
-  const [peatixEvents, prtimesEvents] = await Promise.allSettled([
-    scrapePeatix(),
-    scrapePRTimes(),
+  const [sakeTimesEvents, nihonshuCalendarEvents, prtimesEvents] = await Promise.allSettled([
+    scrapeRssFeed('https://jp.sake-times.com/feed', 'prtimes', 'SAKE TIMES'), // SAKE TIMES (using prtimes badge color for news)
+    scrapeRssFeed('https://nihonshucalendar.com/index.xml', 'peatix', '日本酒カレンダー'), // 日本酒カレンダー (using peatix badge color for events)
+    scrapeRssFeed('https://prtimes.jp/index.rdf', 'prtimes', 'PR TIMES'),
   ]);
 
   const all: SakeEvent[] = [
-    ...(peatixEvents.status === 'fulfilled' ? peatixEvents.value : []),
+    ...(sakeTimesEvents.status === 'fulfilled' ? sakeTimesEvents.value : []),
+    ...(nihonshuCalendarEvents.status === 'fulfilled' ? nihonshuCalendarEvents.value : []),
     ...(prtimesEvents.status === 'fulfilled' ? prtimesEvents.value : []),
   ];
 
