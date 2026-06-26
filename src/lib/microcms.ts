@@ -6,7 +6,24 @@ const API_KEY = process.env.X_MICROCMS_API_KEY || process.env.MICROCMS_API_KEY |
 
 const BASE_URL = `https://${SERVICE_ID}.microcms.io/api/v1`;
 
+import type { EventSource } from './event-scraper';
+
 // Type definitions
+export type EVENT = {
+  id: string;
+  title: string;
+  date: string;
+  dateLabel: string;
+  location: string;
+  imageUrl: string;
+  eventUrl: string;
+  source: EventSource;
+  description: string;
+  organizer: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type SAKE = {
   id: string;
   name: string;
@@ -144,6 +161,32 @@ async function fetchDetail<T>(endpoint: string, contentId: string, queries?: any
 }
 
 // Fetch functions
+export const getEvents = (queries?: any, options?: RequestInit) => fetchList<EVENT>('event', queries, options);
+export const getEventDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<EVENT>('event', contentId, queries, options);
+
+/**
+ * microCMSにイベントデータを書き込む / 更新する (バッチ処理用)
+ */
+export async function writeEvent(event: Omit<EVENT, 'id'> & { id?: string }): Promise<any> {
+  const serviceId = process.env.X_MICROCMS_SERVICE_ID || 'nom2';
+  const apiKey = process.env.X_MICROCMS_API_KEY || '9jTt1rBZrk5OfQ9QL2MdwxjgAGDOq1qUAvMA';
+  const baseUrl = `https://${serviceId}.microcms.io/api/v1/event`;
+  
+  const isUpdate = !!event.id;
+  const url = isUpdate ? `${baseUrl}/${event.id}` : baseUrl;
+  const method = isUpdate ? 'PUT' : 'POST';
+
+  return robustFetch(url, {
+    method,
+    headers: {
+      'X-MICROCMS-API-KEY': apiKey,
+      'Content-Type': 'application/json',
+      'User-Agent': 'node-fetch',
+    },
+    body: JSON.stringify(isUpdate ? { ...event, id: undefined } : event),
+  });
+}
+
 export const getSakes = (queries?: any, options?: RequestInit) => fetchList<SAKE>('sake', queries, options);
 export const getSakeDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<SAKE>('sake', contentId, queries, options);
 

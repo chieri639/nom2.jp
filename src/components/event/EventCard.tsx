@@ -14,6 +14,7 @@ const sourceBadge = {
   prtimes: { label: 'PR TIMES', color: 'bg-blue-100 text-blue-700 border border-blue-200' },
   saketimes: { label: 'SAKE TIMES', color: 'bg-emerald-100 text-emerald-800 border border-emerald-200' },
   nihonshucalendar: { label: '日本酒カレンダー', color: 'bg-purple-100 text-purple-700 border border-purple-200' },
+  google: { label: 'ウェブ検索', color: 'bg-rose-100 text-rose-800 border border-rose-200' },
 };
 
 export default function EventCard({ event }: EventCardProps) {

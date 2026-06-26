@@ -1,6 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { getEvents } from '@/lib/microcms';
 import { scrapeAllEvents, type SakeEvent } from '@/lib/event-scraper';
 import EventList from '@/components/event/EventList';
 import { CalendarDays, Sparkles, Search } from 'lucide-react';
@@ -26,9 +27,36 @@ export default async function EventPage() {
   let events: SakeEvent[] = [];
 
   try {
-    events = await scrapeAllEvents();
+    // 1. microCMSから蓄積されたイベントデータを取得 (開催日が近い・新しい順)
+    const dbRes = await getEvents({
+      limit: 100,
+      orders: '-date',
+    });
+    
+    events = (dbRes.contents || []).map(item => ({
+      id: item.id,
+      title: item.title,
+      date: item.date,
+      dateLabel: item.dateLabel,
+      location: item.location,
+      imageUrl: item.imageUrl,
+      eventUrl: item.eventUrl,
+      source: item.source,
+      description: item.description,
+      organizer: item.organizer,
+    }));
+
+    // 2. 万が一DBが空、または初期セットアップ前の場合はRSS経由でリアルタイム取得（フォールバック）
+    if (events.length === 0) {
+      events = await scrapeAllEvents();
+    }
   } catch (err) {
-    console.error('Failed to fetch events:', err);
+    console.error('Failed to fetch events from DB, falling back to RSS:', err);
+    try {
+      events = await scrapeAllEvents();
+    } catch (fallbackErr) {
+      console.error('Fallback RSS scrape failed too:', fallbackErr);
+    }
   }
 
   return (
