@@ -74,7 +74,7 @@ export async function GET(request: Request) {
       const payload = {
         title: event.title,
         category: 'event',
-        content: event.description || '', // 通常記事の本文としてディスクリプションを設定
+        content: event.fullDescription || event.description || '', // フルの説明テキストを格納
         imageUrl: event.imageUrl || existing?.imageUrl || '',
         oldId: existing?.oldId || `event-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
         // イベント用カスタムメタデータ

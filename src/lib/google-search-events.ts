@@ -88,6 +88,7 @@ export async function searchGoogleEvents(): Promise<SakeEvent[]> {
             eventUrl: link,
             source: 'google' as EventSource,
             description: snippet.slice(0, 120) + '...',
+            fullDescription: snippet,
             organizer: siteName || '',
           });
         }

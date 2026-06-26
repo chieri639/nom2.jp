@@ -18,7 +18,8 @@ export type SakeEvent = {
   imageUrl: string;
   eventUrl: string;      // 元サイトへのリンク
   source: EventSource;
-  description: string;   // 短い概要
+  description: string;   // 短い概要 (一覧カード用)
+  fullDescription?: string; // 切り詰めないフルテキスト
   organizer: string;     // 主催者 / 企業名
 };
 
@@ -127,6 +128,7 @@ async function scrapeRssFeed(url: string, sourceName: EventSource, defaultOrgani
         eventUrl: link || '',
         source: sourceName,
         description: cleanDesc.slice(0, 120) + '...',
+        fullDescription: cleanDesc,
         organizer: organizer,
       });
 

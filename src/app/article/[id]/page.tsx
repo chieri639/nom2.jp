@@ -130,12 +130,73 @@ export default async function ArticleDetailPage(props: any) {
       {/* Article Body */}
       <main className="max-w-3xl mx-auto px-6 pt-8">
         <div className="flex flex-col gap-6">
-          <DynamicBackButton defaultHref="/article" defaultText="BACK TO ARTICLES" />
+          <DynamicBackButton defaultHref={article.category === 'event' ? '/event' : '/article'} defaultText={article.category === 'event' ? 'BACK TO EVENTS' : 'BACK TO ARTICLES'} />
 
-          <article
-            className="rich-text custom-prose max-w-none text-[#333] leading-[2.2] font-medium selection:bg-[#8B7D6B]/20 [&>div:first-child]:!pt-4 [&>div:first-child]:!px-0 md:[&>div:first-child]:!pt-8"
-            dangerouslySetInnerHTML={{ __html: article.content || '' }}
-          />
+          {article.category === 'event' ? (
+            <div className="bg-amber-50/50 border border-amber-200/60 rounded-3xl p-6 md:p-8 my-4 shadow-sm backdrop-blur-sm">
+              <h2 className="text-xl font-bold text-[#1F1F1F] mb-6 flex items-center gap-2">
+                📅 イベント開催概要
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 mb-8">
+                {article.eventDateLabel && (
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-gray-500 w-20 flex-shrink-0">開催日程</span>
+                    <span className="bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm font-medium">{article.eventDateLabel}</span>
+                  </div>
+                )}
+                {article.eventLocation && (
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-gray-500 w-20 flex-shrink-0">開催場所</span>
+                    <span className="bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm font-medium">{article.eventLocation}</span>
+                  </div>
+                )}
+                {article.eventOrganizer && (
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-gray-500 w-20 flex-shrink-0">主催者</span>
+                    <span className="bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm font-medium">{article.eventOrganizer}</span>
+                  </div>
+                )}
+                {article.eventSource && (
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-gray-500 w-20 flex-shrink-0">情報配信元</span>
+                    <span className="bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm capitalize font-medium">{article.eventSource}</span>
+                  </div>
+                )}
+              </div>
+              
+              {article.content && (
+                <div className="mb-8 pt-6 border-t border-gray-200/60">
+                  <h3 className="font-bold text-[#1F1F1F] mb-3">イベント内容・紹介</h3>
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap font-medium">
+                    {article.content}
+                  </p>
+                </div>
+              )}
+
+              {article.eventUrl && (
+                <div className="text-center">
+                  <a
+                    href={article.eventUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#8B7D6B] text-white rounded-full text-sm font-bold hover:bg-[#6B5D4B] transition-all shadow-lg hover:-translate-y-0.5"
+                  >
+                    イベント公式 / 詳細ページを見る
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                  </a>
+                </div>
+              )}
+            </div>
+          ) : (
+            <article
+              className="rich-text custom-prose max-w-none text-[#333] leading-[2.2] font-medium selection:bg-[#8B7D6B]/20 [&>div:first-child]:!pt-4 [&>div:first-child]:!px-0 md:[&>div:first-child]:!pt-8"
+              dangerouslySetInnerHTML={{ __html: article.content || '' }}
+            />
+          )}
 
           {/* Read More / Next Actions */}
           <div className="mt-20 pt-16 border-t border-gray-100 text-center">
