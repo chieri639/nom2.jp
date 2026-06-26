@@ -24,9 +24,9 @@ export async function searchGoogleEvents(): Promise<SakeEvent[]> {
 
   // 複数のキーワードで検索を行い、重複を排除しながらイベントを収集
   const queryKeywords = [
-    '日本酒 イベント 2026 開催',
-    '日本酒 蔵開き 2026',
-    '酒蔵まつり 試飲会 2026'
+    '日本酒 イベント 開催',
+    '日本酒 蔵開き',
+    '酒蔵まつり 試飲会'
   ];
 
   const eventsMap = new Map<string, SakeEvent>();
