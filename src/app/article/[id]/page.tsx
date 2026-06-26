@@ -163,31 +163,37 @@ export default async function ArticleDetailPage(props: any) {
                   </div>
                 )}
               </div>
-              
-              {article.content && (
-                <div className="mb-8 pt-6 border-t border-gray-200/60">
-                  <h3 className="font-bold text-[#1F1F1F] mb-3">イベント内容・紹介</h3>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap font-medium">
-                    {article.content}
-                  </p>
-                </div>
-              )}
 
               {article.eventUrl && (
-                <div className="text-center">
+                <div className="text-center mb-8 bg-white/60 p-4 rounded-2xl border border-gray-100">
+                  <p className="text-xs text-gray-400 mb-3">※最新のスケジュール、チケット購入、出店情報は公式サイトでご確認ください。</p>
                   <a
                     href={article.eventUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#8B7D6B] text-white rounded-full text-sm font-bold hover:bg-[#6B5D4B] transition-all shadow-lg hover:-translate-y-0.5"
                   >
-                    イベント公式 / 詳細ページを見る
+                    公式詳細ページで確認する
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                       <polyline points="15 3 21 3 21 9" />
                       <line x1="10" y1="14" x2="21" y2="3" />
                     </svg>
                   </a>
+                </div>
+              )}
+              
+              {article.content && (
+                <div className="mb-4 pt-6 border-t border-gray-200/60">
+                  <h3 className="font-bold text-[#1F1F1F] mb-3 text-sm text-gray-400">紹介・ダイジェスト</h3>
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap font-medium text-sm">
+                    {article.content
+                      .replace(/\[\s*&#8230;\s*\]/g, '')
+                      .replace(/\[\s*\.\.\.\s*\]/g, '')
+                      .replace(/\s*\.\.\.\s*$/g, '')
+                      .trim()}
+                    ...
+                  </p>
                 </div>
               )}
             </div>
