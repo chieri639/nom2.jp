@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { scrapeAllEvents } from '@/lib/event-scraper';
 import { searchGoogleEvents } from '@/lib/google-search-events';
-import { getEvents, writeEvent, EVENT } from '@/lib/microcms';
+import { getArticles, writeArticleEvent, ARTICLE } from '@/lib/microcms';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    console.log('Starting Sake Event Scraping batch job...');
+    console.log('Starting Sake Event Scraping batch job (Article integration)...');
 
     // 1. 各ソースからデータを並行取得
     const [rssEvents, googleEvents] = await Promise.all([
@@ -27,9 +27,12 @@ export async function GET(request: Request) {
     const combinedEvents = [...rssEvents, ...googleEvents];
     console.log(`Fetched ${rssEvents.length} RSS events, ${googleEvents.length} Google Search events.`);
 
-    // 2. 既存の保存データを取得（重複更新の確認用）
-    const existingRes = await getEvents({ limit: 100 });
-    const existingEvents: EVENT[] = existingRes.contents || [];
+    // 2. 既存の保存データ(categoryがeventのもの)を取得（重複更新の確認用）
+    const existingRes = await getArticles({
+      filters: 'category[equals]event',
+      limit: 100
+    });
+    const existingEvents: ARTICLE[] = existingRes.contents || [];
     console.log(`Existing DB event count: ${existingEvents.length}`);
 
     // 重複チェック用マップ
@@ -39,9 +42,9 @@ export async function GET(request: Request) {
       return `${cleanTitle}-${date || 'no-date'}`;
     };
 
-    const dbMap = new Map<string, EVENT>();
+    const dbMap = new Map<string, ARTICLE>();
     existingEvents.forEach(e => {
-      dbMap.set(normalizeKey(e.title, e.date), e);
+      dbMap.set(normalizeKey(e.title, e.eventDate || ''), e);
     });
 
     let newCount = 0;
@@ -57,39 +60,42 @@ export async function GET(request: Request) {
 
       const payload = {
         title: event.title,
-        date: event.date,
-        dateLabel: event.dateLabel,
-        location: event.location || existing?.location || '',
+        category: 'event',
+        content: event.description || '', // 通常記事の本文としてディスクリプションを設定
         imageUrl: event.imageUrl || existing?.imageUrl || '',
+        oldId: existing?.oldId || `event-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        // イベント用カスタムメタデータ
+        eventDate: event.date,
+        eventDateLabel: event.dateLabel,
+        eventLocation: event.location || existing?.eventLocation || '',
         eventUrl: event.eventUrl,
-        source: event.source,
-        description: event.description,
-        organizer: event.organizer || existing?.organizer || '',
+        eventSource: event.source,
+        eventOrganizer: event.organizer || existing?.eventOrganizer || '',
       };
 
       try {
         if (existing) {
           // すでに存在する場合は内容を更新
-          await writeEvent({
+          await writeArticleEvent({
             ...payload,
             id: existing.id
           });
           updateCount++;
         } else {
           // 新規登録
-          await writeEvent(payload);
+          await writeArticleEvent(payload);
           newCount++;
         }
         // microCMSのAPIレート制限を考慮し、微小ウェイトを置く
         await new Promise(resolve => setTimeout(resolve, 150));
       } catch (err) {
-        console.error(`Failed to write event "${event.title}":`, err);
+        console.error(`Failed to write event to article "${event.title}":`, err);
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: `Scraping completed. Added ${newCount} new events, updated ${updateCount} events.`
+      message: `Scraping completed. Added ${newCount} new events, updated ${updateCount} events inside Articles.`
     });
   } catch (err: any) {
     console.error('Cron Event Scraping Error:', err);

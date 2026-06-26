@@ -1,8 +1,8 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { getEvents } from '@/lib/microcms';
-import { scrapeAllEvents, type SakeEvent } from '@/lib/event-scraper';
+import { getArticles } from '@/lib/microcms';
+import { scrapeAllEvents, type SakeEvent, type EventSource } from '@/lib/event-scraper';
 import EventList from '@/components/event/EventList';
 import { CalendarDays, Sparkles, Search } from 'lucide-react';
 
@@ -27,23 +27,24 @@ export default async function EventPage() {
   let events: SakeEvent[] = [];
 
   try {
-    // 1. microCMSから蓄積されたイベントデータを取得 (開催日が近い・新しい順)
-    const dbRes = await getEvents({
+    // 1. microCMSから蓄積されたイベント同居記事を取得 (開催日が近い・新しい順)
+    const dbRes = await getArticles({
+      filters: 'category[equals]event',
       limit: 100,
-      orders: '-date',
+      orders: '-eventDate',
     });
     
     events = (dbRes.contents || []).map(item => ({
       id: item.id,
       title: item.title,
-      date: item.date,
-      dateLabel: item.dateLabel,
-      location: item.location,
+      date: item.eventDate || '',
+      dateLabel: item.eventDateLabel || '開催日未定',
+      location: item.eventLocation || '',
       imageUrl: item.imageUrl,
-      eventUrl: item.eventUrl,
-      source: item.source,
-      description: item.description,
-      organizer: item.organizer,
+      eventUrl: item.eventUrl || '',
+      source: (item.eventSource || 'google') as EventSource,
+      description: item.content || '',
+      organizer: item.eventOrganizer || '',
     }));
 
     // 2. 万が一DBが空、または初期セットアップ前の場合はRSS経由でリアルタイム取得（フォールバック）

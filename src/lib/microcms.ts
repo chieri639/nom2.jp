@@ -9,17 +9,20 @@ const BASE_URL = `https://${SERVICE_ID}.microcms.io/api/v1`;
 import type { EventSource } from './event-scraper';
 
 // Type definitions
-export type EVENT = {
+export type ARTICLE = {
   id: string;
   title: string;
-  date: string;
-  dateLabel: string;
-  location: string;
+  category: string;
+  content: string;
   imageUrl: string;
-  eventUrl: string;
-  source: EventSource;
-  description: string;
-  organizer: string;
+  oldId: string;
+  // 追加したイベント用メタデータ (オプション)
+  eventDate?: string;
+  eventDateLabel?: string;
+  eventLocation?: string;
+  eventUrl?: string;
+  eventSource?: string;
+  eventOrganizer?: string;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -35,15 +38,6 @@ export type SAKE = {
   oldId: string;
   purchaseUrl?: string;
   prefecture?: string; // 都道府県フィールドを追加
-};
-
-export type ARTICLE = {
-  id: string;
-  title: string;
-  category: string;
-  content: string;
-  imageUrl: string;
-  oldId: string;
 };
 
 export type BREWERY = {
@@ -160,20 +154,16 @@ async function fetchDetail<T>(endpoint: string, contentId: string, queries?: any
   });
 }
 
-// Fetch functions
-export const getEvents = (queries?: any, options?: RequestInit) => fetchList<EVENT>('event', queries, options);
-export const getEventDetail = (contentId: string, queries?: any, options?: RequestInit) => fetchDetail<EVENT>('event', contentId, queries, options);
-
 /**
- * microCMSにイベントデータを書き込む / 更新する (バッチ処理用)
+ * microCMSにイベント同居記事を書き込む / 更新する (バッチ処理用)
  */
-export async function writeEvent(event: Omit<EVENT, 'id'> & { id?: string }): Promise<any> {
+export async function writeArticleEvent(article: Omit<ARTICLE, 'id'> & { id?: string }): Promise<any> {
   const serviceId = process.env.X_MICROCMS_SERVICE_ID || 'nom2';
   const apiKey = process.env.X_MICROCMS_API_KEY || '9jTt1rBZrk5OfQ9QL2MdwxjgAGDOq1qUAvMA';
-  const baseUrl = `https://${serviceId}.microcms.io/api/v1/event`;
+  const baseUrl = `https://${serviceId}.microcms.io/api/v1/article`;
   
-  const isUpdate = !!event.id;
-  const url = isUpdate ? `${baseUrl}/${event.id}` : baseUrl;
+  const isUpdate = !!article.id;
+  const url = isUpdate ? `${baseUrl}/${article.id}` : baseUrl;
   const method = isUpdate ? 'PUT' : 'POST';
 
   return robustFetch(url, {
@@ -183,7 +173,7 @@ export async function writeEvent(event: Omit<EVENT, 'id'> & { id?: string }): Pr
       'Content-Type': 'application/json',
       'User-Agent': 'node-fetch',
     },
-    body: JSON.stringify(isUpdate ? { ...event, id: undefined } : event),
+    body: JSON.stringify(isUpdate ? { ...article, id: undefined } : article),
   });
 }
 
