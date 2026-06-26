@@ -10,14 +10,22 @@ export const revalidate = 60;
 export default async function ArticleIndexPage(props: any) {
     const searchParams = await props.searchParams;
     const page = parseInt(searchParams?.page || '1', 10);
+    const type = searchParams?.type || 'all'; // 'all', 'column', 'event'
     const limit = 12;
     const offset = (page - 1) * limit;
 
     let articles: any[] = [];
     let totalCount = 0;
     try {
+        const queries: any = { limit, offset };
+        if (type === 'column') {
+            queries.filters = 'category[not_equals]event';
+        } else if (type === 'event') {
+            queries.filters = 'category[equals]event';
+        }
+
         const res = await getArticles(
-            { limit, offset }, 
+            queries, 
             { next: { revalidate: 60 } } as RequestInit
         );
         articles = res.contents || [];
@@ -27,6 +35,16 @@ export default async function ArticleIndexPage(props: any) {
     }
 
     const totalPages = Math.ceil(totalCount / limit);
+
+    // ページネーションリンク用のURL構築ヘルパー
+    const getPageUrl = (targetPage: number) => {
+        const params = new URLSearchParams();
+        params.set('page', String(targetPage));
+        if (type !== 'all') {
+            params.set('type', type);
+        }
+        return `/article?${params.toString()}`;
+    };
 
     return (
         <div className="min-h-screen pb-24">
@@ -47,9 +65,43 @@ export default async function ArticleIndexPage(props: any) {
                 </div>
             </header>
 
-            {/* Language Switch CTA */}
-            <div className="max-w-7xl mx-auto px-6 mb-12 flex justify-end">
-                <Link href="/en/article" className="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-100 rounded-full text-xs font-bold text-[#1F1F1F] hover:border-[#8B7D6B] hover:text-[#8B7D6B] transition-all shadow-sm">
+            {/* Filter Tabs & Language Switch */}
+            <div className="max-w-7xl mx-auto px-6 mb-12 flex flex-col md:flex-row justify-between items-center gap-6 border-b border-gray-100 pb-6">
+                {/* Custom Tabs */}
+                <div className="flex bg-gray-50 p-1 rounded-full border border-gray-200/60 w-full md:w-auto">
+                    <Link
+                        href="/article?type=all"
+                        className={`flex-1 md:flex-initial text-center px-6 py-2 rounded-full text-xs font-bold transition-all ${
+                            type === 'all'
+                                ? 'bg-white text-[#1F1F1F] shadow-sm'
+                                : 'text-gray-400 hover:text-gray-600'
+                        }`}
+                    >
+                        すべて
+                    </Link>
+                    <Link
+                        href="/article?type=column"
+                        className={`flex-1 md:flex-initial text-center px-6 py-2 rounded-full text-xs font-bold transition-all ${
+                            type === 'column'
+                                ? 'bg-white text-[#1F1F1F] shadow-sm'
+                                : 'text-gray-400 hover:text-gray-600'
+                        }`}
+                    >
+                        特集・コラム
+                    </Link>
+                    <Link
+                        href="/article?type=event"
+                        className={`flex-1 md:flex-initial text-center px-6 py-2 rounded-full text-xs font-bold transition-all ${
+                            type === 'event'
+                                ? 'bg-white text-[#1F1F1F] shadow-sm'
+                                : 'text-gray-400 hover:text-gray-600'
+                        }`}
+                    >
+                        イベント情報
+                    </Link>
+                </div>
+
+                <Link href="/en/article" className="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-100 rounded-full text-xs font-bold text-[#1F1F1F] hover:border-[#8B7D6B] hover:text-[#8B7D6B] transition-all shadow-sm flex-shrink-0">
                     <span className="text-base">🇬🇧</span> English Guides for Travelers <ArrowRight size={14} />
                 </Link>
             </div>
@@ -61,8 +113,10 @@ export default async function ArticleIndexPage(props: any) {
                         <Link href={`/article/${article.id}`} key={article.id} className="group flex flex-col h-full">
                             <article className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 h-full flex flex-col transform-gpu">
                                 <div className="aspect-[16/10] relative overflow-hidden bg-gray-50">
-                                    <span className="absolute top-4 left-4 z-10 bg-[#8B7D6B] text-white text-[9px] font-bold px-3 py-1 rounded-full tracking-widest uppercase">
-                                        特集記事
+                                    <span className={`absolute top-4 left-4 z-10 text-white text-[9px] font-bold px-3 py-1 rounded-full tracking-widest uppercase ${
+                                        article.category === 'event' ? 'bg-[#C27D38]' : 'bg-[#8B7D6B]'
+                                    }`}>
+                                        {article.category === 'event' ? 'イベント情報' : '特集記事'}
                                     </span>
                                     {article.imageUrl ? (
                                         <Image 
@@ -71,7 +125,6 @@ export default async function ArticleIndexPage(props: any) {
                                             fill
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                             priority={index < 4}
-                                            fetchPriority={index < 4 ? 'high' : 'auto'}
                                             className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110" 
                                         />
                                     ) : (
@@ -111,7 +164,7 @@ export default async function ArticleIndexPage(props: any) {
                         {Array.from({ length: totalPages }).map((_, i) => (
                             <Link
                                 key={i}
-                                href={`/article?page=${i + 1}`}
+                                href={getPageUrl(i + 1)}
                                 className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-bold transition-all ${
                                     page === i + 1 
                                         ? 'bg-[#8B7D6B] text-white shadow-md' 
