@@ -15,14 +15,26 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  let rssEvents: any[] = [];
+  let googleEvents: any[] = [];
+  let googleError: string | null = null;
+
   try {
     console.log('Starting Sake Event Scraping batch job (Article integration)...');
 
-    // 1. 各ソースからデータを並行取得
-    const [rssEvents, googleEvents] = await Promise.all([
-      scrapeAllEvents(),
-      searchGoogleEvents()
-    ]);
+    // 1. 各ソースからデータを取得
+    try {
+      rssEvents = await scrapeAllEvents();
+    } catch (rssErr: any) {
+      console.error('RSS Scrape error:', rssErr);
+    }
+
+    try {
+      googleEvents = await searchGoogleEvents();
+    } catch (gErr: any) {
+      console.error('Google search error:', gErr);
+      googleError = gErr.message || String(gErr);
+    }
 
     const combinedEvents = [...rssEvents, ...googleEvents];
     console.log(`Fetched ${rssEvents.length} RSS events, ${googleEvents.length} Google Search events.`);
@@ -49,6 +61,7 @@ export async function GET(request: Request) {
 
     let newCount = 0;
     let updateCount = 0;
+    const writeErrors: string[] = [];
 
     // 3. データを1件ずつ判定して microCMS へ書き込み
     for (const event of combinedEvents) {
@@ -88,17 +101,31 @@ export async function GET(request: Request) {
         }
         // microCMSのAPIレート制限を考慮し、微小ウェイトを置く
         await new Promise(resolve => setTimeout(resolve, 150));
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Failed to write event to article "${event.title}":`, err);
+        writeErrors.push(`${event.title}: ${err.message || String(err)}`);
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: `Scraping completed. Added ${newCount} new events, updated ${updateCount} events inside Articles.`
+      stats: {
+        rssCount: rssEvents.length,
+        googleCount: googleEvents.length,
+        totalCombined: combinedEvents.length,
+        existingDbCount: existingEvents.length,
+        added: newCount,
+        updated: updateCount
+      },
+      envCheck: {
+        hasGoogleKey: !!process.env.GOOGLE_SEARCH_API_KEY,
+        hasGoogleCx: !!process.env.GOOGLE_SEARCH_CX,
+      },
+      googleError,
+      writeErrors: writeErrors.slice(0, 10) // 最初10件のエラーだけ出力
     });
   } catch (err: any) {
     console.error('Cron Event Scraping Error:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: err.message, stack: err.stack }, { status: 500 });
   }
 }
