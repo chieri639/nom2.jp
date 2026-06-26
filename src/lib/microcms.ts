@@ -164,7 +164,7 @@ export async function writeArticleEvent(article: Omit<ARTICLE, 'id'> & { id?: st
   
   const isUpdate = !!article.id;
   const url = isUpdate ? `${baseUrl}/${article.id}` : baseUrl;
-  const method = isUpdate ? 'PUT' : 'POST';
+  const method = isUpdate ? 'PATCH' : 'POST';
 
   return robustFetch(url, {
     method,
