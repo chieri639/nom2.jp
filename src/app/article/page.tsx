@@ -11,7 +11,7 @@ export default async function ArticleIndexPage(props: any) {
     const searchParams = await props.searchParams;
     const page = parseInt(searchParams?.page || '1', 10);
     const type = searchParams?.type || 'all'; // 'all', 'column', 'event'
-    const limit = 12;
+    const limit = 36;
     const offset = (page - 1) * limit;
 
     let articles: any[] = [];
