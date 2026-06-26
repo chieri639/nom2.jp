@@ -120,6 +120,7 @@ export async function GET(request: Request) {
       envCheck: {
         hasGoogleKey: !!process.env.GOOGLE_SEARCH_API_KEY,
         hasGoogleCx: !!process.env.GOOGLE_SEARCH_CX,
+        allKeysPresentInProcess: Object.keys(process.env).filter(k => k.includes('GOOGLE') || k.includes('SEARCH') || k.includes('API'))
       },
       googleError,
       writeErrors: writeErrors.slice(0, 10) // 最初10件のエラーだけ出力
